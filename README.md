@@ -1,7 +1,10 @@
 # Connect Four AI: Multi-Level Game AI System
 
-Đồ án cuối kỳ môn **Trí tuệ Nhân tạo Nâng cao**
-Chủ đề: **Xây dựng và đánh giá Game AI đa cấp độ (Connect Four 7×6)**
+Đề tài cuối kỳ môn **Trí tuệ Nhân tạo Nâng cao**  
+Giảng viên hướng dẫn: **Thầy Tài**  
+Nhóm thực hiện: **Nhóm 13**  
+Chủ đề: **Xây dựng và đánh giá Game AI đa cấp độ (Connect Four 7×6)**  
+Repository: [https://github.com/Kiyoshiiz178/Advance_AI_Thay_Tai_Nhom_13](https://github.com/Kiyoshiiz178/Advance_AI_Thay_Tai_Nhom_13)
 
 ---
 
