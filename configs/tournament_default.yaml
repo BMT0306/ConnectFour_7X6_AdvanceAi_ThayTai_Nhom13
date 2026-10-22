@@ -1,0 +1,20 @@
+# Cấu hình giải đấu mặc định (Chế độ B - Round-robin)
+tournament:
+  name: "round_robin_default"
+  openings: 100       # 100 khai cuộc x 2 lượt đổi bên = 200 ván/cặp
+  opening_plies: 4    # 4 nước đầu ngẫu nhiên theo seed
+  seed: 42
+
+agents:
+  - name: "random"
+  - name: "heuristic"
+  - name: "alphabeta"
+    budget:
+      depth: 5
+  - name: "mcts"
+    budget:
+      simulations: 1000
+
+output:
+  log_dir: "results/logs"
+  summary_dir: "results/tables"

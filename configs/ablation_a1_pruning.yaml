@@ -1,0 +1,9 @@
+# Nghiên cứu phân rã A1: Đánh giá cắt tỉa Alpha-Beta và sắp xếp nước đi
+ablation:
+  name: "a1_alphabeta_pruning"
+  depths: [4, 5, 6]
+  test_positions: "tests/data/positions.csv"
+  measure:
+    - "nodes_searched"
+    - "time_elapsed_s"
+    - "consistent_best_move"
