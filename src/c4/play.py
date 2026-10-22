@@ -8,6 +8,14 @@ Nhập số cột 1..7; gõ q để thoát.
 from __future__ import annotations
 
 import argparse
+import sys
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 from c4.agents import Budget, make_agent
 from c4.game import PLAYER1, Connect4
