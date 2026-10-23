@@ -57,10 +57,10 @@ Mã nguồn/ý tưởng kế thừa ghi tại `THIRD_PARTY.md`.
 
 | STT | Họ và tên | MSSV | Vai trò | Nhiệm vụ chính | Tỷ lệ đóng góp |
 |---|---|---|---|---|:---:|
-| 1 | **Bùi Minh Trung** | 3124720074 | Nhóm Trưởng | Engine (bitboard + reference), kiểm thử, Heuristic, Alpha-Beta, khung giải đấu và thống kê | **35%** |
-| 2 | **Trần Lê Minh Tâm** | 3124720064 | Thành viên | Random, MCTS-UCT, sinh dữ liệu & huấn luyện Neural Network, giao diện pygame | **35%** |
-| 3 | **Chương Gia Thịnh** | 3124720067 | Thành viên | Chạy thực nghiệm, lưu log CSV, kiểm thử thủ công (`positions.csv`), phân tích ván, video demo | **15%** |
-| 4 | **Nguyễn Thành Tài** | 3124720062 | Thành viên | Báo cáo 5 chương, slide thuyết trình, poster A0, tài liệu tham khảo, README, in ấn | **15%** |
+| 1 | **Bùi Minh Trung** | 3124720074 | Nhóm Trưởng | Engine (bitboard + reference), kiểm thử, Heuristic, Alpha-Beta, khung giải đấu và thống kê | **32%** |
+| 2 | **Trần Lê Minh Tâm** | 3124720064 | Thành viên | Random, MCTS-UCT, sinh dữ liệu & huấn luyện Neural Network, giao diện pygame | **32%** |
+| 3 | **Chương Gia Thịnh** | 3124720067 | Thành viên | Chạy thực nghiệm, lưu log CSV, kiểm thử thủ công (`positions.csv`), phân tích ván, video demo | **18%** |
+| 4 | **Nguyễn Thành Tài** | 3124720062 | Thành viên | Báo cáo 5 chương, slide thuyết trình, poster A0, tài liệu tham khảo, README, in ấn | **18%** |
 | | **TỔNG CỘNG** | | | | **100%** |
 
 ## Quy định nộp đề tài cuối kỳ
