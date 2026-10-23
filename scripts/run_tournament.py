@@ -59,48 +59,62 @@ def run_tournament(config_path: Path) -> None:
 
     summary_rows = []
 
+    time_levels = cfg.get("time_levels")
+
     # Cặp đấu vòng tròn (Round-Robin)
     pairs = list(itertools.combinations(range(len(agent_entries)), 2))
-    for idx_a, idx_b in pairs:
-        entry_a = agent_entries[idx_a]
-        entry_b = agent_entries[idx_b]
-        name_a, budget_a_cfg = entry_a["name"], entry_a.get("budget")
-        name_b, budget_b_cfg = entry_b["name"], entry_b.get("budget")
+    levels = time_levels if time_levels else [None]
 
-        agent_a = make_agent(name_a, seed=seed)
-        agent_b = make_agent(name_b, seed=seed + 1)
-        budget_a = parse_budget(budget_a_cfg)
-        budget_b = parse_budget(budget_b_cfg)
+    for tl in levels:
+        time_limit_s = tl.get("time_s") if tl else None
+        level_tag = f"_{int(time_limit_s * 1000)}ms" if time_limit_s is not None else ""
 
-        pair_name = f"{name_a}_vs_{name_b}"
-        print(f"\n--- Trận đấu: {pair_name} ---")
+        for idx_a, idx_b in pairs:
+            entry_a = agent_entries[idx_a]
+            entry_b = agent_entries[idx_b]
+            name_a, budget_a_cfg = entry_a["name"], entry_a.get("budget")
+            name_b, budget_b_cfg = entry_b["name"], entry_b.get("budget")
 
-        recs = run_match(agent_a, agent_b, openings, budget_a, budget_b, pair=pair_name)
-        log_file = log_dir / f"{t_name}_{pair_name}.csv"
-        save_records_csv(recs, str(log_file))
-        print(f"    Đã lưu {len(recs)} ván vào {log_file.name}")
+            agent_a = make_agent(name_a, seed=seed)
+            agent_b = make_agent(name_b, seed=seed + 1)
 
-        stats_a = summarize([r.a_result for r in recs], seed=seed)
-        times_a = [t for r in recs for t in r.a_times]
-        times_b = [t for r in recs for t in r.b_times]
+            if time_limit_s is not None:
+                budget_a = Budget(time_s=time_limit_s)
+                budget_b = Budget(time_s=time_limit_s)
+            else:
+                budget_a = parse_budget(budget_a_cfg)
+                budget_b = parse_budget(budget_b_cfg)
 
-        summary_rows.append({
-            "Pair": pair_name,
-            "Agent_A": name_a,
-            "Agent_B": name_b,
-            "Games": stats_a["n"],
-            "A_Wins": stats_a["wins"],
-            "Draws": stats_a["draws"],
-            "B_Wins": stats_a["losses"],
-            "A_Score": round(stats_a["score"], 4),
-            "A_Score_CI_Low": round(stats_a["score_boot_low"], 4),
-            "A_Score_CI_High": round(stats_a["score_boot_high"], 4),
-            "A_WinRate": round(stats_a["win_rate"], 4),
-            "A_Mean_Time_ms": round(1000 * sum(times_a) / max(len(times_a), 1), 3),
-            "A_p95_Time_ms": round(1000 * percentile(times_a, 95), 3),
-            "B_Mean_Time_ms": round(1000 * sum(times_b) / max(len(times_b), 1), 3),
-            "B_p95_Time_ms": round(1000 * percentile(times_b, 95), 3),
-        })
+            pair_name = f"{name_a}_vs_{name_b}{level_tag}"
+            print(f"\n--- Trận đấu: {pair_name} ---")
+
+            recs = run_match(agent_a, agent_b, openings, budget_a, budget_b, pair=pair_name)
+            log_file = log_dir / f"{t_name}_{pair_name}.csv"
+            save_records_csv(recs, str(log_file))
+            print(f"    Đã lưu {len(recs)} ván vào {log_file.name}")
+
+            stats_a = summarize([r.a_result for r in recs], seed=seed)
+            times_a = [t for r in recs for t in r.a_times]
+            times_b = [t for r in recs for t in r.b_times]
+
+            summary_rows.append({
+                "Pair": pair_name,
+                "Agent_A": name_a,
+                "Agent_B": name_b,
+                "Time_Limit_s": time_limit_s if time_limit_s is not None else "custom",
+                "Games": stats_a["n"],
+                "A_Wins": stats_a["wins"],
+                "Draws": stats_a["draws"],
+                "B_Wins": stats_a["losses"],
+                "A_Score": round(stats_a["score"], 4),
+                "A_Score_CI_Low": round(stats_a["score_boot_low"], 4),
+                "A_Score_CI_High": round(stats_a["score_boot_high"], 4),
+                "A_WinRate": round(stats_a["win_rate"], 4),
+                "A_Mean_Time_ms": round(1000 * sum(times_a) / max(len(times_a), 1), 3),
+                "A_p95_Time_ms": round(1000 * percentile(times_a, 95), 3),
+                "B_Mean_Time_ms": round(1000 * sum(times_b) / max(len(times_b), 1), 3),
+                "B_p95_Time_ms": round(1000 * percentile(times_b, 95), 3),
+            })
 
     df = pd.DataFrame(summary_rows)
     table_file = summary_dir / f"{t_name}_summary.csv"
