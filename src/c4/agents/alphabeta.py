@@ -63,8 +63,11 @@ class AlphaBetaAgent(Agent):
         ordering: bool = True,
         use_eval: bool = True,
         eval_weights: tuple[int, int, int] = (2, 5, 3),  # (cửa sổ 2 quân, cửa sổ 3 quân, mỗi quân ở cột giữa)
+        depth: int | None = None,
     ) -> None:
         super().__init__(seed)
+        if depth is not None:
+            default_depth = depth
         self.default_depth = default_depth
         self.pruning = pruning
         self.ordering = ordering
