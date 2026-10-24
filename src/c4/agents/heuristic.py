@@ -1,81 +1,52 @@
-"""Level 2 Agent: Rule-Based / Heuristic Agent.
+"""Cấp 2 - Heuristic theo luật (có thứ tự ưu tiên rõ ràng).
 
-Strict priority rules:
-1. Win immediately: If any legal move connects 4, play it.
-2. Block opponent: If opponent can win next turn in any column, block it.
-3. Avoid blunder: Exclude moves that allow the opponent to win immediately above.
-4. Center control: Among remaining candidate moves, prioritize columns [3, 2, 4, 1, 5, 0, 6].
-5. Conflict resolution: If all moves give the opponent a win above, pick the least-bad move by center order.
+Thứ tự ưu tiên (dừng ở luật đầu tiên áp dụng được):
+  1. THẮNG NGAY      : nếu có nước tạo 4 quân liên tiếp thì đi.
+  2. CHẶN            : nếu đối thủ có nước thắng ngay thì chặn (nếu đối thủ có 2 ô thắng - đòn kép -
+                       không thể chặn cả hai, chọn cái ưu tiên theo trung tâm: đây là điểm yếu cố hữu).
+  3. TRÁNH TẠO THẾ   : loại các nước khiến đối thủ có nước thắng ngay ở ô ngay phía trên.
+  4. TRUNG TÂM       : trong các nước còn lại, ưu tiên cột theo thứ tự 3,2,4,1,5,0,6.
+
+Xung đột luật: luật 2 luôn thắng luật 3 (chặn bắt buộc dù nước chặn có thể tạo thế cho đối thủ ngay phía
+trên). Nếu MỌI nước đều bị luật 3 loại, chọn theo luật 4 trong toàn bộ nước hợp lệ.
+`last_stats["rule"]` ghi lại luật đã dùng ("win" / "block" / "safe" / "forced") để phân tích sau này.
 """
-
 from __future__ import annotations
-import time
-from typing import Optional, Any, List
-from c4.agents.base import BaseAgent
-from c4.game.engine import Bitboard, check_win
+
+from c4.agents.base import Agent, Budget
+from c4.game.base import CENTER_FIRST, Connect4Base
 
 
-class HeuristicAgent(BaseAgent):
-    """Rule-based priority agent with tactical look-ahead."""
+def _center_order(cols) -> list[int]:
+    s = set(cols)
+    return [c for c in CENTER_FIRST if c in s]
 
-    # 0-indexed center-outwards preference: col 3 (center), then 2, 4, 1, 5, 0, 6
-    CENTER_PREFERENCE: List[int] = [3, 2, 4, 1, 5, 0, 6]
 
-    def __init__(self, name: str = "Heuristic") -> None:
-        super().__init__(name=name)
+class HeuristicAgent(Agent):
+    name = "heuristic"
 
-    def choose_action(self, game: Bitboard, budget: Optional[Any] = None) -> int:
-        start_time = time.perf_counter()
+    def choose_action(self, game: Connect4Base, budget: Budget | None = None) -> int:
         legal = game.legal_actions()
-        if not legal:
-            raise ValueError("No legal actions available.")
 
-        nodes = 0
+        wins = game.winning_moves()
+        if wins:
+            self.last_stats = {"rule": "win"}
+            return _center_order(wins)[0]
 
-        # Rule 1: Win immediately
-        for action in legal:
-            nodes += 1
-            if game.is_winning_move(action):
-                self._record_stats(start_time, nodes)
-                return action
+        blocks = game.winning_moves(-game.current_player)
+        if blocks:
+            self.last_stats = {"rule": "block", "double_threat": len(blocks) > 1}
+            return _center_order(blocks)[0]
 
-        # Rule 2: Block immediate opponent win
-        for action in legal:
-            nodes += 1
-            if game.is_opponent_winning_move(action):
-                self._record_stats(start_time, nodes)
-                return action
-
-        # Rule 3: Filter out suicidal moves (moves that hand opponent a win right above)
-        safe_actions = []
-        opp_idx = 1 if game.current_player == 1 else 0
-        opp_bb = game.bitboards[opp_idx]
-
-        for action in legal:
-            nodes += 1
-            # Next cell in this column if we play here
-            next_height = game.heights[action] + 1
-            guard_bit = game.GUARD_BITS[action]
-            if next_height < guard_bit:
-                cell_above_bit = 1 << next_height
-                # If opponent placing a piece at cell_above_bit would win:
-                if check_win(opp_bb | cell_above_bit):
-                    # Dangerous move: skip
-                    continue
-            safe_actions.append(action)
-
-        # Rule 4: Pick center-most action from safe candidates
-        candidates = safe_actions if safe_actions else legal
-        for col in self.CENTER_PREFERENCE:
-            if col in candidates:
-                self._record_stats(start_time, nodes)
-                return col
-
-        # Fallback (should never be reached)
-        action = candidates[0]
-        self._record_stats(start_time, nodes)
-        return action
-
-    def _record_stats(self, start_time: float, nodes: int) -> None:
-        self.stats["time_taken"] = time.perf_counter() - start_time
-        self.stats["nodes_visited"] = nodes
+        safe = []
+        for c in _center_order(legal):
+            game.step(c)
+            gives_win = bool(game.winning_moves())  # lúc này tới lượt đối thủ
+            game.undo()
+            if not gives_win:
+                safe.append(c)
+        if safe:
+            self.last_stats = {"rule": "safe"}
+            return safe[0]
+        self.last_stats = {"rule": "forced"}
+        return _center_order(legal)[0]

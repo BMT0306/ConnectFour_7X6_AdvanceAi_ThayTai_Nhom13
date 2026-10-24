@@ -1,0 +1,10 @@
+# Nghiên cứu phân rã A2: Đánh giá MCTS theo số lượng mô phỏng (Simulations)
+ablation:
+  name: "a2_mcts_simulations"
+  opponent: "alphabeta"
+  opponent_budget:
+    depth: 4
+  mcts_simulations: [100, 500, 1000, 2000, 5000]
+  openings: 50         # 50 khai cuộc x 2 lượt đổi bên = 100 ván cho mỗi mức
+  seed: 2026
+  output: "results/logs/ablation_a2_mcts_sims.csv"

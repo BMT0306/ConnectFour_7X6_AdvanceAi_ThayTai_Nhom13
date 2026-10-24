@@ -1,0 +1,18 @@
+# Cấu hình giải đấu cùng ngân sách thời gian (Chế độ A: 100ms và 300ms/nước)
+tournament:
+  name: "round_robin_timed"
+  openings: 100       # 100 khai cuộc x 2 lượt đổi bên = 200 ván/cặp
+  opening_plies: 4
+  seed: 100
+
+time_levels:
+  - time_s: 0.1       # 100 ms/nước
+  - time_s: 0.3       # 300 ms/nước
+
+agents:
+  - name: "alphabeta"
+  - name: "mcts"
+
+output:
+  log_dir: "results/logs"
+  summary_dir: "results/tables"

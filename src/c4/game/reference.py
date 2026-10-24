@@ -1,194 +1,124 @@
-"""Reference implementation of Connect Four (7x6) using 2D NumPy array.
+"""Engine THAM CHIẾU: chậm nhưng cực kỳ dễ đọc (mảng 2 chiều + kiểm tra thắng bằng vòng lặp).
 
-This implementation prioritizes readability, correctness, and transparency.
-It serves as the ground-truth reference to verify the high-performance bitboard engine.
+Chỉ dùng để (1) kiểm thử chéo engine bitboard, (2) để cả nhóm đọc hiểu luật.
+Tuyệt đối không dùng cho Alpha-Beta/MCTS vì chậm.
 """
-
 from __future__ import annotations
-from typing import List, Optional, Tuple
+
+import operator
+
 import numpy as np
 
+from c4.game.base import COLS, ROWS, PLAYER1, PLAYER2, Connect4Base, IllegalMoveError
 
-class ReferenceBoard:
-    """Connect Four Reference Board (6 rows x 7 columns).
-    
-    Coordinate convention:
-      - row 0: bottom row
-      - row 5: top row
-      - col 0: leftmost column
-      - col 6: rightmost column
-      
-    Player convention:
-      - Player 1: Red (goes first, value +1)
-      - Player 2: Yellow (goes second, value -1)
-      - Empty: 0
-    """
+_DIRECTIONS = ((0, 1), (1, 0), (1, 1), (1, -1))  # ngang, dọc, chéo /, chéo \  (dr, dc)
 
-    ROWS: int = 6
-    COLS: int = 7
-    CONNECT: int = 4
 
+class ReferenceConnect4(Connect4Base):
     def __init__(self) -> None:
-        self.grid = np.zeros((self.ROWS, self.COLS), dtype=np.int8)
-        self.heights = [0] * self.COLS  # next available row in each column
-        self.current_player: int = 1     # 1 or 2
-        self.move_count: int = 0
-        self.history: List[Tuple[int, int]] = []  # list of (col, row)
-        self.winner: Optional[int] = None         # 1, 2, 0 (draw), or None
+        self.reset()
 
-    def reset(self) -> ReferenceBoard:
-        """Resets the board to the initial empty state."""
-        self.grid.fill(0)
-        self.heights = [0] * self.COLS
-        self.current_player = 1
-        self.move_count = 0
-        self.history.clear()
-        self.winner = None
-        return self
+    def reset(self) -> None:
+        self._grid = [[0] * COLS for _ in range(ROWS)]  # _grid[hàng][cột], hàng 0 = dưới cùng
+        self._heights = [0] * COLS
+        self._moves = 0
+        self._winner = 0
+        self._history: list[int] = []
 
-    def clone(self) -> ReferenceBoard:
-        """Returns a deep copy of the board."""
-        new_board = ReferenceBoard()
-        new_board.grid = np.copy(self.grid)
-        new_board.heights = list(self.heights)
-        new_board.current_player = self.current_player
-        new_board.move_count = self.move_count
-        new_board.history = list(self.history)
-        new_board.winner = self.winner
-        return new_board
+    @property
+    def current_player(self) -> int:
+        return PLAYER1 if self._moves % 2 == 0 else PLAYER2
 
-    def legal_actions(self) -> List[int]:
-        """Returns list of valid column indices [0..6] that are not full."""
-        if self.is_terminal():
+    @property
+    def winner(self) -> int:
+        return self._winner
+
+    @property
+    def move_count(self) -> int:
+        return self._moves
+
+    def _is_over(self) -> bool:
+        return self._winner != 0 or self._moves == ROWS * COLS
+
+    def legal_actions(self) -> list[int]:
+        if self._is_over():
             return []
-        return [c for c in range(self.COLS) if self.heights[c] < self.ROWS]
+        return [c for c in range(COLS) if self._heights[c] < ROWS]
 
-    def is_legal(self, action: int) -> bool:
-        """Checks if a column action is legal."""
-        return 0 <= action < self.COLS and self.heights[action] < self.ROWS and not self.is_terminal()
-
-    def step(self, action: int) -> ReferenceBoard:
-        """Drops a piece of the current player into column `action`.
-        
-        Raises ValueError if the move is illegal or game is over.
-        """
-        if not self.is_legal(action):
-            raise ValueError(f"Illegal action: {action}. Legal actions: {self.legal_actions()}")
-
-        row = self.heights[action]
-        piece = 1 if self.current_player == 1 else -1
-
-        self.grid[row, action] = piece
-        self.heights[action] += 1
-        self.history.append((action, row))
-        self.move_count += 1
-
-        # Check for victory from the placed piece
-        if self._check_win_at(row, action, piece):
-            self.winner = self.current_player
-        elif self.move_count == self.ROWS * self.COLS:
-            self.winner = 0  # Draw
-        else:
-            self.current_player = 2 if self.current_player == 1 else 1
-
-        return self
-
-    def undo(self) -> ReferenceBoard:
-        """Reverts the last move made."""
-        if not self.history:
-            raise ValueError("No moves to undo.")
-
-        action, row = self.history.pop()
-        self.grid[row, action] = 0
-        self.heights[action] -= 1
-        self.move_count -= 1
-
-        if self.winner is not None:
-            # Last player was the one who made the move
-            self.winner = None
-            # current_player stays as the one who just moved
-        else:
-            # Switch current_player back
-            self.current_player = 2 if self.current_player == 1 else 1
-
-        return self
-
-    def is_terminal(self) -> bool:
-        """Returns True if the game has ended in a win or draw."""
-        return self.winner is not None
-
-    def result(self, player: Optional[int] = None) -> float:
-        """Returns reward from the perspective of `player` (1 or 2).
-        
-        +1.0: win
-         0.0: draw or ongoing
-        -1.0: loss
-        If player is None, uses `current_player`.
-        """
-        if self.winner is None or self.winner == 0:
-            return 0.0
-
-        p = player if player is not None else self.current_player
-        return 1.0 if self.winner == p else -1.0
-
-    def _check_win_at(self, r: int, c: int, piece: int) -> bool:
-        """Checks if placing piece at (r, c) creates 4 in a row."""
-        directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
-        for dr, dc in directions:
+    def _makes_four(self, r: int, c: int, player: int) -> bool:
+        """Nếu `player` có quân ở (r, c), có đường 4 đi qua ô đó không?"""
+        for dr, dc in _DIRECTIONS:
             count = 1
-            # Forward direction
-            nr, nc = r + dr, c + dc
-            while 0 <= nr < self.ROWS and 0 <= nc < self.COLS and self.grid[nr, nc] == piece:
-                count += 1
-                nr += dr
-                nc += dc
-            # Backward direction
-            nr, nc = r - dr, c - dc
-            while 0 <= nr < self.ROWS and 0 <= nc < self.COLS and self.grid[nr, nc] == piece:
-                count += 1
-                nr -= dr
-                nc -= dc
-            if count >= self.CONNECT:
+            for sign in (1, -1):
+                rr, cc = r + sign * dr, c + sign * dc
+                while 0 <= rr < ROWS and 0 <= cc < COLS and self._grid[rr][cc] == player:
+                    count += 1
+                    rr += sign * dr
+                    cc += sign * dc
+            if count >= 4:
                 return True
         return False
 
-    def to_numpy(self) -> np.ndarray:
-        """Returns a 6x7 numpy array copy of the board."""
-        return np.copy(self.grid)
+    def step(self, action: int) -> None:
+        if self._is_over():
+            raise IllegalMoveError("Game đã kết thúc, không thể đi tiếp")
+        try:
+            col = operator.index(action)
+        except TypeError:
+            raise IllegalMoveError(f"Nước đi phải là số nguyên, nhận được {action!r}") from None
+        if not 0 <= col < COLS:
+            raise IllegalMoveError(f"Cột {col} ngoài phạm vi 0..{COLS - 1}")
+        if self._heights[col] >= ROWS:
+            raise IllegalMoveError(f"Cột {col} đã đầy")
+        player = self.current_player
+        row = self._heights[col]
+        self._grid[row][col] = player
+        self._heights[col] += 1
+        self._moves += 1
+        self._history.append(col)
+        if self._makes_four(row, col, player):
+            self._winner = player
 
-    def to_tensor(self) -> np.ndarray:
-        """Returns 2x6x7 numpy array representing state for neural network.
-        
-        Channel 0: current player's pieces (1s and 0s)
-        Channel 1: opponent player's pieces (1s and 0s)
-        """
-        cur_piece = 1 if self.current_player == 1 else -1
-        opp_piece = -cur_piece
-        ch0 = (self.grid == cur_piece).astype(np.float32)
-        ch1 = (self.grid == opp_piece).astype(np.float32)
-        return np.stack([ch0, ch1], axis=0)
+    def undo(self) -> int:
+        if not self._history:
+            raise IllegalMoveError("Không có nước đi nào để hoàn tác")
+        col = self._history.pop()
+        self._heights[col] -= 1
+        self._grid[self._heights[col]][col] = 0
+        self._moves -= 1
+        self._winner = 0
+        return col
 
-    def render(self) -> str:
-        """Renders the board as an ASCII string."""
-        symbols = {0: ".", 1: "X", -1: "O"}
-        lines = []
-        lines.append("  " + " ".join(str(c) for c in range(self.COLS)))
-        lines.append(" +" + "--" * self.COLS + "+")
-        for r in reversed(range(self.ROWS)):
-            row_str = " ".join(symbols[self.grid[r, c]] for c in range(self.COLS))
-            lines.append(f"{r}| {row_str} |")
-        lines.append(" +" + "--" * self.COLS + "+")
-        turn_str = "Red (X)" if self.current_player == 1 else "Yellow (O)"
-        if self.winner == 1:
-            status = "Winner: Red (X)"
-        elif self.winner == 2:
-            status = "Winner: Yellow (O)"
-        elif self.winner == 0:
-            status = "Result: Draw"
-        else:
-            status = f"Turn: {turn_str}"
-        lines.append(f"Move: {self.move_count} | {status}")
-        return "\n".join(lines)
+    def clone(self) -> "ReferenceConnect4":
+        g = ReferenceConnect4.__new__(ReferenceConnect4)
+        g._grid = [row.copy() for row in self._grid]
+        g._heights = self._heights.copy()
+        g._moves = self._moves
+        g._winner = self._winner
+        g._history = self._history.copy()
+        return g
 
-    def __str__(self) -> str:
-        return self.render()
+    def winning_moves(self, player: int | None = None) -> list[int]:
+        if self._is_over():
+            return []
+        if player is None:
+            player = self.current_player
+        res = []
+        for c in range(COLS):
+            if self._heights[c] >= ROWS:
+                continue
+            r = self._heights[c]
+            self._grid[r][c] = player  # đặt thử
+            if self._makes_four(r, c, player):
+                res.append(c)
+            self._grid[r][c] = 0  # gỡ ra
+        return res
+
+    def to_array(self, relative: bool = False) -> np.ndarray:
+        arr = np.array(self._grid, dtype=np.int8)
+        if relative and self.current_player == PLAYER2:
+            arr = -arr
+        return arr
+
+    def key(self):
+        return tuple(v for row in self._grid for v in row)

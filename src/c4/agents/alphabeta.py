@@ -1,245 +1,192 @@
-"""Level 3 Agent: Minimax with Alpha-Beta Pruning.
+"""Cấp 3 - Minimax / Alpha-Beta (negamax).
 
-Features:
-- Negamax formulation with depth-adjusted terminal scores (prefers faster wins).
-- Ultra-fast Bitboard heuristic evaluator precomputing all 69 winning 4-cell windows.
-- Center-outwards move ordering [3, 2, 4, 1, 5, 0, 6] to maximize cutoffs.
-- Iterative Deepening with strict wall-clock time budget enforcement.
-- Configurable ablation flags:
-  * `use_pruning` (toggle Alpha-Beta cutoff on/off for Ablation A1)
-  * `use_ordering` (toggle center move ordering)
-  * `use_heuristic` (toggle heuristic evaluation vs 0-leaf payoff for Ablation A3)
+Quy ước điểm (theo góc nhìn bên ĐANG ĐẾN LƯỢT tại nút đang xét):
+  * thắng ở độ sâu `ply` tính từ gốc: WIN - ply   (thắng càng sớm điểm càng cao, thua càng muộn càng tốt)
+  * hòa (đầy bàn): 0
+  * hết độ sâu: hàm lượng giá `evaluate` (nếu use_eval=False thì coi là 0, giống cách làm đơn giản ở sách Ch. 5)
+`depth` = số nước (ply) nhìn trước, tính cả nước đi ở gốc.
+
+Các cờ phục vụ ablation / so sánh:
+  pruning  : bật/tắt cắt tỉa alpha-beta (tắt = minimax thuần, cùng giá trị và cùng nước đi, chỉ tốn nhiều nút hơn)
+  ordering : sắp xếp nước đi từ giữa ra (tăng hiệu quả cắt tỉa)
+  use_eval : bật/tắt hàm lượng giá khi hết độ sâu
+
+Ngân sách (Budget):
+  * depth       -> tìm kiếm cố định độ sâu đó
+  * time_s      -> iterative deepening: tăng dần độ sâu, dừng khi hết giờ và dùng kết quả của độ sâu cuối cùng
+                   HOÀN THÀNH (tối đa `Budget.depth` nếu có, mặc định 42)
+  * không có gì -> độ sâu mặc định `default_depth`
+Chỉ chạy trên engine bitboard (cần `bitboards()` cho hàm lượng giá).
 """
-
 from __future__ import annotations
+
 import time
-from typing import Optional, Any, List, Tuple
-from c4.agents.base import BaseAgent
-from c4.game.engine import Bitboard, check_win
 
-WIN_SCORE = 100_000
+from c4.agents.base import Agent, Budget
+from c4.game.base import CENTER_FIRST, COLS, ROWS, Connect4Base
 
-
-def _generate_windows_49bit() -> List[int]:
-    """Generates 49-bit masks for all 69 possible 4-in-a-row windows."""
-    windows = []
-    # 1. Horizontal (24 windows: 6 rows x 4 col offsets)
-    for r in range(6):
-        for c in range(4):
-            mask = 0
-            for dc in range(4):
-                mask |= 1 << ((c + dc) * 7 + r)
-            windows.append(mask)
-
-    # 2. Vertical (21 windows: 7 cols x 3 row offsets)
-    for c in range(7):
-        for r in range(3):
-            mask = 0
-            for dr in range(4):
-                mask |= 1 << (c * 7 + (r + dr))
-            windows.append(mask)
-
-    # 3. Diagonal positive slope / (12 windows)
-    for r in range(3):
-        for c in range(4):
-            mask = 0
-            for d in range(4):
-                mask |= 1 << ((c + d) * 7 + (r + d))
-            windows.append(mask)
-
-    # 4. Diagonal negative slope \ (12 windows)
-    for r in range(3, 6):
-        for c in range(4):
-            mask = 0
-            for d in range(4):
-                mask |= 1 << ((c + d) * 7 + (r - d))
-            windows.append(mask)
-
-    assert len(windows) == 69, f"Expected 69 windows, got {len(windows)}"
-    return windows
+WIN = 1_000_000
+_H = ROWS + 1
+_RANK = {c: i for i, c in enumerate(CENTER_FIRST)}
 
 
-# Precomputed static windows & center mask
-ALL_WINDOWS = _generate_windows_49bit()
-CENTER_COL_MASK = sum(1 << (3 * 7 + r) for r in range(6))
+def _build_windows() -> list[int]:
+    """69 cửa sổ 4 ô liên tiếp (mỗi cửa sổ là một bitmask)."""
+    wins = []
+    bit = lambda c, r: 1 << (c * _H + r)
+    for c in range(COLS):
+        for r in range(ROWS):
+            for dc, dr in ((1, 0), (0, 1), (1, 1), (1, -1)):
+                cells = [(c + k * dc, r + k * dr) for k in range(4)]
+                if all(0 <= cc < COLS and 0 <= rr < ROWS for cc, rr in cells):
+                    wins.append(sum(bit(cc, rr) for cc, rr in cells))
+    return wins
 
 
-def evaluate_bitboard(my_bb: int, opp_bb: int) -> int:
-    """Evaluates position for player with `my_bb` relative to `opp_bb`."""
-    score = 0
-
-    # Center column control bonus
-    center_my = (my_bb & CENTER_COL_MASK).bit_count()
-    center_opp = (opp_bb & CENTER_COL_MASK).bit_count()
-    score += (center_my - center_opp) * 6
-
-    # 69 winning window evaluation
-    for w in ALL_WINDOWS:
-        my_cnt = (my_bb & w).bit_count()
-        opp_cnt = (opp_bb & w).bit_count()
-
-        if my_cnt > 0 and opp_cnt == 0:
-            if my_cnt == 3:
-                score += 50
-            elif my_cnt == 2:
-                score += 10
-            elif my_cnt == 1:
-                score += 1
-        elif opp_cnt > 0 and my_cnt == 0:
-            if opp_cnt == 3:
-                score -= 50
-            elif opp_cnt == 2:
-                score -= 10
-            elif opp_cnt == 1:
-                score -= 1
-
-    return score
+_WINDOWS = _build_windows()
+assert len(_WINDOWS) == 69
+_CENTER_MASK = sum(1 << (3 * _H + r) for r in range(ROWS))
 
 
-class AlphaBetaAgent(BaseAgent):
-    """Negamax Alpha-Beta search agent."""
+class _Timeout(Exception):
+    pass
 
-    CENTER_ORDER: List[int] = [3, 2, 4, 1, 5, 0, 6]
+
+class AlphaBetaAgent(Agent):
+    name = "alphabeta"
 
     def __init__(
         self,
-        name: str = "AlphaBeta",
-        depth: int = 5,
-        use_pruning: bool = True,
-        use_ordering: bool = True,
-        use_heuristic: bool = True,
+        seed: int | None = None,
+        default_depth: int = 5,
+        pruning: bool = True,
+        ordering: bool = True,
+        use_eval: bool = True,
+        eval_weights: tuple[int, int, int] = (2, 5, 3),  # (cửa sổ 2 quân, cửa sổ 3 quân, mỗi quân ở cột giữa)
+        depth: int | None = None,
     ) -> None:
-        super().__init__(name=name)
-        self.default_depth = depth
-        self.use_pruning = use_pruning
-        self.use_ordering = use_ordering
-        self.use_heuristic = use_heuristic
+        super().__init__(seed)
+        if depth is not None:
+            default_depth = depth
+        self.default_depth = default_depth
+        self.pruning = pruning
+        self.ordering = ordering
+        self.use_eval = use_eval
+        self.eval_weights = eval_weights
+        self.nodes = 0
+        self._deadline: float | None = None
 
-        self._nodes_visited: int = 0
-        self._deadline: float = float("inf")
-        self._time_exceeded: bool = False
+    # ---------- hàm lượng giá (góc nhìn bên đang đến lượt) ----------
+    def evaluate(self, game) -> int:
+        w2, w3, wc = self.eval_weights
+        me, opp = game.bitboards()
+        score = wc * ((me & _CENTER_MASK).bit_count() - (opp & _CENTER_MASK).bit_count())
+        for w in _WINDOWS:
+            a = (me & w).bit_count()
+            b = (opp & w).bit_count()
+            if b == 0:
+                if a == 3:
+                    score += w3
+                elif a == 2:
+                    score += w2
+            elif a == 0:
+                if b == 3:
+                    score -= w3
+                elif b == 2:
+                    score -= w2
+        return score
 
-    def choose_action(self, game: Bitboard, budget: Optional[Any] = None) -> int:
-        start_time = time.perf_counter()
+    # ---------- tìm kiếm ----------
+    def _ordered(self, game) -> list[int]:
         legal = game.legal_actions()
-        if not legal:
-            raise ValueError("No legal actions available.")
+        return sorted(legal, key=_RANK.__getitem__) if self.ordering else legal
+
+    def _negamax(self, g, depth: int, alpha: int, beta: int, ply: int) -> int:
+        """Giá trị của vị trí g (chưa kết thúc) cho bên đang đến lượt, nhìn trước `depth` nước."""
+        self.nodes += 1
+        if self._deadline is not None and (self.nodes & 15) == 0 and time.perf_counter() > self._deadline:
+            raise _Timeout
+        best = -WIN - 1
+        for c in self._ordered(g):
+            g.step(c)
+            if g.winner:
+                v = WIN - ply
+            elif g.move_count == ROWS * COLS:
+                v = 0
+            elif depth <= 1:
+                v = -self.evaluate(g) if self.use_eval else 0
+            else:
+                v = -self._negamax(g, depth - 1, -beta, -alpha, ply + 1)
+            g.undo()
+            if v > best:
+                best = v
+                if self.pruning:
+                    if best > alpha:
+                        alpha = best
+                    if alpha >= beta:
+                        break
+        return best
+
+    def search_fixed_depth(self, game, depth: int, first: int | None = None) -> tuple[int, int]:
+        """Tìm kiếm cố định độ sâu từ vị trí `game` (không bị sửa đổi). Trả về (giá trị, nước đi tốt nhất).
+
+        `first`: nước thử trước ở gốc (kết quả độ sâu trước, giúp cắt tỉa tốt hơn). Dùng cho test/ablation.
+        """
+        g = game.clone()
+        moves = self._ordered(g)
+        if first in moves:
+            moves.remove(first)
+            moves.insert(0, first)
+        alpha, beta = -WIN - 1, WIN + 1
+        best_v, best_c = -WIN - 1, moves[0]
+        for c in moves:
+            g.step(c)
+            if g.winner:
+                v = WIN
+            elif g.move_count == ROWS * COLS:
+                v = 0
+            elif depth <= 1:
+                v = -self.evaluate(g) if self.use_eval else 0
+            else:
+                v = -self._negamax(g, depth - 1, -beta, -alpha, 1)
+            g.undo()
+            if v > best_v:  # chỉ thay khi LỚN HƠN hẳn => nước đầu tiên (theo thứ tự) đạt max được giữ
+                best_v, best_c = v, c
+                if self.pruning and best_v > alpha:
+                    alpha = best_v
+        return best_v, best_c
+
+    def choose_action(self, game: Connect4Base, budget: Budget | None = None) -> int:
+        legal = game.legal_actions()
+        self.nodes = 0
         if len(legal) == 1:
-            self._record_stats(start_time, 1, 1)
+            self.last_stats = {"nodes": 0, "depth": 0, "value": None}
             return legal[0]
+        max_depth = (budget.depth if budget and budget.depth else None)
+        time_s = budget.time_s if budget else None
 
-        # Instant check for winning move
-        for a in legal:
-            if game.is_winning_move(a):
-                self._record_stats(start_time, 1, 1)
-                return a
+        if time_s is None:
+            depth = max_depth or self.default_depth
+            value, move = self.search_fixed_depth(game, depth)
+            self.last_stats = {"nodes": self.nodes, "depth": depth, "value": value}
+            return move
 
-        self._nodes_visited = 0
-        self._time_exceeded = False
-
-        if budget is not None and isinstance(budget, (int, float)) and budget < 20.0:
-            # Budget treated as time limit in seconds (Iterative Deepening)
-            self._deadline = start_time + budget
-            best_action, max_depth_completed = self._iterative_deepening(game, legal)
-            self._record_stats(start_time, self._nodes_visited, max_depth_completed)
-            return best_action
-        else:
-            # Fixed depth budget
-            target_depth = budget if isinstance(budget, int) and budget >= 1 else self.default_depth
-            self._deadline = float("inf")
-            best_action, _ = self._root_search(game, target_depth)
-            self._record_stats(start_time, self._nodes_visited, target_depth)
-            return best_action
-
-    def _iterative_deepening(self, game: Bitboard, legal: List[int]) -> Tuple[int, int]:
-        best_action = legal[0]
-        completed_depth = 1
-
-        for depth in range(1, 43):
-            action, score = self._root_search(game, depth)
-            if self._time_exceeded:
-                break
-            best_action = action
-            completed_depth = depth
-            # Stop if decisive forced win found
-            if abs(score) >= WIN_SCORE - 100:
-                break
-
-        return best_action, completed_depth
-
-    def _get_ordered_moves(self, legal: List[int]) -> List[int]:
-        if not self.use_ordering:
-            return legal
-        return [c for c in self.CENTER_ORDER if c in legal]
-
-    def _root_search(self, game: Bitboard, depth: int) -> Tuple[int, int]:
-        ordered = self._get_ordered_moves(game.legal_actions())
-        best_action = ordered[0]
-        alpha = -float("inf")
-        beta = float("inf")
-
-        for action in ordered:
-            game.step(action)
-            # From next player's viewpoint, score is negated
-            val = -self._negamax(game, depth - 1, -beta, -alpha, ply=1)
-            game.undo()
-
-            if self._time_exceeded:
-                return best_action, alpha
-
-            if val > alpha:
-                alpha = val
-                best_action = action
-
-            if self.use_pruning and alpha >= beta:
-                break
-
-        return best_action, alpha
-
-    def _negamax(self, game: Bitboard, depth: int, alpha: float, beta: float, ply: int) -> float:
-        self._nodes_visited += 1
-
-        if self._nodes_visited & 1023 == 0:
-            if time.perf_counter() >= self._deadline:
-                self._time_exceeded = True
-                return alpha
-
-        if game.is_terminal():
-            # Check who won
-            if game.winner == 0:
-                return 0.0
-            # Current player is facing a state where previous player won
-            return -float(WIN_SCORE - ply)
-
-        if depth <= 0:
-            if not self.use_heuristic:
-                return 0.0
-            p_idx = 0 if game.current_player == 1 else 1
-            opp_idx = 1 - p_idx
-            return float(evaluate_bitboard(game.bitboards[p_idx], game.bitboards[opp_idx]))
-
-        ordered = self._get_ordered_moves(game.legal_actions())
-        max_val = -float("inf")
-
-        for action in ordered:
-            game.step(action)
-            val = -self._negamax(game, depth - 1, -beta, -alpha, ply + 1)
-            game.undo()
-
-            if self._time_exceeded:
-                return alpha
-
-            if val > max_val:
-                max_val = val
-            if val > alpha:
-                alpha = val
-
-            if self.use_pruning and alpha >= beta:
-                break  # Cutoff
-
-        return max_val
-
-    def _record_stats(self, start_time: float, nodes: int, depth: int) -> None:
-        self.stats["time_taken"] = time.perf_counter() - start_time
-        self.stats["nodes_visited"] = nodes
-        self.stats["depth_reached"] = depth
+        # iterative deepening theo thời gian
+        start = time.perf_counter()
+        self._deadline = start + time_s
+        best_move = self._ordered(game)[0]
+        best_value, done_depth = None, 0
+        try:
+            for d in range(1, (max_depth or ROWS * COLS) + 1):
+                value, move = self.search_fixed_depth(game, d, first=best_move)
+                best_move, best_value, done_depth = move, value, d
+                if abs(value) >= WIN - ROWS * COLS:  # đã thấy thắng/thua cưỡng bức: không cần sâu thêm
+                    break
+                if time.perf_counter() > self._deadline:
+                    break
+        except _Timeout:
+            pass
+        finally:
+            self._deadline = None
+        self.last_stats = {"nodes": self.nodes, "depth": done_depth, "value": best_value}
+        return best_move

@@ -1,26 +1,12 @@
-# Virtual Environment
+__pycache__/
+*.pyc
 .venv/
 venv/
-ENV/
-
-# Python cache
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
 .pytest_cache/
-
-# PyTorch checkpoints and large binaries
-*.pt
-*.pth
-checkpoints/*.pt
-checkpoints/*.pth
-
-# Results & Logs
-results/logs/*.csv
-results/figures/*.png
-results/figures/*.svg
-
-# OS specific
+*.egg-info/
+.ipynb_checkpoints/
 .DS_Store
-Thumbs.db
+# checkpoint lớn: chỉ commit nếu < 50MB, còn lại để Google Drive và ghi link trong README
+checkpoints/*.pt
+!checkpoints/.gitkeep
+*.zip

@@ -1,72 +1,73 @@
-# Connect Four AI: Multi-Level Game AI System
+# Connect Four Game AI (7x6)
 
-Đề tài cuối kỳ môn **Trí tuệ Nhân tạo Nâng cao**  
-Giảng viên hướng dẫn: **Thầy Tài**  
-Nhóm thực hiện: **Nhóm 13**  
-Chủ đề: **Xây dựng và đánh giá Game AI đa cấp độ (Connect Four 7×6)**  
-Repository: [https://github.com/Kiyoshiiz178/Advance_AI_Thay_Tai_Nhom_13](https://github.com/Kiyoshiiz178/Advance_AI_Thay_Tai_Nhom_13)
+Đồ án cuối kỳ môn **Trí tuệ nhân tạo nâng cao**: xây dựng và đánh giá Game AI đa cấp độ
+(Random → Heuristic → Alpha-Beta → MCTS → Neural Network) trên Connect Four, kèm giải đấu round-robin
+có khoảng tin cậy và ablation.
 
----
+> Trạng thái: **v0.2 - engine + 4 agent (Random, Heuristic, Alpha-Beta, MCTS) + khung giải đấu + test.** Còn lại: sinh dữ liệu/huấn luyện NN, giao diện, giải đấu chính, ablation (xem `docs/ROADMAP.md`).
 
-## 1. Cấu trúc thư mục
-
-```
-Connect4/
-├── .venv/                   # Môi trường ảo Python
-├── requirements.txt         # Danh sách thư viện phụ thuộc
-├── configs/                 # Cấu hình giải đấu, huấn luyện, tham số (YAML)
-├── src/
-│   └── c4/
-│       ├── game/            # Engine trò chơi
-│       │   ├── engine.py    # Bitboard engine (tối ưu hóa tốc độ cao)
-│       │   └── reference.py # Engine mảng 2D tham chiếu (ground truth)
-│       ├── agents/          # Các cấp độ AI
-│       │   ├── base.py      # Abstract Base Agent
-│       │   ├── random_agent.py # Cấp 1: Random baseline
-│       │   ├── heuristic.py    # Cấp 2: Rule-based / Heuristic
-│       │   ├── alphabeta.py    # Cấp 3: Minimax / Alpha-Beta pruning
-│       │   ├── mcts.py         # Cấp 4: Monte Carlo Tree Search (UCT)
-│       │   ├── nn_agent.py     # Cấp 5: Neural Network Policy (Supervised)
-│       │   └── mixed_mcts.py   # Cấp 7: Mixed MCTS (MCTS + Policy Prior)
-│       ├── models/
-│       │   └── policy_net.py   # Mạng CNN Policy (PyTorch)
-│       ├── train/
-│       │   ├── gen_data.py     # Sinh dữ liệu từ Alpha-Beta (epsilon-greedy)
-│       │   └── train_policy.py # Huấn luyện mô hình Supervised Learning
-│       ├── eval/
-│       │   ├── tournament.py   # Khung giải đấu Round-robin
-│       │   ├── metrics.py      # Thống kê: Wilson CI, Bootstrap, Latency p95
-│       │   └── ablation.py     # Thí nghiệm độ nhạy / Ablation study
-│       └── ui/
-│           └── app.py          # Giao diện Pygame (Người-Máy & Máy-Máy)
-├── tests/                   # Bộ kiểm thử tự động (pytest)
-│   ├── test_engine.py       # Kiểm thử tính đúng đắn của Engine & Perft
-│   └── test_agents.py       # Kiểm thử logic của các Agent
-├── results/                 # Nhật ký thực nghiệm & Biểu đồ
-│   ├── logs/                # Log CSV thô của các trận đấu
-│   ├── tables/              # Bảng ma trận đối đầu
-│   └── figures/             # Biểu đồ phân tích
-├── checkpoints/             # Lưu trữ trọng số mô hình đã huấn luyện (.pt)
-└── notebooks/               # Phân tích số liệu và sinh đồ thị trực quan
-```
-
----
-
-## 2. Thiết lập môi trường
-
-Hệ thống sử dụng Python 3.10+ (đã kiểm tra tương thích hoàn hảo trên Python 3.13) với các thư viện chính:
-- `torch` (PyTorch CPU / GPU)
-- `pygame` (Giao diện đồ họa)
-- `numpy`, `pandas`, `scipy` (Xử lý dữ liệu & thống kê)
-- `matplotlib`, `seaborn` (Trực quan hóa)
-- `pytest` (Kiểm thử tự động)
-- `pyyaml` (Quản lý cấu hình)
-
-### Kích hoạt môi trường và chạy thử nghiệm
+## Cài đặt (Python 3.10+)
 ```bash
-# Kích hoạt venv (Windows PowerShell)
-.\.venv\Scripts\Activate.ps1
-
-# Chạy toàn bộ kiểm thử
-pytest -v tests/
+git clone <link-repo> && cd connect4-ai
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+pip install -e .
+pytest -q                         # tất cả phải xanh
 ```
+
+## Chạy thử
+```bash
+python -m c4.play --opponent random                       # chơi Người vs Máy trong terminal
+python -m c4.eval.cli --a random --b random --openings 100 --seed 0 \
+       --out results/logs/random_vs_random.csv            # trận đấu 200 ván, có log thô + thống kê
+python -m c4.eval.cli --a alphabeta --b mcts --time-a 0.1 --time-b 0.1 --openings 20   # cùng 100 ms/nước
+python -m c4.eval.cli --a alphabeta --b mcts --depth-a 5 --sims-b 1000 --openings 20   # cấu hình mặc định
+```
+
+## Cấu trúc
+```
+src/c4/game/     engine.py (bitboard), reference.py (bản chậm để đối chiếu), base.py (API + quy ước)
+src/c4/agents/   base.py (Agent, Budget), random_agent.py, heuristic.py, alphabeta.py, mcts.py, __init__.py (đăng ký)
+src/c4/eval/     match.py (ván/trận, khai cuộc, đổi bên), metrics.py (Wilson, bootstrap, p95), cli.py
+src/c4/play.py   chơi trong terminal
+tests/           unit test; tests/data/positions.csv = bộ vị trí kiểm thử viết tay
+configs/ results/ checkpoints/ notebooks/ docs/
+```
+
+## API engine (tóm tắt)
+```python
+from c4.game import Connect4
+g = Connect4()
+g.legal_actions()      # [0..6]
+g.step(3); g.undo()    # thả quân / hoàn tác
+g.clone()              # bản sao độc lập
+g.is_terminal(); g.winner; g.result(player)   # +1 / 0 / -1 theo góc nhìn player
+g.winning_moves(player)                        # cột thắng ngay của player (dùng cho Heuristic)
+g.to_array(); g.encode(); g.key(); print(g.render())
+```
+Quy ước chi tiết: xem `CONTRIBUTING.md`. Cách viết agent mới: kế thừa `c4.agents.base.Agent`, đăng ký vào `AGENTS`.
+
+## Tái lập thí nghiệm
+Mọi thí nghiệm có seed và cấu hình ghi trong `configs/`; log thô nằm ở `results/logs/`.
+Mã nguồn/ý tưởng kế thừa ghi tại `THIRD_PARTY.md`.
+
+## Danh sách thành viên (Nhóm 13 - CONNECT FOUR 7x6)
+**GVHD: Thầy Đỗ Như Tài**
+
+| STT | Họ và tên | MSSV | Vai trò | Nhiệm vụ chính | Tỷ lệ đóng góp |
+|---|---|---|---|---|:---:|
+| 1 | **Bùi Minh Trung** | 3124720074 | Nhóm Trưởng | Engine (bitboard + reference), kiểm thử, Heuristic, Alpha-Beta, khung giải đấu và thống kê | **32%** |
+| 2 | **Trần Lê Minh Tâm** | 3124720064 | Thành viên | Random, MCTS-UCT, sinh dữ liệu & huấn luyện Neural Network, giao diện pygame | **32%** |
+| 3 | **Chương Gia Thịnh** | 3124720067 | Thành viên | Chạy thực nghiệm, lưu log CSV, kiểm thử thủ công (`positions.csv`), phân tích ván, video demo | **18%** |
+| 4 | **Nguyễn Thành Tài** | 3124720062 | Thành viên | Báo cáo 5 chương, slide thuyết trình, poster A0, tài liệu tham khảo, README, in ấn | **18%** |
+| | **TỔNG CỘNG** | | | | **100%** |
+
+## Quy định nộp đề tài cuối kỳ
+- File nộp dạng ZIP: `Nhom13_GameAI_Connect4_BuiMinhTrung_3124720074.zip`
+- Lệnh tự động đóng gói đúng chuẩn: `python scripts/package_submission.py`
+- Bộ sản phẩm bao gồm:
+  1. Mã nguồn Python, cấu hình YAML, requirements.txt, bộ test tự động (`pytest`).
+  2. Báo cáo hoàn chỉnh (5 chương), slide thuyết trình, poster giới thiệu đề tài (`docs/`).
+  3. Log thực nghiệm đối kháng thô CSV, bảng biểu ma trận và biểu đồ trực quan hóa (`results/`).
+  4. Script đóng gói, chạy giải đấu và video demo (`scripts/`, `docs/demo/`).

@@ -1,251 +1,164 @@
-"""High-performance Bitboard implementation of Connect Four (7x6).
+"""Engine Connect Four bằng BITBOARD (nhanh, dùng cho Alpha-Beta / MCTS).
 
-Each column has 6 board rows and 1 guard row (7 bits total).
-The whole 7x6 board is represented using 49 bits across two integers
-(one for Player 1 / Red, one for Player 2 / Yellow).
+Biểu diễn: mỗi cột dùng 7 bit (6 ô + 1 bit đệm ở trên cùng), tổng 49 bit.
+Bit của ô (cột c, hàng r) là  c*7 + r  (hàng 0 = dưới cùng).
 
-Bit index for (row, col) is `col * 7 + row`:
-  - row 0: bottom row
-  - row 5: top playable row
-  - row 6: guard bit (always 0, prevents wrapping across columns)
+  _pos  : các quân của bên ĐANG ĐẾN LƯỢT
+  _mask : tất cả các quân đã thả
+=> quân của đối thủ = _pos ^ _mask.
 
-Win detection is performed in 4 directions using single-cycle bitwise shifts:
-  - Vertical: shift 1
-  - Horizontal: shift 7
-  - Diagonal \\: shift 6 (r-1, c+1)
-  - Diagonal /: shift 8 (r+1, c+1)
+Kỹ thuật theo ý tưởng của Pascal Pons (đã tự cài đặt lại). Bản chậm, dễ đọc dùng để
+đối chiếu nằm ở reference.py; hai bản được kiểm thử chéo trong tests/test_crosscheck.py.
 """
-
 from __future__ import annotations
-from typing import List, Optional, Tuple
+
+import operator
+
 import numpy as np
 
+from c4.game.base import COLS, ROWS, PLAYER1, PLAYER2, Connect4Base, IllegalMoveError
 
-def check_win(bb: int) -> bool:
-    """Checks if bitboard `bb` contains 4 connected pieces in any direction.
-    
-    Single-instruction bitwise tests:
-      1. Horizontal: shift 7
-      2. Diagonal \\: shift 6
-      3. Diagonal /: shift 8
-      4. Vertical:   shift 1
-    """
-    # Horizontal
-    m = bb & (bb >> 7)
-    if m & (m >> 14):
+_H = ROWS + 1  # 7 bit mỗi cột (có 1 bit đệm để tránh nhảy cột khi dịch bit)
+_BOTTOM = tuple(1 << (c * _H) for c in range(COLS))  # bit hàng 0 của từng cột
+_COLMASK = tuple(((1 << ROWS) - 1) << (c * _H) for c in range(COLS))  # 6 bit hợp lệ của cột
+_TOP = tuple(1 << (c * _H + ROWS - 1) for c in range(COLS))  # bit hàng 5 (trên cùng)
+_FULL = ROWS * COLS
+
+
+def _has_four(b: int) -> bool:
+    """Có 4 quân liên tiếp trong bitboard b? (ngang, 2 đường chéo, dọc)."""
+    m = b & (b >> _H)  # ngang
+    if m & (m >> (2 * _H)):
         return True
-    # Diagonal \
-    m = bb & (bb >> 6)
-    if m & (m >> 12):
+    m = b & (b >> (_H - 1))  # chéo \
+    if m & (m >> (2 * (_H - 1))):
         return True
-    # Diagonal /
-    m = bb & (bb >> 8)
-    if m & (m >> 16):
+    m = b & (b >> (_H + 1))  # chéo /
+    if m & (m >> (2 * (_H + 1))):
         return True
-    # Vertical
-    m = bb & (bb >> 1)
+    m = b & (b >> 1)  # dọc
     if m & (m >> 2):
         return True
     return False
 
 
-class Bitboard:
-    """Connect Four 7x6 Game Engine using 49-bit Bitboards."""
-
-    ROWS: int = 6
-    COLS: int = 7
-    CONNECT: int = 4
-    TOTAL_CELLS: int = 42
-
-    # Column base bit offsets: col * 7
-    COL_BASES: Tuple[int, ...] = (0, 7, 14, 21, 28, 35, 42)
-    # Column guard bit positions: col * 7 + 6
-    GUARD_BITS: Tuple[int, ...] = (6, 13, 20, 27, 34, 41, 48)
-    # Default exploration order: center outwards for better move ordering
-    EXPLORATION_ORDER: Tuple[int, ...] = (3, 2, 4, 1, 5, 0, 6)
+class Connect4(Connect4Base):
+    __slots__ = ("_pos", "_mask", "_moves", "_winner", "_history")
 
     def __init__(self) -> None:
-        self.bitboards: List[int] = [0, 0]  # [0]: Player 1 (Red), [1]: Player 2 (Yellow)
-        self.heights: List[int] = list(self.COL_BASES)  # Next available bit index per column
-        self.current_player: int = 1         # 1 or 2
-        self.move_count: int = 0
-        self.history: List[Tuple[int, int, int]] = []  # (action, bit, prev_player)
-        self.winner: Optional[int] = None              # 1, 2, 0 (draw), or None
+        self.reset()
 
-    def reset(self) -> Bitboard:
-        """Resets the board to an empty state."""
-        self.bitboards[0] = 0
-        self.bitboards[1] = 0
-        self.heights = list(self.COL_BASES)
-        self.current_player = 1
-        self.move_count = 0
-        self.history.clear()
-        self.winner = None
-        return self
+    # ---- trạng thái ----
+    def reset(self) -> None:
+        self._pos = 0
+        self._mask = 0
+        self._moves = 0
+        self._winner = 0
+        self._history: list[int] = []
 
-    def clone(self) -> Bitboard:
-        """Fast cloning without deepcopy overhead."""
-        b = Bitboard.__new__(Bitboard)
-        b.bitboards = [self.bitboards[0], self.bitboards[1]]
-        b.heights = list(self.heights)
-        b.current_player = self.current_player
-        b.move_count = self.move_count
-        b.history = list(self.history)
-        b.winner = self.winner
-        return b
+    @property
+    def current_player(self) -> int:
+        return PLAYER1 if self._moves % 2 == 0 else PLAYER2
 
-    def legal_actions(self) -> List[int]:
-        """Returns list of valid column indices [0..6] that are not full."""
-        if self.winner is not None:
+    @property
+    def winner(self) -> int:
+        return self._winner
+
+    @property
+    def move_count(self) -> int:
+        return self._moves
+
+    # ---- hành động ----
+    def legal_actions(self) -> list[int]:
+        if self._winner or self._moves == _FULL:
             return []
-        return [c for c in range(self.COLS) if self.heights[c] < self.GUARD_BITS[c]]
+        mask = self._mask
+        return [c for c in range(COLS) if not mask & _TOP[c]]
 
-    def is_legal(self, action: int) -> bool:
-        """Checks if a column move is legal."""
-        return (
-            0 <= action < self.COLS
-            and self.winner is None
-            and self.heights[action] < self.GUARD_BITS[action]
-        )
+    def step(self, action: int) -> None:
+        if self._winner or self._moves == _FULL:
+            raise IllegalMoveError("Game đã kết thúc, không thể đi tiếp")
+        try:
+            col = operator.index(action)  # nhận cả numpy int, từ chối float/str
+        except TypeError:
+            raise IllegalMoveError(f"Nước đi phải là số nguyên, nhận được {action!r}") from None
+        if not 0 <= col < COLS:
+            raise IllegalMoveError(f"Cột {col} ngoài phạm vi 0..{COLS - 1}")
+        if self._mask & _TOP[col]:
+            raise IllegalMoveError(f"Cột {col} đã đầy")
 
-    def is_winning_move(self, action: int) -> bool:
-        """Instantly checks if playing `action` wins the game for current player."""
-        if not self.is_legal(action):
-            return False
-        bit = 1 << self.heights[action]
-        p_idx = 0 if self.current_player == 1 else 1
-        return check_win(self.bitboards[p_idx] | bit)
+        new = (self._mask + _BOTTOM[col]) & _COLMASK[col]  # bit ô trống thấp nhất của cột
+        if _has_four(self._pos | new):
+            self._winner = self.current_player  # tính TRƯỚC khi đổi lượt
+        self._pos ^= self._mask  # đổi vai: _pos giờ là quân của bên đến lượt kế tiếp
+        self._mask |= new
+        self._moves += 1
+        self._history.append(col)
 
-    def is_opponent_winning_move(self, action: int) -> bool:
-        """Instantly checks if opponent playing `action` would win."""
-        if not self.is_legal(action):
-            return False
-        bit = 1 << self.heights[action]
-        opp_idx = 1 if self.current_player == 1 else 0
-        return check_win(self.bitboards[opp_idx] | bit)
+    def undo(self) -> int:
+        if not self._history:
+            raise IllegalMoveError("Không có nước đi nào để hoàn tác")
+        col = self._history.pop()
+        top = 1 << ((self._mask & _COLMASK[col]).bit_length() - 1)  # quân trên cùng của cột
+        self._mask ^= top
+        self._pos ^= self._mask
+        self._moves -= 1
+        self._winner = 0
+        return col
 
-    def step(self, action: int) -> Bitboard:
-        """Drops a piece into column `action` for the current player.
-        
-        Raises ValueError if the move is illegal or game is over.
+    def clone(self) -> "Connect4":
+        g = Connect4.__new__(Connect4)
+        g._pos = self._pos
+        g._mask = self._mask
+        g._moves = self._moves
+        g._winner = self._winner
+        g._history = self._history.copy()
+        return g
+
+    # ---- truy vấn chiến thuật ----
+    def winning_moves(self, player: int | None = None) -> list[int]:
+        if self.is_terminal():
+            return []
+        if player is None:
+            player = self.current_player
+        stones = self._pos if player == self.current_player else self._pos ^ self._mask
+        res = []
+        for c in range(COLS):
+            if self._mask & _TOP[c]:
+                continue
+            new = (self._mask + _BOTTOM[c]) & _COLMASK[c]
+            if _has_four(stones | new):
+                res.append(c)
+        return res
+
+    # ---- biểu diễn ----
+    def to_array(self, relative: bool = False) -> np.ndarray:
+        cur, opp = self._pos, self._pos ^ self._mask
+        p1, p2 = (cur, opp) if self._moves % 2 == 0 else (opp, cur)
+        arr = np.zeros((ROWS, COLS), dtype=np.int8)
+        for c in range(COLS):
+            for r in range(ROWS):
+                bit = 1 << (c * _H + r)
+                if p1 & bit:
+                    arr[r, c] = 1
+                elif p2 & bit:
+                    arr[r, c] = -1
+        if relative and self.current_player == PLAYER2:
+            arr = -arr
+        return arr
+
+    def key(self) -> int:
+        """Duy nhất cho mỗi vị trí: (quân bên đến lượt, tất cả quân) gói vào một số nguyên."""
+        return (self._pos << 49) | self._mask
+
+    def bitboards(self) -> tuple[int, int]:
+        """(quân bên đang đến lượt, quân đối thủ) dưới dạng bitboard - dành cho hàm lượng giá nhanh.
+
+        CHỈ có ở engine bitboard (không thuộc API chung). Bit của ô (cột c, hàng r) là c*7 + r.
         """
-        if not self.is_legal(action):
-            raise ValueError(f"Illegal action: {action}. Legal actions: {self.legal_actions()}")
+        return self._pos, self._pos ^ self._mask
 
-        bit = 1 << self.heights[action]
-        p_idx = 0 if self.current_player == 1 else 1
-
-        self.history.append((action, bit, self.current_player))
-        self.bitboards[p_idx] |= bit
-        self.heights[action] += 1
-        self.move_count += 1
-
-        if check_win(self.bitboards[p_idx]):
-            self.winner = self.current_player
-        elif self.move_count == self.TOTAL_CELLS:
-            self.winner = 0  # Draw
-        else:
-            self.current_player = 2 if self.current_player == 1 else 1
-
-        return self
-
-    def undo(self) -> Bitboard:
-        """Reverts the last move made."""
-        if not self.history:
-            raise ValueError("No moves to undo.")
-
-        action, bit, prev_player = self.history.pop()
-        p_idx = 0 if prev_player == 1 else 1
-
-        self.bitboards[p_idx] ^= bit
-        self.heights[action] -= 1
-        self.move_count -= 1
-        self.current_player = prev_player
-        self.winner = None
-
-        return self
-
-    def is_terminal(self) -> bool:
-        """Returns True if the game is over (win or draw)."""
-        return self.winner is not None
-
-    def result(self, player: Optional[int] = None) -> float:
-        """Returns outcome from the perspective of `player` (1 or 2).
-        
-        +1.0: win
-         0.0: draw or ongoing
-        -1.0: loss
-        If player is None, uses `current_player`.
-        """
-        if self.winner is None or self.winner == 0:
-            return 0.0
-
-        p = player if player is not None else self.current_player
-        return 1.0 if self.winner == p else -1.0
-
-    def to_numpy(self) -> np.ndarray:
-        """Converts bitboards to 6x7 numpy array (row 0 = bottom).
-        
-        Values: +1 for Player 1, -1 for Player 2, 0 for empty.
-        """
-        grid = np.zeros((self.ROWS, self.COLS), dtype=np.int8)
-        bb1, bb2 = self.bitboards[0], self.bitboards[1]
-        for c in range(self.COLS):
-            base = self.COL_BASES[c]
-            for r in range(self.ROWS):
-                bit = 1 << (base + r)
-                if bb1 & bit:
-                    grid[r, c] = 1
-                elif bb2 & bit:
-                    grid[r, c] = -1
-        return grid
-
-    def to_tensor(self) -> np.ndarray:
-        """Returns 2x6x7 numpy array representing state for neural network.
-        
-        Channel 0: current player's pieces (1.0 or 0.0)
-        Channel 1: opponent's pieces (1.0 or 0.0)
-        """
-        cur_idx = 0 if self.current_player == 1 else 1
-        opp_idx = 1 - cur_idx
-        cur_bb, opp_bb = self.bitboards[cur_idx], self.bitboards[opp_idx]
-
-        ch0 = np.zeros((self.ROWS, self.COLS), dtype=np.float32)
-        ch1 = np.zeros((self.ROWS, self.COLS), dtype=np.float32)
-
-        for c in range(self.COLS):
-            base = self.COL_BASES[c]
-            for r in range(self.ROWS):
-                bit = 1 << (base + r)
-                if cur_bb & bit:
-                    ch0[r, c] = 1.0
-                elif opp_bb & bit:
-                    ch1[r, c] = 1.0
-
-        return np.stack([ch0, ch1], axis=0)
-
-    def render(self) -> str:
-        """Renders the board as an ASCII string."""
-        symbols = {0: ".", 1: "X", -1: "O"}
-        grid = self.to_numpy()
-        lines = []
-        lines.append("  " + " ".join(str(c) for c in range(self.COLS)))
-        lines.append(" +" + "--" * self.COLS + "+")
-        for r in reversed(range(self.ROWS)):
-            row_str = " ".join(symbols[grid[r, c]] for c in range(self.COLS))
-            lines.append(f"{r}| {row_str} |")
-        lines.append(" +" + "--" * self.COLS + "+")
-        turn_str = "Red (X)" if self.current_player == 1 else "Yellow (O)"
-        if self.winner == 1:
-            status = "Winner: Red (X)"
-        elif self.winner == 2:
-            status = "Winner: Yellow (O)"
-        elif self.winner == 0:
-            status = "Result: Draw"
-        else:
-            status = f"Turn: {turn_str}"
-        lines.append(f"Move: {self.move_count} | {status}")
-        return "\n".join(lines)
-
-    def __str__(self) -> str:
-        return self.render()
+    @property
+    def history(self) -> tuple[int, ...]:
+        """Chuỗi cột đã đi (chỉ đọc) - tiện cho log và debug."""
+        return tuple(self._history)
