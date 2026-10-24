@@ -12,7 +12,7 @@ from c4.agents.heuristic import HeuristicAgent
 from c4.agents.mcts import MCTSAgent
 from c4.agents.random_agent import RandomAgent
 from c4.agents.nn_agent import NNAgent
-from c4.agents.mixed_mcts import MixedMCTSAgent
+from c4.agents.mixed_mcts import MixedMCTSAgent, PUCTAgent, AlphaZeroAgent
 
 AGENTS: dict[str, Callable[..., Agent]] = {
     "random": RandomAgent,          # Cấp 1
@@ -20,7 +20,9 @@ AGENTS: dict[str, Callable[..., Agent]] = {
     "alphabeta": AlphaBetaAgent,    # Cấp 3
     "mcts": MCTSAgent,              # Cấp 4
     "nn": NNAgent,                  # Cấp 5
-    "mixed_mcts": MixedMCTSAgent,   # Cấp mở rộng (RQ3)
+    "mixed_mcts": MixedMCTSAgent,   # Cấp mở rộng (AlphaZero PUCT)
+    "puct": MixedMCTSAgent,         # Alias PUCT
+    "alphazero": MixedMCTSAgent,    # Alias AlphaZero-lite
 }
 
 
@@ -41,6 +43,9 @@ __all__ = [
     "MCTSAgent",
     "NNAgent",
     "MixedMCTSAgent",
+    "PUCTAgent",
+    "AlphaZeroAgent",
     "AGENTS",
     "make_agent",
 ]
+
