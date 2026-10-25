@@ -1,0 +1,6 @@
+﻿MCTS_Simulations,Opponent,Games,MCTS_Wins,Draws,AlphaBeta_Wins,Score,Score_CI_Low,Score_CI_High,WinRate,Mean_Time_ms,p95_Time_ms
+100,alphabeta_depth4,100,5,3,92,0.065,0.025,0.115,0.05,3.022,4.616
+500,alphabeta_depth4,100,29,3,68,0.305,0.22,0.395,0.29,15.886,28.197
+1000,alphabeta_depth4,100,42,0,58,0.42,0.32,0.52,0.42,35.894,71.396
+2000,alphabeta_depth4,100,51,6,43,0.54,0.445,0.635,0.51,61.195,118.431
+5000,alphabeta_depth4,100,57,3,40,0.585,0.49,0.68,0.57,155.397,287.937
