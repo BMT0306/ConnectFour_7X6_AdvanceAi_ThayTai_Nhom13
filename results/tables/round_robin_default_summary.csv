@@ -1,0 +1,7 @@
+﻿Pair,Agent_A,Agent_B,Time_Limit_s,Games,A_Wins,Draws,B_Wins,A_Score,A_Score_CI_Low,A_Score_CI_High,A_WinRate,A_Mean_Time_ms,A_p95_Time_ms,B_Mean_Time_ms,B_p95_Time_ms
+random_vs_heuristic,random,heuristic,custom,200,1,0,199,0.005,0.0,0.015,0.005,0.002,0.004,0.058,0.111
+random_vs_alphabeta,random,alphabeta,custom,200,0,0,200,0.0,0.0,0.0,0.0,0.004,0.007,12.472,29.381
+random_vs_mcts,random,mcts,custom,200,0,0,200,0.0,0.0,0.0,0.0,0.003,0.004,37.105,54.366
+heuristic_vs_alphabeta,heuristic,alphabeta,custom,200,25,17,158,0.1675,0.1225,0.2175,0.125,0.049,0.083,8.425,23.726
+heuristic_vs_mcts,heuristic,mcts,custom,200,41,11,148,0.2325,0.1775,0.2901,0.205,0.052,0.089,29.356,49.266
+alphabeta_vs_mcts,alphabeta,mcts,custom,200,135,4,61,0.685,0.62,0.7475,0.675,8.485,23.373,30.767,50.296
