@@ -48,6 +48,9 @@ class MixedMCTSAgent(Agent):
         default_simulations: int = 500,
         c_puct: float = 2.0,
         use_value_head: bool = True,
+        add_dirichlet_noise: bool = False,
+        dirichlet_alpha: float = 0.3,
+        dirichlet_epsilon: float = 0.25,
         checkpoint_path: str | Path | None = None,
         device: str | None = None,
     ) -> None:
@@ -55,6 +58,9 @@ class MixedMCTSAgent(Agent):
         self.default_simulations = default_simulations
         self.c_puct = c_puct
         self.use_value_head = use_value_head
+        self.add_dirichlet_noise = add_dirichlet_noise
+        self.dirichlet_alpha = dirichlet_alpha
+        self.dirichlet_epsilon = dirichlet_epsilon
         self.device = torch.device(device if device else ("cuda" if torch.cuda.is_available() else "cpu"))
 
         # Bộ nhớ đệm chuyển vị (Transposition Cache)
@@ -136,6 +142,15 @@ class MixedMCTSAgent(Agent):
 
         # Khởi tạo gốc với priors
         root_priors, _ = self._get_priors(game)
+
+        # Thêm nhiễu Dirichlet tại nút gốc nếu bật
+        if self.add_dirichlet_noise and len(legal) > 1:
+            noise = self.rng.gamma(self.dirichlet_alpha, 1.0, size=len(legal))
+            noise /= max(noise.sum(), 1e-8)
+            eps = self.dirichlet_epsilon
+            for idx, a in enumerate(legal):
+                root_priors[a] = (1.0 - eps) * root_priors[a] + eps * noise[idx]
+
         root = _PUCTNode(None, None, -game.current_player, list(legal))
 
         sims = 0
