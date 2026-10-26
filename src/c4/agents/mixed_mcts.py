@@ -47,12 +47,14 @@ class MixedMCTSAgent(Agent):
         seed: int | None = None,
         default_simulations: int = 500,
         c_puct: float = 2.0,
+        use_value_head: bool = True,
         checkpoint_path: str | Path | None = None,
         device: str | None = None,
     ) -> None:
         super().__init__(seed)
         self.default_simulations = default_simulations
         self.c_puct = c_puct
+        self.use_value_head = use_value_head
         self.device = torch.device(device if device else ("cuda" if torch.cuda.is_available() else "cpu"))
 
         # Mô hình nơ-ron
@@ -119,6 +121,7 @@ class MixedMCTSAgent(Agent):
         root = _PUCTNode(None, None, -game.current_player, list(legal))
 
         sims = 0
+        cache_hits = 0
         while max_sims is None or sims < max_sims:
             if deadline is not None and sims > 0 and (sims & 7) == 0 and time.perf_counter() > deadline:
                 break
@@ -133,7 +136,7 @@ class MixedMCTSAgent(Agent):
 
             # 2. Expansion
             if node.untried and not g.is_terminal():
-                priors, _ = self._get_priors(g)
+                priors, val_leaf = self._get_priors(g)
                 # Lấy nước đi có prior cao nhất trong số untried
                 mv = max(node.untried, key=lambda m: priors[m])
                 node.untried.remove(mv)
@@ -149,18 +152,45 @@ class MixedMCTSAgent(Agent):
                 node.children.append(child)
                 node = child
 
-            # 3. Playout (Rollout ngẫu nhiên nhẹ)
-            while not g.is_terminal():
-                wins = g.winning_moves()
-                g.step(self.rng.choice(wins) if wins else self.rng.choice(g.legal_actions()))
+            # 3. Evaluation (Value Head vs Rollout)
+            if self.use_value_head:
+                if g.is_terminal():
+                    w = g.winner
+                    # Giá trị theo góc nhìn của người chơi node.mover
+                    if w == 0:
+                        v_eval = 0.0
+                    else:
+                        v_eval = 1.0 if node.mover == w else -1.0
+                else:
+                    _, val_net = self._get_priors(g)
+                    # val_net là lượng giá theo góc nhìn của g.current_player (đối thủ của node.mover)
+                    # Do đó với node.mover thì giá trị thế cờ là -val_net
+                    v_eval = -val_net
 
-            w = g.winner
+                # 4. Backpropagation (Value Head mode)
+                # Chuyển v_eval [-1, 1] về xác suất thắng [0, 1] cho node.mover
+                win_prob_mover = (v_eval + 1.0) / 2.0
+                curr = node
+                while curr is not None:
+                    curr.N += 1
+                    if curr.mover == node.mover:
+                        curr.W += win_prob_mover
+                    else:
+                        curr.W += (1.0 - win_prob_mover)
+                    curr = curr.parent
+            else:
+                # Chế độ Rollout ngẫu nhiên truyền thống (dùng cho Ablation A3)
+                while not g.is_terminal():
+                    wins = g.winning_moves()
+                    g.step(self.rng.choice(wins) if wins else self.rng.choice(g.legal_actions()))
 
-            # 4. Backpropagation
-            while node is not None:
-                node.N += 1
-                node.W += 1.0 if node.mover == w else (0.5 if w == 0 else 0.0)
-                node = node.parent
+                w = g.winner
+                curr = node
+                while curr is not None:
+                    curr.N += 1
+                    curr.W += 1.0 if curr.mover == w else (0.5 if w == 0 else 0.0)
+                    curr = curr.parent
+
             sims += 1
 
         best = max(root.children, key=lambda ch: (ch.N, ch.W / max(ch.N, 1)))
@@ -168,5 +198,12 @@ class MixedMCTSAgent(Agent):
             "simulations": sims,
             "best_visits": best.N,
             "best_winrate": round(best.W / max(best.N, 1), 3),
+            "use_value_head": self.use_value_head,
         }
         return best.move
+
+
+# Alias chuẩn AlphaZero
+PUCTAgent = MixedMCTSAgent
+AlphaZeroAgent = MixedMCTSAgent
+
