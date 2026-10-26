@@ -48,6 +48,9 @@ class MixedMCTSAgent(Agent):
         default_simulations: int = 500,
         c_puct: float = 2.0,
         use_value_head: bool = True,
+        add_dirichlet_noise: bool = False,
+        dirichlet_alpha: float = 0.3,
+        dirichlet_epsilon: float = 0.25,
         checkpoint_path: str | Path | None = None,
         device: str | None = None,
     ) -> None:
@@ -55,7 +58,13 @@ class MixedMCTSAgent(Agent):
         self.default_simulations = default_simulations
         self.c_puct = c_puct
         self.use_value_head = use_value_head
+        self.add_dirichlet_noise = add_dirichlet_noise
+        self.dirichlet_alpha = dirichlet_alpha
+        self.dirichlet_epsilon = dirichlet_epsilon
         self.device = torch.device(device if device else ("cuda" if torch.cuda.is_available() else "cpu"))
+
+        # Bộ nhớ đệm chuyển vị (Transposition Cache)
+        self._cache: dict[tuple, tuple[np.ndarray, float]] = {}
 
         # Mô hình nơ-ron
         self.model = Connect4PolicyValueNet(num_res_blocks=3, num_filters=64).to(self.device)
@@ -70,8 +79,18 @@ class MixedMCTSAgent(Agent):
             except Exception:
                 pass
 
+    def _state_key(self, g: Connect4Base) -> tuple:
+        """Tạo khóa băm cho bàn cờ để tra cứu trong bộ nhớ đệm."""
+        if hasattr(g, "_pos") and hasattr(g, "_mask"):
+            return (g.current_player, g._pos, g._mask)
+        return (g.current_player, tuple(g.board.flatten()))
+
     def _get_priors(self, g: Connect4Base) -> tuple[np.ndarray, float]:
-        """Dự đoán prior probabilities và value từ CNN."""
+        """Dự đoán prior probabilities và value từ CNN có sử dụng bộ nhớ đệm."""
+        key = self._state_key(g)
+        if key in self._cache:
+            return self._cache[key]
+
         legal = g.legal_actions()
         if not legal:
             return np.ones(7) / 7.0, 0.0
@@ -89,7 +108,9 @@ class MixedMCTSAgent(Agent):
             probs = torch.softmax(masked_logits, dim=-1).cpu().numpy().squeeze(0)
             val = float(val_t.squeeze().item())
 
-        return probs, val
+        res = (probs, val)
+        self._cache[key] = res
+        return res
 
     def _select_child(self, node: _PUCTNode) -> _PUCTNode:
         sqrt_parent_n = math.sqrt(max(node.N, 1))
@@ -110,6 +131,9 @@ class MixedMCTSAgent(Agent):
             self.last_stats = {"simulations": 0}
             return legal[0]
 
+        # Reset cache mỗi nước đi để tiết kiệm bộ nhớ
+        self._cache.clear()
+
         max_sims = budget.simulations if budget and budget.simulations else None
         time_s = budget.time_s if budget else None
         if max_sims is None and time_s is None:
@@ -118,6 +142,15 @@ class MixedMCTSAgent(Agent):
 
         # Khởi tạo gốc với priors
         root_priors, _ = self._get_priors(game)
+
+        # Thêm nhiễu Dirichlet tại nút gốc nếu bật
+        if self.add_dirichlet_noise and len(legal) > 1:
+            noise = self.rng.gamma(self.dirichlet_alpha, 1.0, size=len(legal))
+            noise /= max(noise.sum(), 1e-8)
+            eps = self.dirichlet_epsilon
+            for idx, a in enumerate(legal):
+                root_priors[a] = (1.0 - eps) * root_priors[a] + eps * noise[idx]
+
         root = _PUCTNode(None, None, -game.current_player, list(legal))
 
         sims = 0
