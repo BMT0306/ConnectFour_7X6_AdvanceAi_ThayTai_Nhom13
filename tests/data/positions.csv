@@ -5,3 +5,4 @@ vertical-three,1 2 1 2 1,O,-,1,X có 3 quân chồng ở cột 1: O phải chặ
 gap-win,1 7 2 7 4 7,X,3,7,X thắng ngay ở cột 3 (lấp chỗ trống); O đang có 3 quân cột 7 nên cột 7 là nước chặn
 both-threats,4 1 5 1 6 1,X,3 7,1,X có thể thắng ở cột 3 hoặc 7 (thắng ngay thay vì chặn)
 diagonal-win,1 2 2 3 7 3 3 4 7 4 7 4,X,4 7,4 5,X thắng ngay ở cột 4 (đường chéo) hoặc cột 7 (3 quân chồng); O cũng đang đe dọa cột 4 (dọc) và cột 5 (ngang)
+manual-bottom-row-win,1 7 2 7 3 6,X,4,-,"X có ba quân liên tiếp ở hàng đáy cột 1-3; đi cột 4 sẽ thắng ngay"

@@ -71,7 +71,7 @@ def run_ablation_a1(depths=(4, 5, 6)) -> None:
     print(f"[+] Đã lưu kết quả Ablation A1 vào: {out_file}")
 
 
-def run_ablation_a2(simulations=(100, 500, 1000, 2000), openings_count=20, seed=42) -> None:
+def run_ablation_a2(simulations=(100, 500, 1000, 2000, 5000), openings_count=50, seed=2026) -> None:
     print("\n=======================================================")
     print(" CHẠY ABLATION A2: MCTS THEO SỐ LƯỢNG MÔ PHỎNG (RQ1)")
     print("=======================================================")
