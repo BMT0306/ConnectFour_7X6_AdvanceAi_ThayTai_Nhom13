@@ -34,7 +34,7 @@
 #### Phân cảnh 4: Chơi trên Giao diện Đồ họa Pygame (1.5 phút)
 - Lệnh chạy:
   ```bash
-  python -m c4.ui.app
+  python scripts/run_gui.py
   ```
 - Thao tác:
   + Giới thiệu bàn cờ 7x6 màu sắc rõ nét, trực quan.
