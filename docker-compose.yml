@@ -1,0 +1,8 @@
+services:
+  connect4-web:
+    build: .
+    image: connect4-ai-nhom13:latest
+    container_name: connect4_ai_game
+    ports:
+      - "5000:5000"
+    restart: unless-stopped

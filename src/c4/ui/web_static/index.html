@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect Four AI - Nhóm 13 (7x6 Bitboard Engine)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --board-blue: #1e3a8a;
+      --board-inner: #172554;
+      --red-p1: #ef4444;
+      --red-glow: rgba(239, 68, 68, 0.6);
+      --yellow-p2: #f59e0b;
+      --yellow-glow: rgba(245, 158, 11, 0.6);
+      --accent: #0ea5e9;
+      --accent-glow: rgba(14, 165, 233, 0.4);
+      --emerald: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.12) 0px, transparent 50%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 36px;
+      border-bottom: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      background: rgba(9, 13, 22, 0.6);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .brand-title h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-title span {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .header-tags {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .tag {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tag.pulse::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 10px var(--emerald);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 32px;
+      max-width: 1360px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 28px 24px;
+    }
+
+    @media (max-width: 1080px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Game Area */
+    .game-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .turn-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 620px;
+      padding: 12px 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+    }
+
+    .turn-indicator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .disc-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-block;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .disc-icon.red {
+      background: radial-gradient(circle at 35% 35%, #fca5a5, var(--red-p1));
+      box-shadow: 0 0 12px var(--red-glow);
+    }
+
+    .disc-icon.yellow {
+      background: radial-gradient(circle at 35% 35%, #fde68a, var(--yellow-p2));
+      box-shadow: 0 0 12px var(--yellow-glow);
+    }
+
+    /* Board Wrapper */
+    .board-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Ghost preview disk bar */
+    .ghost-bar {
+      display: grid;
+      grid-template-columns: repeat(7, 78px);
+      gap: 8px;
+      height: 64px;
+      align-items: center;
+      justify-items: center;
+      margin-bottom: 8px;
+    }
+
+    .ghost-slot {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .ghost-slot.active {
+      opacity: 0.7;
+      transform: translateY(-4px);
+    }
+
+    /* Board */
+    .board {
+      background: linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%);
+      padding: 14px;
+      border-radius: 24px;
+      box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.6),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.4);
+      display: grid;
+      grid-template-columns: repeat(7, 78px);
+      grid-template-rows: repeat(6, 78px);
+      gap: 8px;
+      position: relative;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cell {
+      width: 78px;
+      height: 78px;
+      background: var(--bg);
+      border-radius: 50%;
+      box-shadow: 
+        inset 0 6px 12px rgba(0, 0, 0, 0.8),
+        inset 0 -2px 4px rgba(255, 255, 255, 0.1),
+        0 1px 2px rgba(255, 255, 255, 0.1);
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .piece {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      position: absolute;
+      transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .piece.red {
+      background: radial-gradient(circle at 30% 30%, #fca5a5 0%, #ef4444 60%, #991b1b 100%);
+      box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.4),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+        inset 0 3px 6px rgba(255, 255, 255, 0.4);
+    }
+
+    .piece.yellow {
+      background: radial-gradient(circle at 30% 30%, #fef08a 0%, #f59e0b 60%, #b45309 100%);
+      box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.4),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+        inset 0 3px 6px rgba(255, 255, 255, 0.4);
+    }
+
+    .piece.winning {
+      animation: winGlow 1s infinite alternate;
+      border: 3px solid #34d399;
+    }
+
+    @keyframes winGlow {
+      0% {
+        box-shadow: 0 0 15px #34d399, inset 0 0 10px #34d399;
+        transform: scale(0.96);
+      }
+      100% {
+        box-shadow: 0 0 30px #34d399, 0 0 50px rgba(52, 211, 153, 0.8);
+        transform: scale(1.04);
+      }
+    }
+
+    /* Column Hover Highlight */
+    .col-highlight {
+      position: absolute;
+      top: 14px;
+      bottom: 14px;
+      width: 78px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      pointer-events: none;
+      transition: left 0.15s ease-out;
+      display: none;
+    }
+
+    /* Sidebar Control Panel */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Mode Selector */
+    .mode-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .mode-btn {
+      padding: 10px 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .mode-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.2));
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    /* Agent Select */
+    .agent-select {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .agent-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    /* Sliders */
+    .setting-row {
+      margin-top: 14px;
+    }
+
+    .setting-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .setting-slider {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* Telemetry Info */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .telemetry-item {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      padding: 12px;
+      border-radius: 14px;
+    }
+
+    .tele-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .tele-val {
+      font-size: 17px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+    }
+
+    /* Action Buttons */
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+      color: #fff;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Banner for Winner */
+    .win-modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: rgba(15, 23, 42, 0.95);
+      border: 2px solid var(--emerald);
+      border-radius: 24px;
+      padding: 28px 42px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(16, 185, 129, 0.4);
+      backdrop-filter: blur(20px);
+      display: none;
+      z-index: 50;
+      animation: popIn 0.3s forwards cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      to { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    .win-modal h2 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .win-modal p {
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* Sound toggle */
+    .sound-toggle {
+      cursor: pointer;
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="logo-badge">C4</div>
+      <div class="brand-title">
+        <h1>CONNECT FOUR AI</h1>
+        <span>Nhóm 13 • Bitboard 64-bit Engine</span>
+      </div>
+    </div>
+    <div class="header-tags">
+      <div class="tag pulse" id="status-tag">Sẵn sàng</div>
+      <div class="sound-toggle" id="sound-btn" onclick="toggleSound()">🔊 Âm thanh: Bật</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Game Section -->
+    <div class="game-area">
+      <div class="turn-bar">
+        <div class="turn-indicator">
+          <span class="disc-icon red" id="turn-disc"></span>
+          <span id="turn-text">Lượt Người chơi 1 (Đỏ)</span>
+        </div>
+        <div style="font-size: 13px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;" id="move-counter">
+          Nước đi: 0 / 42
+        </div>
+      </div>
+
+      <div class="board-container">
+        <!-- Ghost disc bar -->
+        <div class="ghost-bar" id="ghost-bar"></div>
+
+        <!-- 7x6 Board -->
+        <div class="board" id="board">
+          <div class="col-highlight" id="col-highlight"></div>
+        </div>
+
+        <!-- Win Modal Popup -->
+        <div class="win-modal" id="win-modal">
+          <h2 id="win-title">Chiến Thắng!</h2>
+          <p id="win-subtitle">Đã kết nối thành công 4 quân liên tiếp</p>
+          <button class="btn btn-primary" onclick="resetGame()" style="margin: 0 auto;">Chơi Ván Mới</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls Sidebar -->
+    <div class="sidebar">
+      <!-- Mode Card -->
+      <div class="card">
+        <div class="card-title">🎮 Chế Độ Chơi</div>
+        <div class="mode-group">
+          <div class="mode-btn active" id="mode-H_AI" onclick="setMode('H_AI')">Người vs Máy</div>
+          <div class="mode-btn" id="mode-AI_AI" onclick="setMode('AI_AI')">Máy vs Máy</div>
+          <div class="mode-btn" id="mode-H_H" onclick="setMode('H_H')">2 Người</div>
+        </div>
+
+        <div class="card-title" style="margin-top: 14px;">🤖 Cấp Độ Tác Tử AI</div>
+        <select class="agent-select" id="agent-select" onchange="onAgentChange()">
+          <option value="alphabeta" selected>Level 3: Alpha-Beta (Minimax + Transposition)</option>
+          <option value="heuristic">Level 2: Rule-Based Heuristic (4 tầng luật)</option>
+          <option value="mcts">Level 4: MCTS-UCT (Duyệt cây Monte Carlo)</option>
+          <option value="mixed_mcts">Level 5: Mixed MCTS (PUCT + Value Head)</option>
+          <option value="nn">Level 5: Deep CNN (Mạng nơ-ron tích chập)</option>
+          <option value="random">Level 1: Random (Nước đi ngẫu nhiên)</option>
+        </select>
+
+        <div class="setting-row" id="depth-setting">
+          <div class="setting-label">
+            <span>Độ sâu tìm kiếm (Depth)</span>
+            <span id="depth-val" style="color: var(--accent); font-weight: 700;">5 nước</span>
+          </div>
+          <input type="range" class="setting-slider" id="depth-slider" min="1" max="8" value="5" oninput="updateSettings()">
+        </div>
+      </div>
+
+      <!-- Telemetry Card -->
+      <div class="card">
+        <div class="card-title">⚡ Hiệu Năng & Thống Kê</div>
+        <div class="telemetry-grid">
+          <div class="telemetry-item">
+            <div class="tele-label">Độ trễ AI (Latency)</div>
+            <div class="tele-val" id="tele-latency">0.0 ms</div>
+          </div>
+          <div class="telemetry-item">
+            <div class="tele-label">Số nút / Thông số</div>
+            <div class="tele-val" id="tele-nodes">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Card -->
+      <div class="card">
+        <div class="actions">
+          <button class="btn btn-primary" onclick="resetGame()">🔄 Ván Mới</button>
+          <button class="btn btn-secondary" onclick="undoMove()">↩️ Đi Lại</button>
+        </div>
+        <button class="btn btn-secondary" onclick="triggerAIMove()" style="width: 100%; margin-top: 10px;" id="ai-step-btn">
+          🧠 Máy Đi Hộ Lượt Này
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const ROWS = 6;
+    const COLS = 7;
+    let gameState = null;
+    let currentMode = "H_AI";
+    let isThinking = false;
+    let soundEnabled = true;
+
+    // Web Audio Synthesizer
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'drop') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } else if (type === 'win') {
+        const notes = [440, 554.37, 659.25, 880];
+        notes.forEach((freq, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.frequency.value = freq;
+          g.gain.setValueAtTime(0, audioCtx.currentTime + i * 0.1);
+          g.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + i * 0.1 + 0.05);
+          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.1 + 0.5);
+          o.start(audioCtx.currentTime + i * 0.1);
+          o.stop(audioCtx.currentTime + i * 0.1 + 0.5);
+        });
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('sound-btn').innerText = soundEnabled ? '🔊 Âm thanh: Bật' : '🔇 Âm thanh: Tắt';
+    }
+
+    // Build DOM Board
+    function initBoardDOM() {
+      const ghostBar = document.getElementById('ghost-bar');
+      ghostBar.innerHTML = '';
+      for (let c = 0; c < COLS; c++) {
+        const slot = document.createElement('div');
+        slot.className = 'ghost-slot';
+        slot.dataset.col = c;
+        slot.addEventListener('click', () => onColumnClick(c));
+        ghostBar.appendChild(slot);
+      }
+
+      const board = document.getElementById('board');
+      // Keep col-highlight
+      const highlight = document.getElementById('col-highlight');
+      board.innerHTML = '';
+      board.appendChild(highlight);
+
+      for (let r = ROWS - 1; r >= 0; r--) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.addEventListener('click', () => onColumnClick(c));
+          cell.addEventListener('mouseenter', () => showGhost(c));
+          board.appendChild(cell);
+        }
+      }
+
+      board.addEventListener('mouseleave', hideGhost);
+    }
+
+    function showGhost(col) {
+      if (!gameState || gameState.is_terminal || isThinking) return;
+      const ghostSlots = document.querySelectorAll('.ghost-slot');
+      ghostSlots.forEach((slot, i) => {
+        if (i === col) {
+          slot.className = `ghost-slot active disc-icon ${gameState.current_player === 1 ? 'red' : 'yellow'}`;
+        } else {
+          slot.className = 'ghost-slot';
+        }
+      });
+
+      const highlight = document.getElementById('col-highlight');
+      highlight.style.display = 'block';
+      highlight.style.left = `${14 + col * (78 + 8)}px`;
+    }
+
+    function hideGhost() {
+      document.querySelectorAll('.ghost-slot').forEach(s => s.className = 'ghost-slot');
+      document.getElementById('col-highlight').style.display = 'none';
+    }
+
+    // Update UI from gameState
+    function renderBoard(state) {
+      gameState = state;
+
+      // Pieces
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+          const val = state.board[r][c];
+          cell.innerHTML = '';
+          if (val !== 0) {
+            const piece = document.createElement('div');
+            piece.className = `piece ${val === 1 ? 'red' : 'yellow'}`;
+            cell.appendChild(piece);
+          }
+        }
+      }
+
+      // Winning Quad Highlight
+      if (state.winning_quad && state.winning_quad.length === 4) {
+        state.winning_quad.forEach(([r, c]) => {
+          const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+          if (cell && cell.firstChild) {
+            cell.firstChild.classList.add('winning');
+          }
+        });
+      }
+
+      // Turn bar & Move counter
+      const turnDisc = document.getElementById('turn-disc');
+      const turnText = document.getElementById('turn-text');
+      const counter = document.getElementById('move-counter');
+      const winModal = document.getElementById('win-modal');
+
+      counter.innerText = `Nước đi: ${state.move_count} / 42`;
+
+      if (state.is_terminal) {
+        winModal.style.display = 'block';
+        if (state.winner === 1) {
+          document.getElementById('win-title').innerText = '🎉 Quân Đỏ (P1) Thắng!';
+          document.getElementById('win-title').style.color = 'var(--red-p1)';
+          playSound('win');
+        } else if (state.winner === -1) {
+          document.getElementById('win-title').innerText = '🏆 Quân Vàng (P2) Thắng!';
+          document.getElementById('win-title').style.color = 'var(--yellow-p2)';
+          playSound('win');
+        } else {
+          document.getElementById('win-title').innerText = '🤝 Hòa Cờ!';
+          document.getElementById('win-title').style.color = 'var(--text-muted)';
+        }
+        turnText.innerText = 'Ván cờ đã kết thúc';
+        return;
+      } else {
+        winModal.style.display = 'none';
+      }
+
+      if (state.current_player === 1) {
+        turnDisc.className = 'disc-icon red';
+        turnText.innerText = currentMode === 'H_AI' ? 'Lượt của bạn (Đỏ)' : 'Lượt Quân Đỏ (P1)';
+      } else {
+        turnDisc.className = 'disc-icon yellow';
+        turnText.innerText = currentMode === 'H_AI' ? 'Lượt Máy AI (Vàng)' : 'Lượt Quân Vàng (P2)';
+      }
+    }
+
+    // User Column Click
+    async function onColumnClick(col) {
+      if (!gameState || gameState.is_terminal || isThinking) return;
+      if (!gameState.legal_actions.includes(col)) return;
+
+      if (currentMode === 'H_AI' && gameState.current_player !== 1) return;
+
+      await makeHumanMove(col);
+    }
+
+    async function makeHumanMove(col) {
+      playSound('drop');
+      const res = await fetch('/api/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ col: col })
+      });
+      if (res.ok) {
+        const state = await res.json();
+        renderBoard(state);
+
+        if (!state.is_terminal) {
+          if (currentMode === 'H_AI' && state.current_player === -1) {
+            triggerAIMove();
+          } else if (currentMode === 'AI_AI') {
+            triggerAIMove();
+          }
+        }
+      }
+    }
+
+    // Trigger AI Move
+    async function triggerAIMove() {
+      if (!gameState || gameState.is_terminal || isThinking) return;
+
+      isThinking = true;
+      const statusTag = document.getElementById('status-tag');
+      statusTag.innerText = 'Máy đang tính...';
+      statusTag.style.borderColor = 'var(--accent)';
+
+      const agent = document.getElementById('agent-select').value;
+      const depth = parseInt(document.getElementById('depth-slider').value);
+
+      try {
+        const res = await fetch('/api/ai_move', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agent: agent,
+            depth: depth,
+            simulations: 1000,
+            time_s: 0.25
+          })
+        });
+
+        if (res.ok) {
+          const state = await res.json();
+          playSound('drop');
+          renderBoard(state);
+
+          document.getElementById('tele-latency').innerText = `${state.elapsed_ms} ms`;
+          document.getElementById('tele-nodes').innerText = state.stats || 'Xong';
+
+          if (currentMode === 'AI_AI' && !state.is_terminal) {
+            setTimeout(triggerAIMove, 400);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        isThinking = false;
+        statusTag.innerText = 'Sẵn sàng';
+        statusTag.style.borderColor = 'var(--card-border)';
+      }
+    }
+
+    // Controls
+    async function resetGame() {
+      const res = await fetch('/api/reset', { method: 'POST' });
+      if (res.ok) {
+        const state = await res.json();
+        renderBoard(state);
+        document.getElementById('tele-latency').innerText = '0.0 ms';
+        document.getElementById('tele-nodes').innerText = '-';
+        if (currentMode === 'AI_AI') {
+          setTimeout(triggerAIMove, 300);
+        }
+      }
+    }
+
+    async function undoMove() {
+      if (isThinking) return;
+      const steps = currentMode === 'H_AI' ? 2 : 1;
+      const res = await fetch('/api/undo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ steps: steps })
+      });
+      if (res.ok) {
+        const state = await res.json();
+        renderBoard(state);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`mode-${mode}`).classList.add('active');
+      resetGame();
+    }
+
+    function onAgentChange() {
+      const agent = document.getElementById('agent-select').value;
+      const depthSetting = document.getElementById('depth-setting');
+      depthSetting.style.display = agent === 'alphabeta' ? 'block' : 'none';
+    }
+
+    function updateSettings() {
+      const d = document.getElementById('depth-slider').value;
+      document.getElementById('depth-val').innerText = `${d} nước`;
+    }
+
+    // Initial Load
+    window.addEventListener('DOMContentLoaded', async () => {
+      initBoardDOM();
+      const res = await fetch('/api/state');
+      if (res.ok) {
+        const state = await res.json();
+        renderBoard(state);
+      }
+    });
+  </script>
+</body>
+</html>
