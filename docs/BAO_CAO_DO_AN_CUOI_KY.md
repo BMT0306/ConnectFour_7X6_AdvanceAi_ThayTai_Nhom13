@@ -45,46 +45,46 @@ Quá trình đánh giá được thực hiện thông qua giải đấu vòng tr
 
 ## MỤC LỤC
 
-- **LỜI NÓI ĐẦU**
-- **TÓM TẮT ĐỒ ÁN**
-- **MỤC LỤC**
-- **DANH MỤC HÌNH ẢNH VÀ BẢNG BIỂU**
-- **CHƯƠNG 1: GIỚI THIỆU VÀ KHẢO SÁT CHƯƠNG TRÌNH CONNECT FOUR**
-  - 1.1. Bối cảnh đề tài và hình thức hóa toán học không gian trạng thái $(S, A, T, R)$
-  - 1.2. Khảo sát thuật toán/mã nguồn sẵn có và đặt mốc đánh giá chuẩn (Benchmark Baseline)
-  - 1.3. Các câu hỏi nghiên cứu định lượng (RQ1 – RQ3)
-- **CHƯƠNG 2: HẠ TẦNG KỸ THUẬT VÀ CẤU TRÚC DỮ LIỆU BITBOARD**
-  - 2.1. Thiết kế Bitboard 49-bit và toán tử Bitwise $O(1)$
-    - 2.1.1. Cách ánh xạ bàn cờ 7×6 vào 49 bit của số nguyên 64-bit
-    - 2.1.2. Toán tử thả quân và kiểm tra thắng `_has_won` trong thời gian hằng số $O(1)$
-  - 2.2. Kiểm chuẩn tính đúng đắn cây trò chơi (Perft Validation at Depth 6)
-- **CHƯƠNG 3: PHƯƠNG PHÁP TRIỂN KHAI CHUỖI TÁC TỬ AI (LEVEL 1 – LEVEL 5)**
-  - 3.1. Nhóm tác tử cổ điển (Random, Heuristic, Negamax Alpha-Beta Pruning)
-    - 3.1.1. Tác tử Cấp 1 — `RandomAgent` (`src/c4/agents/random_agent.py`)
-    - 3.1.2. Tác tử Cấp 2 — `HeuristicAgent` (`src/c4/agents/heuristic.py`)
-    - 3.1.3. Tác tử Cấp 3 — `AlphaBetaAgent` (`src/c4/agents/alphabeta.py`)
-  - 3.2. Nhóm tác tử Monte Carlo (MCTS-UCT 4 giai đoạn)
-  - 3.3. Đề xuất Tác tử Học sâu AlphaZero-lite (Dual-Head ResNet + PUCT Search Pseudocode)
-    - 3.3.1. Kiến trúc mạng hai đầu `Connect4PolicyValueNet` (`src/c4/models/net.py`)
-    - 3.3.2. Sự cải tiến khi tích hợp mạng học sâu vào cây tìm kiếm PUCT (`MixedMCTSAgent`)
-- **CHƯƠNG 4: QUY TRÌNH QUẢN TRỊ DỮ LIỆU VÀ MINH BẠCH HÓA AI (XAI)**
-  - 4.1. Data Pipeline: Mã hóa Tensor, Symmetry Augmentation và Game-level Splitting
-  - 4.2. Quá trình huấn luyện Joint Loss và trực quan hóa bản đồ độ nhạy Saliency Map
-    - 4.2.1. Kiểm định toán học quá trình huấn luyện đa mục tiêu (Joint Loss Validation)
-    - 4.2.2. Trực quan hóa quyết định của mạng bằng bản đồ độ nhạy Saliency Map (XAI)
-- **CHƯƠNG 5: THỰC NGHIỆM ĐỐI KHÁNG VÀ PHÂN TÍCH KẾT QUẢ**
-  - 5.1. Quy chuẩn Giải đấu Vòng tròn Round-Robin Đối xứng (200 ván/cặp, Wilson 95% CI)
-  - 5.2. Phân tích kết quả thí nghiệm Giải đấu Tính giờ (RQ1) và Ablation Studies (A1 – A4)
-    - 5.2.1. Giải đấu giới hạn thời gian suy nghĩ cho RQ1 (`round_robin_timed_summary.csv`)
-    - 5.2.2. Thí nghiệm Ablation A1: Đóng góp của cắt tỉa Alpha-Beta và sắp xếp nước đi Center-First
-    - 5.2.3. Thí nghiệm Ablation A2: Tìm điểm giao thoa của MCTS trước Alpha-Beta cố định độ sâu 4
-    - 5.2.4. Thí nghiệm Ablation A3: Bóc tách vai trò của Policy Prior và Value Head trong PUCT (Trả lời RQ2 và RQ3)
-    - 5.2.5. Thí nghiệm Ablation A4: Định lượng lợi thế của người đi trước trên 3.000 ván đấu
-  - 5.3. Đánh giá mối quan hệ đánh đổi: Thông lượng duyệt nút, Độ trễ suy luận và Tỷ lệ thắng
-- **KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN**
-  - 1. Kết luận chung
-  - 2. Hạn chế và hướng phát triển tiếp theo
-- **TÀI LIỆU THAM KHẢO**
+- **LỜI NÓI ĐẦU** ................................................................ **Trang 3**
+- **TÓM TẮT ĐỒ ÁN** .............................................................. **Trang 4**
+- **MỤC LỤC** .................................................................... **Trang 5**
+- **DANH MỤC HÌNH ẢNH VÀ BẢNG BIỂU** ............................................. **Trang 7**
+- **CHƯƠNG 1: GIỚI THIỆU VÀ KHẢO SÁT CHƯƠNG TRÌNH CONNECT FOUR** ................. **Trang 8**
+  - 1.1. Bối cảnh đề tài và hình thức hóa toán học không gian trạng thái (S, A, T, R) ... Trang 8
+  - 1.2. Khảo sát thuật toán/mã nguồn sẵn có và đặt mốc đánh giá chuẩn (Benchmark Baseline) ... Trang 10
+  - 1.3. Các câu hỏi nghiên cứu định lượng (RQ1 – RQ3) ....................... Trang 11
+- **CHƯƠNG 2: HẠ TẦNG KỸ THUẬT VÀ CẤU TRÚC DỮ LIỆU BITBOARD** .................... **Trang 13**
+  - 2.1. Thiết kế Bitboard 49-bit và toán tử Bitwise O(1) .................... Trang 13
+    - 2.1.1. Cách ánh xạ bàn cờ 7×6 vào 49 bit của số nguyên 64-bit .......... Trang 13
+    - 2.1.2. Toán tử thả quân và kiểm tra thắng _has_won trong thời gian hằng số O(1) ... Trang 14
+  - 2.2. Kiểm chuẩn tính đúng đắn cây trò chơi (Perft Validation at Depth 6) ... Trang 15
+- **CHƯƠNG 3: PHƯƠNG PHÁP TRIỂN KHAI CHUỖI TÁC TỬ AI (LEVEL 1 – LEVEL 5)** ....... **Trang 17**
+  - 3.1. Nhóm tác tử cổ điển (Random, Heuristic, Negamax Alpha-Beta Pruning) ... Trang 17
+    - 3.1.1. Tác tử Cấp 1 — RandomAgent ...................................... Trang 17
+    - 3.1.2. Tác tử Cấp 2 — HeuristicAgent ................................... Trang 17
+    - 3.1.3. Tác tử Cấp 3 — AlphaBetaAgent ................................... Trang 17
+  - 3.2. Nhóm tác tử Monte Carlo (MCTS-UCT 4 giai đoạn) ...................... Trang 18
+  - 3.3. Đề xuất Tác tử Học sâu AlphaZero-lite (Dual-Head ResNet + PUCT Search Pseudocode) ... Trang 19
+    - 3.3.1. Kiến trúc mạng hai đầu Connect4PolicyValueNet ................... Trang 19
+    - 3.3.2. Sự cải tiến khi tích hợp mạng học sâu vào cây tìm kiếm PUCT (MixedMCTSAgent) ... Trang 20
+- **CHƯƠNG 4: QUY TRÌNH QUẢN TRỊ DỮ LIỆU VÀ MINH BẠCH HÓA AI (XAI)** ............. **Trang 23**
+  - 4.1. Data Pipeline: Mã hóa Tensor, Symmetry Augmentation và Game-level Splitting ... Trang 23
+  - 4.2. Quá trình huấn luyện Joint Loss và trực quan hóa bản đồ độ nhạy Saliency Map ... Trang 24
+    - 4.2.1. Kiểm định toán học quá trình huấn luyện đa mục tiêu (Joint Loss Validation) ... Trang 24
+    - 4.2.2. Trực quan hóa quyết định của mạng bằng bản đồ độ nhạy Saliency Map (XAI) ... Trang 26
+- **CHƯƠNG 5: THỰC NGHIỆM ĐỐI KHÁNG VÀ PHÂN TÍCH KẾT QUẢ** ....................... **Trang 29**
+  - 5.1. Quy chuẩn Giải đấu Vòng tròn Round-Robin Đối xứng (200 ván/cặp, Wilson 95% CI) ... Trang 29
+  - 5.2. Phân tích kết quả thí nghiệm Giải đấu Tính giờ (RQ1) và Ablation Studies (A1 – A4) ... Trang 32
+    - 5.2.1. Giải đấu giới hạn thời gian suy nghĩ cho RQ1 .................... Trang 32
+    - 5.2.2. Thí nghiệm Ablation A1: Đóng góp của cắt tỉa Alpha-Beta và sắp xếp nước đi Center-First ... Trang 33
+    - 5.2.3. Thí nghiệm Ablation A2: Tìm điểm giao thoa của MCTS trước Alpha-Beta cố định độ sâu 4 ... Trang 35
+    - 5.2.4. Thí nghiệm Ablation A3: Bóc tách vai trò của Policy Prior và Value Head trong PUCT ... Trang 36
+    - 5.2.5. Thí nghiệm Ablation A4: Định lượng lợi thế của người đi trước trên 3.000 ván đấu ... Trang 38
+  - 5.3. Đánh giá mối quan hệ đánh đổi: Thông lượng duyệt nút, Độ trễ suy luận và Tỷ lệ thắng ... Trang 39
+- **KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN** ............................................... **Trang 42**
+  - 1. Kết luận chung ........................................................ Trang 42
+  - 2. Hạn chế và hướng phát triển tiếp theo ................................. Trang 43
+- **TÀI LIỆU THAM KHẢO** ......................................................... **Trang 44**
 
 ---
 
@@ -92,27 +92,27 @@ Quá trình đánh giá được thực hiện thông qua giải đấu vòng tr
 
 ### Danh mục Hình ảnh
 
-- **Hình 4.1**: Diễn biến hàm mất mát và độ chính xác trên tập Train và Validation qua 10 epochs
-- **Hình 4.2**: Bản đồ độ nhạy Saliency Map giải thích quyết định của mạng trên hai thế cờ chiến thuật
-- **Hình 5.1**: Ma trận điểm số đối đầu trực tiếp và bảng xếp hạng tổng hợp 6 tác tử qua 3.000 ván
-- **Hình 5.2**: So sánh tỷ lệ điểm giữa Alpha-Beta và MCTS-UCT ở các mức ngân sách thời gian 50ms, 100ms, 300ms
-- **Hình 5.3**: Biểu đồ so sánh số nút duyệt trong thí nghiệm Ablation A1 ở độ sâu 4, 5 và 6
-- **Hình 5.4**: Đường cong tăng trưởng điểm số của MCTS-UCT theo số lượng mô phỏng trước Alpha-Beta depth 4
-- **Hình 5.5**: Kết quả Ablation A3 bóc tách đóng góp của Policy Prior và Value Head ở mức 200 mô phỏng
-- **Hình 5.6**: Tỷ lệ thắng của người đi trước (Quân Đỏ) và người đi sau (Quân Vàng) trên từng cặp đấu
+- **Hình 4.1: Diễn biến hàm mất mát và độ chính xác trên tập Train và Validation qua 10 epochs** ... Trang 25
+- **Hình 4.2: Bản đồ độ nhạy Saliency Map giải thích quyết định của mạng trên hai thế cờ chiến thuật** ... Trang 27
+- **Hình 5.1: Ma trận điểm số đối đầu trực tiếp và bảng xếp hạng tổng hợp 6 tác tử qua 3.000 ván** ... Trang 31
+- **Hình 5.2: So sánh tỷ lệ điểm giữa Alpha-Beta và MCTS-UCT ở các mức ngân sách thời gian 50ms, 100ms, 300ms** ... Trang 33
+- **Hình 5.3: Biểu đồ so sánh số nút duyệt trong thí nghiệm Ablation A1 ở độ sâu 4, 5 và 6** ... Trang 34
+- **Hình 5.4: Đường cong tăng trưởng điểm số của MCTS-UCT theo số lượng mô phỏng trước Alpha-Beta depth 4** ... Trang 36
+- **Hình 5.5: Kết quả Ablation A3 bóc tách đóng góp của Policy Prior và Value Head ở mức 200 mô phỏng** ... Trang 37
+- **Hình 5.6: Tỷ lệ thắng của người đi trước (Quân Đỏ) và người đi sau (Quân Vàng) trên từng cặp đấu** ... Trang 38
 
 ### Danh mục Bảng biểu
 
-- **Bảng 1.1**: Tổng hợp khảo sát các nhóm chương trình chơi Connect Four phổ biến
-- **Bảng 2.1**: Kết quả kiểm chuẩn Perft từ độ sâu 1 đến độ sâu 6 trên bàn cờ 7×6
-- **Bảng 3.1**: So sánh cơ chế giữa MCTS-UCT thuần, Biased MCTS và MixedMCTSAgent (PUCT)
-- **Bảng 4.1**: Kết quả huấn luyện và kiểm định mạng Connect4PolicyValueNet qua 10 epochs
-- **Bảng 5.1**: Kết quả chi tiết 15 cặp đấu trong giải đấu Round-Robin 3.000 ván (200 ván/cặp)
-- **Bảng 5.2**: Kết quả đối đầu giữa Alpha-Beta (Iterative Deepening) và MCTS-UCT dưới cùng ngân sách thời gian
-- **Bảng 5.3**: Kết quả Ablation A1 — Số nút duyệt và thời gian chạy khi bật/tắt cắt tỉa và sắp xếp nước đi
-- **Bảng 5.4**: Kết quả Ablation A2 — Tỷ lệ điểm của MCTS-UCT khi tăng số mô phỏng trước Alpha-Beta (depth = 4)
-- **Bảng 5.5**: Kết quả Ablation A3 — So sánh 4 biến thể trước hai mốc chuẩn mcts_500 và alphabeta_d4
-- **Bảng 5.6**: Bảng tổng hợp tiến hóa 6 phiên bản tác tử AI và sự đánh đổi giữa độ trễ suy luận với tỷ lệ thắng
+- **Bảng 1.1: Tổng hợp khảo sát các nhóm chương trình chơi Connect Four phổ biến** ... Trang 10
+- **Bảng 2.1: Kết quả kiểm chuẩn Perft từ độ sâu 1 đến độ sâu 6 trên bàn cờ 7×6** ... Trang 15
+- **Bảng 3.1: So sánh cơ chế giữa MCTS-UCT thuần, Biased MCTS và MixedMCTSAgent (PUCT)** ... Trang 20
+- **Bảng 4.1: Kết quả huấn luyện và kiểm định mạng Connect4PolicyValueNet qua 10 epochs** ... Trang 25
+- **Bảng 5.1: Kết quả chi tiết 15 cặp đấu trong giải đấu Round-Robin 3.000 ván (200 ván/cặp)** ... Trang 30
+- **Bảng 5.2: Kết quả đối đầu giữa Alpha-Beta (Iterative Deepening) và MCTS-UCT dưới cùng ngân sách thời gian** ... Trang 32
+- **Bảng 5.3: Kết quả Ablation A1 — Số nút duyệt và thời gian chạy khi bật/tắt cắt tỉa và sắp xếp nước đi** ... Trang 34
+- **Bảng 5.4: Kết quả Ablation A2 — Tỷ lệ điểm của MCTS-UCT khi tăng số mô phỏng trước Alpha-Beta (depth = 4)** ... Trang 35
+- **Bảng 5.5: Kết quả Ablation A3 — So sánh 4 biến thể trước hai mốc chuẩn mcts_500 và alphabeta_d4** ... Trang 37
+- **Bảng 5.6: Bảng tổng hợp tiến hóa 6 phiên bản tác tử AI và sự đánh đổi giữa độ trễ suy luận với tỷ lệ thắng** ... Trang 40
 
 ---
 
