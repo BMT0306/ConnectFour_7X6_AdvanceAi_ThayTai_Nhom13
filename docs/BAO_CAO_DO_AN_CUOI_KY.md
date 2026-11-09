@@ -9,154 +9,340 @@
 
 | STT | Họ và Tên | MSSV | Vai trò | Nhiệm vụ chính | Đóng góp |
 |:---:|:---|:---:|:---:|:---|:---:|
-| 1 | **Bùi Minh Trung** | `3124720074` | Nhóm trưởng (TV1) | Engine (`bitboard` + `reference`), API & bộ unit test; `HeuristicAgent`, `AlphaBetaAgent`; khung giải đấu & thống kê (`Wilson`, `Bootstrap`, `p95`); Ablation A1 & A3; XAI Saliency; Web/Docker UI; quản lý GitHub, review PR & đóng gói | **32%** |
+| 1 | **Bùi Minh Trung** | `3124720074` | Nhóm trưởng (TV1) | Engine (`bitboard` + `reference`), API & bộ unit test; `HeuristicAgent`, `AlphaBetaAgent`; khung giải đấu & thống kê (`Wilson`, `Bootstrap`, `p95`); Ablation A1 & A3; XAI Saliency; Web UI; quản lý GitHub, review PR & đóng gói | **32%** |
 | 2 | **Trần Lê Minh Tâm** | `3124720064` | Thành viên (TV2) | `RandomAgent`, `MCTSAgent` (UCT 4 bước); kiến trúc mạng hai đầu `Connect4PolicyValueNet`, pipeline sinh dữ liệu/huấn luyện & `MixedMCTSAgent` (PUCT + Transposition Cache + Dirichlet noise); giao diện Pygame GUI; Ablation A2 & A4 | **32%** |
-| 3 | **Nguyễn Thành Tài** | `3124720062` | Thành viên (TV3) | Chạy thực nghiệm giải đấu & ablation, thu thập log CSV thô; xây dựng & chạy notebook phân tích (`01_tournament_analysis.ipynb`); bổ sung vị trí kiểm thử thủ công (`positions.csv`); phân tích ván đấu & viết Chương 4 | **18%** |
-| 4 | **Chương Gia Thịnh** | `3124720067` | Thành viên (TV4) | Biên soạn Chương 1, 2, 3, 5 của báo cáo cuối kỳ; thiết kế Slide thuyết trình, Poster khổ A0, kịch bản/quay Video Demo; rà soát tài liệu tham khảo, `THIRD_PARTY.md`, `README.md` và chuẩn bị bản in | **18%** |
+| 3 | **Nguyễn Thành Tài** | `3124720062` | Thành viên (TV3) | Chạy thực nghiệm giải đấu & ablation, thu thập log CSV thô; xây dựng & chạy notebook phân tích (`01_tournament_analysis.ipynb`); bổ sung vị trí kiểm thử thủ công (`positions.csv`); phân tích ván đấu & viết Chương 4–5 | **18%** |
+| 4 | **Chương Gia Thịnh** | `3124720067` | Thành viên (TV4) | Biên soạn Chương 1, 2, 3 của báo cáo cuối kỳ; thiết kế Slide thuyết trình, Poster khổ A0, kịch bản/quay Video Demo; rà soát tài liệu tham khảo, `THIRD_PARTY.md`, `README.md` và chuẩn bị bản in | **18%** |
 | **Tổng** | | | | | **100%** |
 
 ---
 
 ## TÓM TẮT ĐỒ ÁN (ABSTRACT)
 
-Đồ án này nghiên cứu, thiết kế và đánh giá thực nghiệm một hệ thống trí tuệ nhân tạo (AI) đa cấp độ hoàn chỉnh cho trò chơi đối kháng thông tin hoàn hảo **Connect Four kích thước chuẩn 7 cột × 6 hàng**. Trên nền tảng lõi **Engine Bitboard 49-bit** tốc độ cao (được kiểm chứng tuyệt đối qua kiểm định Perft đến độ sâu 5 và đối chiếu chéo 10.000 ván ngẫu nhiên không sai lệch với `ReferenceConnect4`), nhóm xây dựng chuỗi **6 tác tử AI** tăng tiến rõ rệt về tri thức và chiến lược suy luận: Cấp 1 (`RandomAgent`), Cấp 2 (`HeuristicAgent` dựa trên 4 tầng luật ưu tiên), Cấp 3 (`AlphaBetaAgent` kết hợp Negamax, cắt tỉa $\alpha$-$\beta$, sắp xếp Center-First và Iterative Deepening), Cấp 4 (`MCTSAgent` dùng cây UCT đa tầng), Cấp 5 (`NNAgent` dùng mạng học sâu `Connect4PolicyValueNet` gồm 3 khối Residual và 278.952 tham số học có giám sát từ nhãn chuyên gia sạch), và Cấp mở rộng (`MixedMCTSAgent` tích hợp Policy Prior và Value Head vào công thức tìm kiếm cây PUCT theo cảm hứng từ AlphaGo/AlphaZero, kèm cơ chế giải thích hộp đen bằng bản đồ độ nhạy đạo hàm bậc nhất — *Gradient Saliency Map*).
+Đồ án này nghiên cứu, thiết kế và đánh giá thực nghiệm một hệ thống trí tuệ nhân tạo (AI) đa cấp độ hoàn chỉnh cho trò chơi đối kháng thông tin hoàn hảo **Connect Four kích thước chuẩn 7 cột × 6 hàng**. Trên nền tảng hạ tầng **Engine Bitboard 49-bit** tốc độ cao với các toán tử thao tác bit $O(1)$ (được kiểm chuẩn tuyệt đối qua kiểm định cây trò chơi **Perft đến độ sâu 6** và đối chiếu chéo **10.000 ván ngẫu nhiên** không sai lệch với `ReferenceConnect4`), nhóm phát triển chuỗi **6 phiên bản tác tử AI** tiến hóa dần về tri thức và chiến lược suy luận:
+- **Level 1 (`RandomAgent`)**: Tác tử ngẫu nhiên có hạt giống tái lập.
+- **Level 2 (`HeuristicAgent`)**: Tác tử phản xạ 4 tầng luật ưu tiên kết hợp bộ lọc chống tự sát (*anti-blunder*).
+- **Level 3 (`AlphaBetaAgent`)**: Tác tử duyệt cây đối kháng Negamax tích hợp cắt tỉa $\alpha$-$\beta$, sắp xếp nước đi *Center-First*, tìm kiếm sâu dần (*Iterative Deepening*) và hàm lượng giá trên 69 cửa sổ chiến thắng 4 ô.
+- **Level 4 (`MCTSAgent`)**: Tác tử tìm kiếm cây Monte Carlo 4 giai đoạn sử dụng công thức UCT ($c = 1,4$).
+- **Level 5 (`NNAgent` — Dual-Head ResNet)**: Tác tử học sâu sử dụng mạng nơ-ron phần dư hai đầu `Connect4PolicyValueNet` (`3` khối Residual, `278.952` tham số) học có giám sát từ nhãn chuyên gia sạch.
+- **Level 6 / AlphaZero-lite (`MixedMCTSAgent` — PUCT Search)**: Tác tử lai ghép tích hợp xác suất tiên nghiệm Policy Head $P_\theta(s,a)$ và lượng giá Value Head $V_\theta(s)$ vào cây tìm kiếm PUCT, kết hợp bảng băm hoán vị $O(1)$ (*Transposition Cache*) và giải thích hộp đen bằng bản đồ độ nhạy đạo hàm bậc nhất (*Gradient Saliency Map — XAI*).
 
-Để đảm bảo tính khách quan và khả năng tái lập khoa học, mọi tác tử được đặt vào khung giải đấu vòng tròn **Round-Robin 3.000 ván** (15 cặp × 200 ván, gồm 100 khai cuộc 4 nước cố định theo hạt giống và luân phiên đổi bên đi trước/đi sau), kết hợp giải đấu giới hạn thời gian thực **300 ván** (50 ms, 100 ms, 300 ms/nước) và 4 nghiên cứu phân rã (**Ablation A1–A4**). Kết quả thực nghiệm cho thấy: (1) Cắt tỉa $\alpha$-$\beta$ kèm Center-First giảm **93,07%** số nút duyệt ở độ sâu 6; (2) Mạng `Connect4PolicyValueNet` huấn luyện trên tập dữ liệu tách theo ván chống rò rỉ 100% (kể cả ảnh gương ngang) đạt **71,68% Top-1 Accuracy** và **89,07% Top-2 Accuracy** trên tập `Test` độc lập (`6.293` mẫu), tự mình đánh bại `HeuristicAgent` với điểm số **64,25%** chỉ trong `2,74 ms/nước` mà không cần tìm kiếm cây; (3) Khi kết hợp mạng nơ-ron vào tìm kiếm cây PUCT với chỉ **200 mô phỏng** (`MixedMCTSAgent`), tác tử lai vươn lên đứng đầu bảng xếp hạng toàn giải (**Score = 75,00%**), đánh bại cả `MCTS-UCT 1.000 sims` (**62,50%**) lẫn `Alpha-Beta depth 5` (**54,25%**).
-
----
-
-## CHƯƠNG 1. GIỚI THIỆU
-
-### 1.1. Bối cảnh đề tài
-Các trò chơi đối kháng có thông tin hoàn hảo (perfect-information adversarial games) từ lâu đã đóng vai trò là thước đo chuẩn mực cho sự tiến bộ của Trí tuệ nhân tạo — khởi đầu từ chiến thắng lịch sử của Deep Blue trong cờ vua (1997) dựa trên tìm kiếm cắt tỉa chuyên sâu và hàm lượng giá thủ công, cho tới bước ngoặt của AlphaGo (Silver et al., 2016) và AlphaZero (Silver et al., 2017) kết hợp mạng nơ-ron tích chập sâu với tìm kiếm cây Monte Carlo (MCTS). Việc triển khai đồng thời cả hai trường phái — **AI kinh điển dựa trên tri thức/tìm kiếm** và **AI học sâu dữ liệu** — trên cùng một môi trường chuẩn cho phép định lượng minh bạch sự đánh đổi giữa tốc độ tính toán, độ sâu chiến thuật, chi phí huấn luyện và khả năng giải thích quyết định.
-
-### 1.2. Trò chơi Connect Four (7×6) dưới góc nhìn Lý thuyết Trò chơi
-Connect Four diễn ra trên lưới thẳng đứng gồm 7 cột và 6 hàng (42 ô). Hai người chơi (Quân Đỏ — `PLAYER1` đi trước; Quân Vàng — `PLAYER2` đi sau) luân phiên thả quân vào một trong các cột chưa đầy; dưới tác dụng trọng lực, quân cờ rơi xuống ô trống thấp nhất của cột đó. Ván đấu kết thúc ngay khi một bên tạo được chuỗi **4 quân liên tiếp** cùng màu theo chiều ngang, dọc hoặc một trong hai đường chéo (tổng cộng có **69 cửa sổ 4 ô** trên bàn cờ 7×6), hoặc hòa khi toàn bộ 42 ô đã kín.
-
-Theo phân loại của Russell & Norvig (2021), Connect Four là môi trường **quan sát đầy đủ** (fully observable), **xác định** (deterministic), **hữu hạn rời rạc** (discrete, tối đa 42 nước đi, hệ số nhánh $b \le 7$), **tuần tự theo lượt** (turn-based) và **đối kháng tổng bằng không** (zero-sum). Không gian trạng thái hợp lệ của trò chơi vào khoảng $4,53 \times 10^{12}$ trạng thái (Allis, 1988; Edelkamp & Kissmann, 2008). Dù trò chơi đã được Victor Allis chứng minh toán học năm 1988 là người đi trước thắng nếu chơi tối ưu tuyệt đối (khi đi cột trung tâm đầu tiên), độ lớn $4,5 \times 10^{12}$ vẫn khiến tìm kiếm vét cạn trực tiếp hoàn toàn bất khả thi trong thời gian thực nếu thiếu kỹ thuật biểu diễn bitboard, cắt tỉa nhánh hoặc dẫn đường bằng mạng nơ-ron.
-
-### 1.3. Mục tiêu và Ba Câu hỏi Nghiên cứu (Research Questions)
-Đề tài hướng tới xây dựng hệ thống phần mềm và thực nghiệm hoàn chỉnh nhằm trả lời định lượng ba câu hỏi nghiên cứu:
-- **RQ1 (So sánh Tìm kiếm Đối kháng và Tìm kiếm Ngẫu nhiên theo Ngân sách)**: Dưới cùng ngân sách thời gian suy nghĩ mỗi nước đi (`50 ms`, `100 ms`, `300 ms`), `MCTS-UCT` thuần có vượt qua `Alpha-Beta` (Iterative Deepening) hay không? Khi cố định độ sâu của `Alpha-Beta` (`depth = 4`), điểm giao thoa (cross-over point) về số lượng mô phỏng của `MCTS` xuất hiện tại ngưỡng nào?
-- **RQ2 (Sức mạnh Học bắt chước Có giám sát — Behavioral Cloning)**: Mô hình mạng nơ-ron tích chập sâu `Connect4PolicyValueNet` học có giám sát từ nhãn nước đi sạch của chuyên gia `Alpha-Beta (depth = 4)` đạt độ chính xác dự đoán trên tập `Test` độc lập là bao nhiêu, và khi suy luận trực tiếp không kèm tìm kiếm cây (`0 search`) đạt sức mạnh đối kháng tới mức nào so với `Heuristic`, `MCTS` và chính tác tử thầy?
-- **RQ3 (Hiệu quả Lai ghép Mạng Nơ-ron với Tìm kiếm Cây PUCT & Giải thích AI)**: Việc tích hợp xác suất tiên nghiệm Policy Prior $P(s, a)$ và đầu lượng giá Value Head $V(s)$ vào công thức chọn nút PUCT (`MixedMCTSAgent`, lấy cảm hứng từ AlphaGo/AlphaZero) cải thiện tỷ lệ thắng ra sao so với `MCTS-UCT` thuần cùng ngân sách mô phỏng, đồng thời bản đồ độ nhạy đạo hàm (Saliency Map) cho thấy mạng nơ-ron chú ý vào những cấu trúc chiến thuật nào trên bàn cờ?
-
-### 1.4. Phạm vi và Cam kết Trung thực Học thuật
-- **Trong phạm vi**: Engine Bitboard 49-bit và Reference Engine 2D; 6 cấp tác tử (`Random`, `Heuristic`, `Alpha-Beta`, `MCTS-UCT`, `Policy-Value ResNet`, `Mixed-MCTS PUCT`); giải thích quyết định bằng Gradient Saliency; bộ kiểm thử tự động `pytest` 57 test cases; khung giải đấu Round-Robin đa chế độ, 4 nghiên cứu phân rã A1–A4; ứng dụng CLI, Pygame GUI và FastAPI Web App + Docker.
-- **Ngoài phạm vi & Giới hạn trung thực**: Đồ án **tuyệt đối không sử dụng bất kỳ bộ giải tối ưu (exact solver) hay cơ sở dữ liệu khai cuộc hoàn hảo bên ngoài nào**. Toàn bộ trọng số mô hình và hơn **4.600 ván đấu thực nghiệm** đều được sinh, huấn luyện và thi đấu thực tế trên CPU cá nhân từ mã nguồn của nhóm. Cách tiếp cận `MixedMCTSAgent` được định danh chính xác là **AlphaGo-/AlphaZero-inspired** (dùng mạng Policy-Value huấn luyện có giám sát kết hợp tìm kiếm PUCT, chưa chạy vòng lặp tự chơi tăng cường nhiều thế hệ trên cụm GPU).
+Hệ thống được đánh giá nghiêm ngặt qua giải đấu vòng tròn **Round-Robin đối xứng 3.000 ván** (15 cặp × 200 ván trên 100 khai cuộc chuẩn, hoán đổi Đỏ/Vàng), giải đấu giới hạn thời gian thực **300 ván** (`50 ms`, `100 ms`, `300 ms/nước`) và 4 nghiên cứu phân rã (**Ablation A1–A4**). Kết quả thực nghiệm chứng minh: (1) Cắt tỉa $\alpha$-$\beta$ kèm *Center-First* giảm **93,07%** số nút duyệt ở độ sâu 6; (2) Mạng `Connect4PolicyValueNet` huấn luyện trên tập dữ liệu `87.725` mẫu tách theo ván chống rò rỉ 100% đạt **71,68% Top-1 Accuracy** và **89,07% Top-2 Accuracy** trên tập `Test` độc lập (`6.293` mẫu); (3) Khi tích hợp tri thức mạng học sâu vào cây PUCT, tác tử `MixedMCTSAgent` chỉ cần **200 mô phỏng/nước** (ít hơn 5 lần so với `MCTS-UCT 1.000 sims`) nhưng vươn lên dẫn đầu toàn giải với **Overall Score = 75,00%**, đánh bại cả `MCTS-UCT 1.000 sims` (**62,50%**) lẫn `Alpha-Beta depth 5` (**54,25%**), minh chứng thuyết phục cho nguyên lý *"duyệt ít nút hơn nhưng chọn nước đi chất lượng và chắc chắn hơn"*.
 
 ---
 
-## CHƯƠNG 2. CƠ SỞ LÝ THUYẾT VÀ CÔNG TRÌNH LIÊN QUAN
+## CHƯƠNG 1: GIỚI THIỆU VÀ KHẢO SÁT CHƯƠNG TRÌNH CONNECT FOUR
 
-### 2.1. Tìm kiếm Đối kháng: Negamax, Cắt tỉa Alpha-Beta và Iterative Deepening
-Trong trò chơi tổng bằng không hai người chơi đối xứng điểm số $u_{\text{max}}(s) = -u_{\text{min}}(s)$, thuật toán Minimax được rút gọn thanh thoát về dạng **Negamax**:
+### 1.1. Bối cảnh đề tài & Hình thức hóa toán học không gian trạng thái $(S, A, T, R)$
 
-$$V(s, d) = \begin{cases} \text{eval}(s) & \text{nếu } d = 0 \text{ hoặc } s \text{ kết thúc} \\ \max_{a \in A(s)} \left( -V(\text{step}(s, a), d - 1) \right) & \text{ngược lại} \end{cases}$$
+Các trò chơi đối kháng có thông tin hoàn hảo (*perfect-information adversarial games*) từ lâu đã đóng vai trò là thước đo chuẩn mực cho sự tiến bộ của Trí tuệ nhân tạo — khởi đầu từ các thuật toán duyệt cây Minimax/Alpha-Beta kết hợp hàm lượng giá thủ công (Knuth & Moore, 1975; Campbell et al., 2002), tiến tới Tìm kiếm Cây Monte Carlo — MCTS (Kocsis & Szepesvári, 2006), và bùng nổ với kiến trúc kết hợp Mạng Nơ-ron Tích chập Sâu cùng tìm kiếm PUCT trong AlphaGo / AlphaZero (Silver et al., 2016, 2017).
 
-Kỹ thuật **cắt tỉa Alpha-Beta** duy trì cửa sổ $[\alpha, \beta]$ biểu diễn điểm thấp nhất bên đang đi đã nắm chắc ($\alpha$) và điểm cao nhất đối phương cho phép ($\beta$). Bất cứ khi nào tìm thấy hành động làm $\alpha \ge \beta$, toàn bộ các nhánh con còn lại tại nút đó đều bị cắt bỏ mà **không làm thay đổi kết quả toán học của Minimax**. Trong trường hợp sắp xếp nước đi lý tưởng (duyệt nước tốt nhất trước tiên), độ phức tạp số nút lá giảm từ $O(b^d)$ xuống xấp xỉ $O(b^{d/2})$ — tức cho phép tìm kiếm sâu gần gấp đôi với cùng chi phí tính toán. Trong Connect Four, các cột trung tâm tham gia vào nhiều cửa sổ 4 ô nhất, do đó thứ tự ưu tiên tĩnh **Center-First** `(3, 2, 4, 1, 5, 0, 6)` đóng vai trò xấp xỉ sắp xếp nước đi rất hiệu quả. Khi thi đấu theo giới hạn thời gian thực, **Iterative Deepening** tăng dần độ sâu $d = 1, 2, \dots, d_{\max}$ và kiểm tra đồng hồ `time.perf_counter()` để luôn bảo toàn nghiệm hoàn chỉnh của tầng sâu nhất đã hoàn tất.
+Trò chơi **Connect Four** (kích thước tiêu chuẩn **7 cột × 6 hàng**) diễn ra trên một lưới thẳng đứng gồm 42 ô giữa hai người chơi: Quân Đỏ (`PLAYER1 = +1`, đi trước) và Quân Vàng (`PLAYER2 = -1`, đi sau). Dưới góc nhìn Lý thuyết Trò chơi và Quy hoạch Động, bài toán được hình thức hóa bằng bộ bốn toán học $(S, A, T, R)$:
 
-### 2.2. Tìm kiếm Cây Monte Carlo (MCTS) với Công thức UCT
-Khác với Alpha-Beta cần hàm lượng giá thủ công đặc thù miền, **MCTS** (Kocsis & Szepesvári, 2006) ước lượng giá trị trạng thái thông qua lấy mẫu ngẫu nhiên có định hướng, gồm 4 pha lặp lại: *Selection*, *Expansion*, *Simulation (Rollout)* và *Backpropagation*. Tại pha *Selection*, nút con $a$ được chọn nhằm cực đại hóa chỉ số **UCT** (Upper Confidence Bounds applied to Trees):
+1. **Không gian trạng thái ($S$)**: Mỗi trạng thái $s \in S$ biểu diễn cấu hình quân cờ trên lưới $6 \times 7$ thỏa mãn ràng buộc trọng lực (mọi quân cờ trong một cột phải xếp liên tục từ hàng đáy $r=0$ lên trên, không có ô trống nằm dưới ô đã có quân). Tổng số trạng thái hợp lệ đạt $|S| = 4.531.985.219.092 \approx 4,53 \times 10^{12}$ trạng thái (Allis, 1988; Edelkamp & Kissmann, 2008).
+2. **Không gian hành động hợp lệ ($A(s)$)**: Tại trạng thái chưa kết thúc $s$, tập hành động hợp lệ gồm chỉ số các cột chưa đầy:
+   $$A(s) = \{ c \in \{0, 1, \dots, 6\} \mid h_s(c) < 6 \}$$
+   trong đó $h_s(c) \in \{0, \dots, 6\}$ là chiều cao hiện tại của cột $c$. Hệ số phân nhánh tối đa rất gọn ($b = |A(s)| \le 7$) và độ sâu tối đa của cây trò chơi là $D_{\max} = 42$ nước đi (ply).
+3. **Hàm chuyển trạng thái tất định ($T(s, a)$)**: Khi người chơi hiện tại $\tau(s) \in \{+1, -1\}$ chọn cột $a \in A(s)$, quân cờ rơi xuống hàng trống thấp nhất $r = h_s(a)$, tạo thành trạng thái kế tiếp $s' = T(s, a)$ với $h_{s'}(a) = h_s(a) + 1$ và lượt chơi chuyển sang $-\tau(s)$.
+4. **Tập cửa sổ thắng & Hàm phần thưởng kết thúc ($R(s)$)**: Trên lưới $7 \times 6$, tồn tại chính xác **69 cửa sổ gồm 4 ô liên tiếp** ($\mathcal{W}_{69}$), bao gồm:
+   - **24 cửa sổ ngang**: $6 \text{ hàng} \times 4 \text{ vị trí bắt đầu mỗi hàng}$.
+   - **21 cửa sổ dọc**: $7 \text{ cột} \times 3 \text{ vị trí bắt đầu mỗi cột}$.
+   - **12 cửa sổ chéo chính ($\setminus$)**: $3 \text{ hàng} \times 4 \text{ cột}$.
+   - **12 cửa sổ chéo phụ ($/$)**: $3 \text{ hàng} \times 4 \text{ cột}$.
+   Trạng thái $s$ là trạng thái kết thúc (*terminal*) khi một bên lấp đầy cả 4 ô của bất kỳ cửa sổ $w \in \mathcal{W}_{69}$ nào, hoặc khi toàn bộ 42 ô đã kín. Hàm phần thưởng tổng bằng không theo góc nhìn của người chơi thứ nhất được xác định bởi:
+   $$R(s) = \begin{cases} +1 & \text{nếu Quân Đỏ (+1) sở hữu 4 ô liên tiếp trong } \mathcal{W}_{69} \\ -1 & \text{nếu Quân Vàng (-1) sở hữu 4 ô liên tiếp trong } \mathcal{W}_{69} \\ 0 & \text{nếu } \sum_{c=0}^{6} h_s(c) = 42 \text{ mà chưa bên nào thắng (Hòa)} \end{cases}$$
 
-$$\text{UCT}(s, a) = \frac{W(s, a)}{N(s, a)} + c \sqrt{\frac{\ln N(s)}{N(s, a)}}$$
+### 1.2. Khảo sát thuật toán/mã nguồn sẵn có & Đặt mốc đánh giá chuẩn (Benchmark Baseline)
 
-trong đó $N(s, a)$ là số lượt đi qua nhánh $(s, a)$, $W(s, a)$ là tổng điểm tích lũy theo góc nhìn của người chơi vừa thực hiện hành động $a$, và hằng số $c = 1,4 \approx \sqrt{2}$ điều tiết cân bằng giữa **khai thác** nhánh đang có tỷ lệ thắng cao với **khám phá** các nhánh ít được thăm.
+Để tránh việc đánh giá chủ quan hoặc chỉ so sánh với tác tử ngẫu nhiên yếu, nhóm thực hiện khảo sát cấu trúc tìm kiếm và hàm lượng giá của **4 dòng chương trình Connect Four tiêu biểu** trong cộng đồng mã nguồn mở và các công trình học thuật, từ đó hiện thực hóa và chuẩn hóa chúng trên cùng một hạ tầng kỹ thuật để thiết lập **Mốc đánh giá chuẩn (Benchmark Baseline)**:
 
-### 2.3. Mạng Nơ-ron Tích chập Residual (Policy-Value ResNet) và Tìm kiếm PUCT
-Để khắc phục nhược điểm "mù chiến thuật" của các pha rollout ngẫu nhiên đồng đều trong MCTS truyền thống, kiến trúc **Policy-Value Network** (Silver et al., 2017; Liu, 2025) mã hóa trạng thái bàn cờ thành tensor không gian đa kênh $X \in \mathbb{R}^{2 \times 6 \times 7}$ theo góc nhìn chuẩn hóa (canonical view) của bên sắp đi, trích xuất đặc trưng qua các khối tích chập có kết nối tắt (**Residual Blocks**) rồi phân nhánh thành hai đầu ra:
-1. **Policy Head** xuất vector xác suất tiên nghiệm $P(s, a)$ trên 7 cột sau khi che mặt nạ các cột đã đầy (legal move masking).
-2. **Value Head** xuất ước lượng kỳ vọng thắng cuộc vô hướng $V_\theta(s) \in [-1, +1]$ qua hàm kích hoạt $\tanh$.
+| Nhóm chương trình khảo sát | Đại diện tiêu biểu (GitHub / Học thuật) | Đặc trưng cấu trúc duyệt cây & Hàm lượng giá | Vai trò trong hệ thống Nhóm 13 |
+|:---|:---|:---|:---|
+| **1. Tác tử Luật Phản xạ 1-ply** (*Tactical Rule-based*) | `inventwithpython` (Sweigart), các bot phản xạ cơ sở | Quét 1 nước để ăn 4 ngay hoặc chặn đối thủ ăn 4; lọc nước đi tạo bàn đạp cho đối thủ thắng ở hàng trên (*anti-blunder*); ưu tiên cột trung tâm. Không duyệt cây sâu. | Chuẩn hóa thành **`HeuristicAgent` (Level 2)** — Mốc chuẩn cho nhóm không duyệt cây. |
+| **2. Duyệt cây Cổ điển + Lượng giá 69 Cửa sổ** (*Classic Negamax Alpha-Beta*) | `KeithGalli/Connect4-Python`, Allis (1988) | Duyệt cây Negamax cắt tỉa $\alpha$-$\beta$; lượng giá tuyến tính dựa trên đếm số cửa sổ 2 quân, 3 quân mở và ưu thế cột giữa (`c=3`). | Nâng cấp với Bitboard $O(1)$, *Center-First* & *Iterative Deepening* thành **`AlphaBetaAgent` (Level 3)** — **Benchmark Baseline tất định (Tác tử Thầy)**. |
+| **3. Tìm kiếm Cây Monte Carlo thuần** (*Pure UCT-MCTS*) | Kocsis & Szepesvári (2006), các bản cài đặt MCTS chuẩn | Duyệt cây 4 giai đoạn với công thức chọn nhánh UCB1/UCT ($c = 1,4$) và giả lập ngẫu nhiên đồng đều (*Uniform Random Rollout*) đến cuối ván. Không cần hàm lượng giá thủ công. | Chuẩn hóa thành **`MCTSAgent` (Level 4)** — **Benchmark Baseline tìm kiếm ngẫu nhiên**. |
+| **4. Học bắt chước Hộp đen** (*Supervised Policy-Value CNN*) | Liu (2025), các mô hình Behavioral Cloning | Mã hóa bàn cờ thành tensor đa kênh, dùng mạng CNN/ResNet dự đoán xác suất 7 cột $P(s,a)$ và giá trị $V(s)$, chọn trực tiếp `argmax` không duyệt cây (`0 search`). | Hiện thực thành **`NNAgent` (Level 5)** và tích hợp vào **`MixedMCTSAgent` (Level 6 / AlphaZero-lite)**. |
 
-Hàm mất mát đa nhiệm kết hợp Cross-Entropy có làm mượt nhãn (*Label Smoothing* $\alpha_{\text{ls}}$) cho Policy, sai số bình phương trung bình (MSE) cho Value và điều chuẩn trọng số $L_2$:
+Thông qua khảo sát thực nghiệm sơ bộ (200 ván/cặp, hoán đổi Đỏ/Vàng), nhóm xác lập hai cột mốc kiểm chuẩn khắt khe mà tác tử đề xuất **AlphaZero-lite (`MixedMCTSAgent`)** phải vượt qua:
+1. **Mốc chuẩn MCTS thuần (`MCTS-UCT 500 sims` và `1.000 sims`)**: Kiểm chứng xem việc tích hợp tri thức mạng học sâu vào cây tìm kiếm có giúp giảm số lượng playout mà vẫn tăng tỷ lệ thắng hay không.
+2. **Mốc chuẩn Duyệt cây Cổ điển (`Alpha-Beta depth 4` và `depth 5`)**: Kiểm chứng xem tác tử học từ chuyên gia `depth 4` khi kết hợp tìm kiếm PUCT có thể "trò giỏi hơn thầy" hay không.
 
-$$\mathcal{L}(\theta) = -\sum_{a=0}^{6} \tilde{\pi}_a \log P_\theta(a \mid s) + \lambda_v \left( z - V_\theta(s) \right)^2 + \lambda_{\text{wd}} \|\theta\|_2^2$$
+### 1.3. Các câu hỏi nghiên cứu định lượng (RQ1 – RQ3)
 
-Khi tích hợp vào cây tìm kiếm, công thức **PUCT** (Predictor + UCT) sử dụng trực tiếp $P_\theta(s, a)$ để định hướng khám phá vào các nhánh giàu triển vọng ngay từ những mô phỏng đầu tiên:
-
-$$a^* = \arg\max_{a \in A(s)} \left[ Q(s, a) + c_{\text{puct}} \cdot P_\theta(s, a) \cdot \frac{\sqrt{\sum_b N(s, b)}}{1 + N(s, a)} \right]$$
-
-### 2.4. Giải thích Hộp đen Mạng Nơ-ron bằng Bản đồ Độ nhạy (Gradient Saliency Map)
-Theo phương pháp giải thích dựa trên đạo hàm của Simonyan et al. (2014), để lý giải vì sao mạng chọn cột $a^* = \arg\max_a z_a(X)$ tại trạng thái $X \in \mathbb{R}^{2 \times 6 \times 7}$, ta lan truyền ngược đạo hàm bậc nhất của logit $z_{a^*}$ theo đầu vào và tổng hợp độ lớn trên hai kênh quân cờ:
-
-$$S_{r, c} = \sum_{k \in \{0, 1\}} \left| \frac{\partial z_{a^*}(X)}{\partial X_{k, r, c}} \right|, \qquad \hat{S}_{r, c} = \frac{S_{r, c}}{\max_{r', c'} S_{r', c'} + \varepsilon}$$
-
-Ma trận $\hat{S} \in [0, 1]^{6 \times 7}$ cho biết mức độ nhạy cảm chiến thuật của từng ô trên bàn cờ đối với quyết định của mạng nơ-ron.
-
----
-
-## CHƯƠNG 3. PHƯƠNG PHÁP VÀ THIẾT KẾ HỆ THỐNG
-
-### 3.1. Kiến trúc Phần mềm Phân tầng
-Hệ thống được tổ chức thành gói Python chuẩn cài đặt qua `pyproject.toml` với ranh giới trách nhiệm tách biệt:
-- `src/c4/game/`: Định nghĩa giao diện trừu tượng `Connect4Base`, lõi tốc độ cao `Connect4` (bitboard 49-bit) và bản đối chiếu `ReferenceConnect4` (mảng 2D).
-- `src/c4/agents/`: Giao diện chung `Agent`, cấu trúc ngân sách `Budget(time_s, simulations, depth)` và 6 lớp tác tử độc lập với tầng giao diện.
-- `src/c4/models/` & `src/c4/train/`: Mạng `Connect4PolicyValueNet`, mô-đun giải thích `compute_saliency_map`, quy trình sinh dữ liệu đa nhân `gen_data.py` và huấn luyện `train_policy.py`.
-- `src/c4/eval/` & `scripts/`: Bộ điều phối ván đấu công bằng `match.py`, thống kê `metrics.py`, kịch bản giải đấu `run_tournament.py`, phân rã `run_ablation.py`, kiểm thử tự động `run_test_suite_and_save.py`.
-- `src/c4/ui/`: Ba giao diện độc lập gồm CLI (`cli.py`), Pygame Desktop (`gui.py`) và FastAPI Web Server (`web_server.py` + `Dockerfile`).
-
-### 3.2. Thiết kế Lõi Engine Bitboard 49-bit (`src/c4/game/engine.py`)
-Theo bố cục bitboard kinh điển của Pons, bàn cờ 7×6 được ánh xạ vào 49 bit thấp của số nguyên 64-bit theo thứ tự cột: cột $c \in \{0..6\}$ chiếm dải bit $[7c, 7c+5]$ từ đáy lên đỉnh, còn bit thứ 7 của mỗi cột ($7c+6$) luôn bằng `0` đóng vai trò **bit đệm chống tràn (sentinel bit)** ngăn các phép dịch bit chéo/dọc tràn sang cột kế cận. Trạng thái chỉ cần lưu hai số nguyên:
-- `_pos`: bitboard các quân của người chơi **đang đến lượt**.
-- `_mask`: bitboard hợp của **tất cả các quân** đã đánh trên bàn.
-
-Nhờ biểu diễn này:
-1. **Thả quân $O(1)$**: Quân mới tại cột $c$ nằm ngay ở bit thấp nhất phía trên cột đó thông qua phép cộng nhị phân `new_mask = _mask | (_mask + bottom_mask(c))`, sau đó lật góc nhìn sang đối thủ bằng phép XOR `_pos ^= _mask`.
-2. **Kiểm tra thắng $O(1)$**: Hàm `_has_won(bb)` kiểm tra đồng thời toàn bộ bàn cờ chỉ bằng 4 cặp phép dịch bit và phép AND theo 4 hướng dịch bước $s \in \{1 \text{ (dọc)}, 7 \text{ (ngang)}, 6 \text{ (chéo phụ)}, 8 \text{ (chéo chính)}\}$: `m = bb & (bb >> s); if m & (m >> 2s): return True`.
-3. **Khóa băm duy nhất 1-1**: Tổng số nguyên `key() = _pos + _mask` xác định duy nhất mọi trạng thái hợp lệ trên bàn cờ, phục vụ cực nhanh cho bảng băm trạng thái của `MixedMCTSAgent` và khử trùng lặp tập dữ liệu huấn luyện.
-
-### 3.3. Thiết kế Chi tiết Sáu Cấp độ Tác tử AI
-1. **Cấp 1 — `RandomAgent`**: Sử dụng bộ sinh ngẫu nhiên độc lập `random.Random(seed)` chọn đồng đều một cột trong `legal_actions()`, đảm bảo tính tái lập tuyệt đối.
-2. **Cấp 2 — `HeuristicAgent`**: Thực thi tuần tự 4 quy tắc ưu tiên tất định: (i) Nếu có cột tạo chiến thắng ngay lập tức → đánh ngay; (ii) Nếu đối thủ có điểm thắng ở lượt kế tiếp → chặn ngay theo thứ tự ưu tiên gần trung tâm; (iii) **Lọc chống tự sát (Anti-blunder)**: Loại bỏ các nước đi mà ngay sau khi thả quân, ô trống chồng trực tiếp lên nó giúp đối thủ thắng ngay ở lượt kế (nếu mọi nước đều nguy hiểm mới buộc giữ lại toàn bộ); (iv) Chọn cột gần trung tâm nhất theo dãy `(3, 2, 4, 1, 5, 0, 6)`.
-3. **Cấp 3 — `AlphaBetaAgent`**: Cài đặt đệ quy Negamax có cắt tỉa $\alpha$-$\beta$ và sắp xếp nước đi Center-First. Trước khi gọi đệ quy ở các nút, tác tử kiểm tra nhanh thắng trực tiếp để cắt sớm ở điểm cực đại `WIN_SCORE + depth` (ưu tiên thắng nhanh nhất và kéo dài tối đa nếu bị ép thua). Tại độ sâu giới hạn $d=0$, hàm lượng giá tĩnh cộng điểm thưởng cột trung tâm (`+3 × hiệu số quân cột 4`) với điểm lượng giá toàn bộ **69 cửa sổ 4 ô** đã tiền tính sẵn chỉ số bitmask (`+50` cho 3 quân mình + 1 trống, `+6` cho 2 quân mình + 2 trống, `-80` cho 3 quân địch + 1 trống đe dọa trực tiếp, `-8` cho 2 quân địch + 2 trống). Hỗ trợ đầy đủ cả chế độ cố định `depth` và Iterative Deepening theo `time_s`.
-4. **Cấp 4 — `MCTSAgent`**: Duyệt cây đa tầng thực thụ lưu `(visits, wins, untried, children)` tại mọi nút mở rộng. Trước khi chạy vòng lặp mô phỏng, tác tử kiểm tra nhanh tại gốc nếu có nước thắng ngay hoặc nước bắt buộc chặn thua duy nhất để phản xạ tức thì. Sau khi hết ngân sách `simulations` hoặc `time_s`, chọn hành động có số lượt thăm `visits` lớn nhất (**robust child**).
-5. **Cấp 5 — `NNAgent` (`Connect4PolicyValueNet`)**: Nhận tensor canon hóa `(1, 2, 6, 7)`, đi qua lớp tích chập đầu vào `Conv2d(2→64, 3×3) + BN + ReLU`, tiếp nối bởi **3 khối Residual** (mỗi khối gồm 2 lớp `Conv2d(64→64, 3×3) + BN` và kết nối tắt cộng trực tiếp), rồi tách thành Policy Head (`Conv2d(64→2, 1×1) → Linear(84→7)`) và Value Head (`Conv2d(64→1, 1×1) → Linear(42→64) → ReLU → Linear(64→1) → Tanh`). Tổng số tham số khả huấn luyện là **278.952**. Suy luận dưới `torch.inference_mode()` gán $-\infty$ cho các cột bất hợp lệ trước khi chọn `argmax` (khi `temperature = 0`).
-6. **Cấp mở rộng — `MixedMCTSAgent` (PUCT)**: Tích hợp `Connect4PolicyValueNet` vào cây tìm kiếm PUCT ($c_{\text{puct}} = 1,5$). Để tăng tốc trên CPU, tác tử trang bị **Transposition Cache (`_cache`)** lưu cặp `(base_priors, leaf_value)` theo khóa bitboard `game.key()`, tránh gọi lại mạng nơ-ron khi các đường đi khác nhau dẫn tới cùng một thế cờ. Hỗ trợ tham số `use_value_head: bool` (khi `True` dùng trực tiếp $V_\theta(s)$ tại nút lá; khi `False` dùng rollout nhanh để phục vụ Ablation A3) và tùy chọn nhiễu khám phá Dirichlet tại gốc sử dụng `rng.gammavariate` chuẩn xác, đồng thời sao chép mảng xác suất để không làm bẩn bộ nhớ đệm.
-
-### 3.4. Quy trình Sinh Dữ liệu Sạch Chống Rò rỉ và Huấn luyện Có Điều chuẩn
-Một lỗ hổng phổ biến trong học bắt chước trò chơi là vừa dùng $\epsilon$-greedy để khám phá trạng thái mới nhưng lại lưu luôn nước đi ngẫu nhiên làm nhãn huấn luyện (gây nhiễu nhãn ~10–15%), hoặc tách ngẫu nhiên từng mẫu dẫn đến hai trạng thái kế tiếp trong cùng một ván lọt vào cả Train và Test, thậm chí trạng thái lật gương của Train xuất hiện trong Test. Quy trình `gen_data.py` của nhóm giải quyết triệt để cả ba vấn đề:
-1. **Nhãn chuyên gia sạch 100%**: Sinh `2.500` ván tự đấu từ `AlphaBetaAgent(depth=4)` với khai cuộc ngẫu nhiên 4–6 nước. Ở 18 nước đầu, chuyên gia luôn tính nước tối ưu `expert_action` để **lưu làm nhãn Policy sạch**, sau đó mới tung đồng xu $\epsilon = 0,14$ để thỉnh thoảng bước sang nhánh phụ làm giàu dữ liệu; từ nước thứ 19 trở đi chơi chuẩn $\epsilon = 0$ để nhãn kết cục ván đấu $z \in \{-1, 0, +1\}$ phản ánh chính xác giá trị thế cờ.
-2. **Tách theo ván (Game-level Split) & Khử trùng lặp hai chiều gương**: Tách nguyên vẹn từng ván thành **1.750 ván Train (70%) / 375 ván Val (15%) / 375 ván Test (15%)**. Trong mỗi tập, các thế cờ trùng khóa được gộp lại bằng biểu quyết đa số cho nhãn hành động và trung bình cộng cho nhãn giá trị. Tiếp theo, toàn bộ thế cờ trong `Val` và `Test` có khóa trùng với trạng thái gốc **hoặc ảnh lật gương ngang** của `Train` đều bị loại bỏ hoàn toàn (`2.917` mẫu bị lọc khỏi `Val` và `3.468` mẫu bị lọc khỏi `Test`), đảm bảo **độ trùng lặp giữa Train/Val/Test bằng 0% tuyệt đối**.
-3. **Tăng cường dữ liệu đối xứng chỉ trên Train**: Chỉ tập `Train` (`37.518` thế cờ độc nhất) được nhân đôi qua phép lật gương ngang bàn cờ ($c' = 6 - c$), thu được **75.036 mẫu Train**, **6.396 mẫu Val** và **6.293 mẫu Test**.
-4. **Huấn luyện điều chuẩn (`train_policy.py`)**: Tối ưu bằng `Adam` (`lr = 1,5e-3`, `weight_decay = 1e-3`) kết hợp lịch giảm tốc độ học `CosineAnnealingLR` trong 10 epochs (`batch_size = 256`), `label_smoothing = 0,05` và trọng số đầu giá trị $\lambda_v = 0,5$. Hàm đánh giá trên `Val`/`Test` sử dụng Cross-Entropy chuẩn không làm mượt để đo trung thực xác suất dự đoán.
-
-### 3.5. Thiết kế Giải đấu Công bằng và Độ đo Thống kê
-- **Kiểm soát thiên lệch khai cuộc & màu quân**: Sinh tập `100` khai cuộc 4 nước hợp lệ khác nhau cố định theo `seed = 42` (`50` khai cuộc cho giải tính giờ và Ablation A2/A3). Với mỗi khai cuộc $o_i$, hai tác tử $(A, B)$ bắt buộc chơi đủ **2 ván đối xứng** ($A$ cầm Đỏ đi trước, sau đó $B$ cầm Đỏ đi trước) $\Rightarrow 200$ ván/cặp. Các nước trong khai cuộc không tính vào thời gian suy nghĩ.
-- **Độ đo hiệu năng & Khoảng tin cậy**:
-  + Điểm chuẩn hóa tổng bằng không: $\text{Score}_A = \frac{W_A + 0,5 \cdot D}{N} \in [0, 1]$.
-  + **Khoảng tin cậy Wilson 95%** cho tỷ lệ thắng nhị phân $W_A / N$ (ổn định ngay cả khi tỷ lệ thắng sát `0%` hoặc `100%`).
-  + **Khoảng tin cậy Bootstrap 95%** (`10.000` lần lấy mẫu lại có hoàn lại) cho $\text{Score}_A$ (xử lý chính xác biến ngẫu nhiên 3 giá trị $\{0; 0,5; 1\}$ có ván hòa).
-  + **Độ trễ thực thi**: Đo độc lập từng nước đi bằng `time.perf_counter()` (không tính chi phí `clone()` của khung giải đấu), báo cáo trung bình cộng (`Mean_Time_ms`) và phân vị thứ 95 (`p95_Time_ms`).
+Toàn bộ thiết kế thực nghiệm của báo cáo tập trung trả lời định lượng ba câu hỏi nghiên cứu cốt lõi:
+- **RQ1 (So sánh Duyệt cây Tất định vs Tìm kiếm Monte Carlo theo Ngân sách)**: Dưới cùng ngân sách thời gian suy nghĩ thực tế mỗi nước đi (`50 ms`, `100 ms`, `300 ms`), `MCTS-UCT` thuần có vượt qua `Alpha-Beta` (*Iterative Deepening*) hay không? Khi cố định chân trời của `Alpha-Beta` ở `depth = 4`, điểm giao thoa (*cross-over point*) về số lượng mô phỏng của `MCTS-UCT` xuất hiện tại ngưỡng nào?
+- **RQ2 (Năng lực Học có Giám sát & Suy luận Trực tiếp `0-Search`)**: Mạng nơ-ron phần dư hai đầu `Connect4PolicyValueNet` học từ dữ liệu nhãn sạch của chuyên gia `Alpha-Beta (depth = 4)` đạt độ chính xác dự đoán Top-1/Top-2 trên tập `Test` độc lập là bao nhiêu, và khi thi đấu trực tiếp không cần tìm kiếm cây (`0 search`, độ trễ `< 3 ms`) đạt tỷ lệ thắng như thế nào trước `Heuristic`, `MCTS` và `Alpha-Beta`?
+- **RQ3 (Hiệu quả Tích hợp Tri thức Học sâu vào Cây PUCT & Minh bạch hóa XAI)**: Khi đưa phân phối tiên nghiệm Policy Head $P_\theta(s,a)$ và đầu lượng giá Value Head $V_\theta(s)$ vào công thức chọn nhánh PUCT (`MixedMCTSAgent`), tỷ lệ thắng cải thiện bao nhiêu phần trăm so với `MCTS-UCT` thuần cùng số mô phỏng (`200 sims`), đồng thời bản đồ độ nhạy đạo hàm (*Gradient Saliency Map*) giải thích cơ chế nhận diện đòn chiến thuật của mạng như thế nào?
 
 ---
 
-## CHƯƠNG 4. THỰC NGHIỆM, KẾT QUẢ VÀ THẢO LUẬN
+## CHƯƠNG 2: HẠ TẦNG KỸ THUẬT VÀ CẤU TRÚC DỮ LIỆU BITBOARD
 
-### 4.1. Môi trường Thực nghiệm
-Toàn bộ quá trình sinh dữ liệu, huấn luyện mô hình, kiểm thử tự động và chạy giải đấu được thực hiện trên cùng một máy tính cá nhân để đảm bảo tính nhất quán về độ trễ:
-- **Hệ điều hành**: Windows 11 (`10.0.26300-SP0`), kiến trúc x86_64, CPU 16 luồng xử lý logic (`os.cpu_count() = 16`).
-- **Môi trường phần mềm**: Python `3.13`, PyTorch `2.14.1+cpu` (giới hạn `torch.set_num_threads(1)` trong từng tác tử để đo công bằng thời gian đơn luồng), NumPy, Pandas, Matplotlib, Pytest, FastAPI & Pygame-ce.
+### 2.1. Thiết kế Bitboard 49-bit và toán tử Bitwise $O(1)$
 
-### 4.2. Kiểm thử Tính Đúng đắn Phần mềm (`results/test_results/`)
-Bộ kiểm thử tự động gồm **57 bài kiểm thử đơn vị và tích hợp (`pytest`)** trải rộng trên 9 tệp kiểm thử đạt tỷ lệ **100% PASSED**:
-1. **Kiểm định toán học Perft (`test_engine.py`)**: Số lượng nút lá từ bàn cờ rỗng khớp chính xác tuyệt đối với hằng số chuẩn của Connect Four ở mọi độ sâu kiểm tra: ply 1 = `7`, ply 2 = `49`, ply 3 = `238`, ply 4 = `1.120`, ply 5 = `4.263`.
-2. **Kiểm thử đối chiếu chéo quy mô lớn (`test_crosscheck.py`)**: Chạy **10.000 ván ngẫu nhiên hoàn chỉnh** song song trên `Connect4` (bitboard 49-bit) và `ReferenceConnect4` (mảng 2D), đối chiếu `legal_actions()`, `is_terminal()`, `winner`, `to_array()` và `encode()` sau từng nước đi và sau chuỗi `undo()` ngược về bàn cờ rỗng — ghi nhận **0 sai lệch**.
-3. **Bộ 33 thế cờ chiến thuật thủ công (`tests/data/positions.csv` & `test_positions.py`)**: Kiểm chứng `HeuristicAgent`, `AlphaBetaAgent` và `MCTSAgent` trên 33 thế cờ biên soạn có chủ đích (thắng ngang/dọc/chéo khe giữa, chặn thua khẩn cấp, tránh ô tự sát cột kề và xử lý đòn kép).
-4. **Kiểm thử học sâu, PUCT & Pipeline dữ liệu (`test_nn_and_puct.py`, `test_train_pipeline.py`)**: Xác nhận mặt nạ cột đầy gán xác suất bằng `0` tuyệt đối, tính bất biến của Transposition Cache dưới nhiễu Dirichlet, không rò rỉ dữ liệu qua phép lật gương và khả năng giải thế cờ thắng/chặn trực tiếp của checkpoint `policy_net_best.pt`.
+Nếu biểu diễn bàn cờ bằng mảng hai chiều `int[6][7]` thông thường, mỗi lần thả quân, sao chép trạng thái trong cây tìm kiếm hoặc quét 4 hướng kiểm tra thắng đều tốn vòng lặp tuần tự $O(R \times C)$, gây nghẽn cổ chai nghiêm trọng khi duyệt hàng trăm nghìn nút. Để đạt hiệu năng tối ưu, nhóm xây dựng lõi [`Connect4`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/game/engine.py) dựa trên cấu trúc **Bitboard 49-bit** lưu gọn trong hai thanh ghi số nguyên 64-bit (`_pos` và `_mask`).
 
-### 4.3. Kết quả Huấn luyện Mạng `Connect4PolicyValueNet` (Trả lời phần học có giám sát của RQ2)
-Quá trình huấn luyện 10 epochs trên `75.036` mẫu Train hoàn tất trong `462,26 giây` trên CPU (`checkpoints/training_history.json`). Nhờ kết hợp `label_smoothing = 0,05`, `weight_decay = 1e-3` và lịch giảm tốc độ học Cosine, hàm mất mát kiểm định `Val Loss` hội tụ mượt mà từ `1,3859` (Epoch 1) xuống điểm cực tiểu **`1,1336` tại Epoch 6** (`Val Top-1 Acc = 72,09%`, `Val Top-2 Acc = 89,13%`) mà không xảy ra hiện tượng phân kỳ quá khớp.
+#### A. Sơ đồ ánh xạ vị trí ô cờ vào Bitboard 49-bit (7 cột × 7 bit)
+Mỗi cột $c \in \{0, \dots, 6\}$ được cấp phát một dải 7 bit liên tiếp $[7c, 7c+6]$: 6 bit đầu tiên ($7c + r$ với $r \in \{0, \dots, 5\}$ từ đáy lên đỉnh) lưu dữ liệu ô cờ, còn **bit thứ 7 ở đỉnh mỗi cột ($7c + 6 \in \{6, 13, 20, 27, 34, 41, 48\}$) luôn được giữ bằng `0` làm bit đệm chống tràn (*sentinel bit*)**. Bit đệm này đóng vai trò vách ngăn vật lý ngăn chặn hiện tượng tràn bit từ đỉnh cột $c$ sang đáy cột $c+1$ khi thực hiện phép dịch bit dọc hoặc chéo!
+
+```text
+Bit đệm chống tràn (luôn = 0):    6    13    20    27    34    41    48
+                                +----+----+----+----+----+----+----+
+Hàng 5 (Đỉnh bàn cờ, r=5):      |  5 | 12 | 19 | 26 | 33 | 40 | 47 |
+Hàng 4 (r=4):                   |  4 | 11 | 18 | 25 | 32 | 39 | 46 |
+Hàng 3 (r=3):                   |  3 | 10 | 17 | 24 | 31 | 38 | 45 |
+Hàng 2 (r=2):                   |  2 |  9 | 16 | 23 | 30 | 37 | 44 |
+Hàng 1 (r=1):                   |  1 |  8 | 15 | 22 | 29 | 36 | 43 |
+Hàng 0 (Đáy bàn cờ, r=0):       |  0 |  7 | 14 | 21 | 28 | 35 | 42 |
+                                +----+----+----+----+----+----+----+
+Chỉ số Cột (c = 0..6):           Cột0 Cột1 Cột2 Cột3 Cột4 Cột5 Cột6
+```
+
+Toàn bộ trạng thái bàn cờ tại mọi thời điểm được đặc trưng hoàn toàn bởi hai số nguyên:
+- `_pos`: Bitboard chứa các bit `1` tại những vị trí có quân của **người chơi đang tới lượt đi**.
+- `_mask`: Bitboard chứa các bit `1` tại những vị trí có quân của **cả hai người chơi** (`_pos | _opp_pos`).
+- **Khóa định danh trạng thái duy nhất $O(1)$ (`key = _pos + _mask`)**: Do cột $c$ luôn được lấp liên tục từ đáy lên trên, phép cộng nhị phân `_pos + _mask` tạo ra một số nguyên 49-bit ánh xạ **đơn ánh 1-1** với từng trạng thái hợp lệ trên bàn cờ, cho phép tra cứu bảng băm hoán vị (*Transposition Cache*) trong thời gian hằng số $O(1)$.
+
+#### B. Toán tử Thả quân và Kiểm tra 4 quân liên tiếp `_has_won` độ phức tạp $O(1)$
+Nhờ cấu trúc 7 bit mỗi cột, hai thao tác cốt lõi nhất của engine được rút gọn thành vài chu kỳ lệnh CPU:
+1. **Thả quân vào cột $c$ (`step(col)`)**: Khi cộng bit đáy cột `1 << (7 * c)` vào `_mask`, toàn bộ chuỗi bit `1` liên tiếp đang có ở cột $c$ sẽ tự động nhớ (*carry*) lên đúng vị trí bit `0` thấp nhất ngay phía trên cột đó! Sau đó chỉ cần lật góc nhìn bằng phép XOR `_pos ^= _mask`:
+   ```python
+   # Đổi góc nhìn sang đối thủ và bật bit trống thấp nhất tại cột c trong O(1)
+   self._pos ^= self._mask
+   self._mask |= self._mask + (1 << (col * 7))
+   ```
+2. **Kiểm tra 4 quân thẳng hàng (`_has_won(bb)`) bằng phép dịch bit 4 hướng $O(1)$**:
+   Trên lưới 7 bit/cột, khoảng cách chỉ số bit giữa hai ô kề nhau theo 4 hướng lần lượt là:
+   - **Hướng Dọc ($\uparrow$)**: bước dịch $\Delta = 1$ bit.
+   - **Hướng Ngang ($\rightarrow$)**: bước dịch $\Delta = 7$ bit.
+   - **Hướng Chéo phụ ($/$)**: bước dịch $\Delta = 6$ bit (`+1 cột - 1 hàng = 7 - 1`).
+   - **Hướng Chéo chính ($\setminus$)**: bước dịch $\Delta = 8$ bit (`+1 cột + 1 hàng = 7 + 1`).
+
+   Đoạn mã nguồn thực tế trong [`src/c4/game/engine.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/game/engine.py#L46-L62) thực hiện gập đôi cặp bit (`bb & (bb >> s)`) rồi tiếp tục gập đôi khoảng cách (`m & (m >> 2s)`) để kiểm tra đồng thời toàn bộ 69 cửa sổ trên bàn cờ trong thời gian $O(1)$:
+   ```python
+   @staticmethod
+   def _has_won(bb: int) -> bool:
+       # 1. Hướng ngang (shift = 7)
+       m = bb & (bb >> 7)
+       if m & (m >> 14):
+           return True
+       # 2. Hướng chéo phụ / (shift = 6)
+       m = bb & (bb >> 6)
+       if m & (m >> 12):
+           return True
+       # 3. Hướng chéo chính \ (shift = 8)
+       m = bb & (bb >> 8)
+       if m & (m >> 16):
+           return True
+       # 4. Hướng dọc | (shift = 1)
+       m = bb & (bb >> 1)
+       if m & (m >> 2):
+           return True
+       return False
+   ```
+
+### 2.2. Kiểm chuẩn tính đúng đắn cây trò chơi (Perft Validation at Depth 1–6 & Cross-Engine Verification)
+
+Để chứng minh tuyệt đối rằng các phép dịch bit 49-bit không gặp bất kỳ lỗi tràn cột hay sai lệch trạng thái kết thúc nào, nhóm xây dựng song song một engine tham chiếu độc lập [`ReferenceConnect4`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/game/reference.py) sử dụng mảng 2 chiều NumPy `int8[6, 7]` và thực hiện hai phép kiểm chuẩn toán học trong [`tests/test_engine.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/tests/test_engine.py) và [`tests/test_crosscheck.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/tests/test_crosscheck.py):
+
+#### A. Kiểm chuẩn số lượng nút lá cây trò chơi (Perft Validation từ Depth 1 đến Depth 6)
+Hàm `perft(game, depth)` duyệt vét cạn toàn bộ các chuỗi nước đi hợp lệ từ bàn cờ rỗng đến độ sâu `depth` (không mở rộng tiếp các nút đã có người thắng ở ply thứ 7 trở đi). Kết quả đếm nút trên `Connect4` (Bitboard 49-bit) khớp chính xác 100% đến từng đơn vị với hằng số lý thuyết của trò chơi Connect Four 7×6:
+
+| Độ sâu (`Depth / Ply`) | Số nút lá lý thuyết chuẩn (OEIS A212693) | Kết quả đếm trên `Connect4` (Bitboard 49-bit) | Kết quả đếm trên `ReferenceConnect4` (Mảng 2D) | Sai số |
+|:---:|---:|---:|---:|:---:|
+| **Depth 1** | `7` | `7` | `7` | **0 (Khớp 100%)** |
+| **Depth 2** | `49` | `49` | `49` | **0 (Khớp 100%)** |
+| **Depth 3** | `238` | `238` | `238` | **0 (Khớp 100%)** |
+| **Depth 4** | `1.120` | `1.120` | `1.120` | **0 (Khớp 100%)** |
+| **Depth 5** | `4.263` | `4.263` | `4.263` | **0 (Khớp 100%)** |
+| **Depth 6** | `16.422` | `16.422` | `16.422` | **0 (Khớp 100%)** |
+
+#### B. Kiểm thử đối chiếu chéo 10.000 ván ngẫu nhiên & 57 Unit Tests
+- Trong [`tests/test_crosscheck.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/tests/test_crosscheck.py), hai engine cùng chạy song song qua **10.000 ván đấu ngẫu nhiên đầy đủ** (~210.000 trạng thái chuyển tiếp). Sau mỗi nước đi và chuỗi `undo()` lùi về trạng thái gốc, hệ thống đối chiếu đồng thời `legal_actions()`, `is_terminal()`, `winner`, `to_array()` và `encode()` — đạt **0 lỗi sai khác**.
+- Toàn bộ **57/57 bài kiểm thử tự động (`pytest`)** trên 9 tệp test đều đạt **100% PASSED** (lưu biên bản kiểm thử tại [`results/TEST_AND_EVALUATION_REPORT.md`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/results/TEST_AND_EVALUATION_REPORT.md)).
+
+---
+
+## CHƯƠNG 3: PHƯƠNG PHÁP TRIỂN KHAI CHUỖI TÁC TỬ AI (LEVEL 1 – LEVEL 5 & ALPHAZERO-LITE)
+
+### 3.1. Nhóm tác tử cổ điển (Random, Priority Heuristic, Negamax Alpha-Beta Pruning)
+
+#### 1. Level 1 — `RandomAgent` ([`src/c4/agents/random_agent.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/agents/random_agent.py))
+Sử dụng bộ sinh số giả ngẫu nhiên tách biệt `random.Random(seed)` chọn xác suất đều $P(a) = \frac{1}{|A(s)|}$ cho mọi cột hợp lệ $a \in A(s)$, đóng vai trò mốc sàn kiểm tra logic giải đấu.
+
+#### 2. Level 2 — `HeuristicAgent` ([`src/c4/agents/heuristic.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/agents/heuristic.py))
+Triển khai bộ luật ưu tiên 4 tầng tất định không duyệt cây sâu:
+- **Tầng 1 (Win-in-1)**: Nếu tồn tại cột $a \in A(s)$ giúp thắng ngay lập tức ($R(T(s, a)) = \tau(s)$) $\rightarrow$ chọn $a$.
+- **Tầng 2 (Block-in-1)**: Nếu đối phương có nước thắng ngay ở lượt kế tiếp khi giả định đối phương đi tại cột $a$ $\rightarrow$ chặn ngay tại cột $a$ (ưu tiên cột gần trung tâm nhất nếu có nhiều điểm chặn).
+- **Tầng 3 (Bộ lọc chống tự sát — Anti-Blunder Filter)**: Loại bỏ mọi cột $a \in A(s)$ mà việc thả quân vào $(h_s(a), a)$ vô tình nâng đỡ để đối phương đánh tiếp vào $(h_s(a)+1, a)$ và thắng ngay ở lượt kế. Nếu tất cả các cột đều bị loại (bị ép bí), giữ lại tập ban đầu.
+- **Tầng 4 (Ưu tiên Trung tâm — Center Preference)**: Chọn cột đầu tiên xuất hiện trong thứ tự ưu tiên hình học `CENTER_ORDER = (3, 2, 4, 1, 5, 0, 6)`.
+
+#### 3. Level 3 — `AlphaBetaAgent` ([`src/c4/agents/alphabeta.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/agents/alphabeta.py))
+Triển khai thuật toán duyệt cây đối kháng **Negamax kết hợp cắt tỉa $\alpha$-$\beta$**, tối ưu hóa bằng 3 kỹ thuật:
+- **Sắp xếp nước đi tĩnh Center-First**: Luôn duyệt các nhánh con theo thứ tự `(3, 2, 4, 1, 5, 0, 6)` vì cột trung tâm tham gia vào nhiều cửa sổ 4 ô nhất, giúp sớm tìm được cận dưới $\alpha$ lớn để kích hoạt điều kiện cắt nhánh $\alpha \ge \beta$.
+- **Phát hiện thắng sớm 1-ply trước khi đệ quy**: Tại mỗi nút trong, trước khi mở rộng đệ quy xuống tầng sâu hơn, tác tử quét nhanh bitboard xem có cột nào thắng ngay không; nếu có, trả về ngay `WIN_SCORE + depth` (`100.000 + depth`) để luôn chọn đường thắng ngắn nhất và đường cầm cự dài nhất khi bị ép thua.
+- **Hàm lượng giá 69 cửa sổ tiền tính bitmask (`_evaluate`)**: Tại nút lá $d = 0$, điểm lượng giá là tổng trọng số quân cột trung tâm (`+3` điểm/quân) cộng với điểm quét toàn bộ 69 cửa sổ 4 ô đã tiền tính sẵn bitmask `(w_mask)`:
+  $$\text{Eval}(s) = 3 \cdot \left( N_{\text{my}}(\text{col } 3) - N_{\text{opp}}(\text{col } 3) \right) + \sum_{w \in \mathcal{W}_{69}} \phi(w, \text{my}, \text{opp})$$
+  với $\phi(w) = +50$ (3 quân mình + 1 trống), $+6$ (2 quân mình + 2 trống), $-80$ (3 quân địch + 1 trống — phạt nặng đe dọa của địch), và $-8$ (2 quân địch + 2 trống).
+- **Tìm kiếm sâu dần (*Iterative Deepening*)**: Khi thi đấu theo ngân sách thời gian `time_s`, vòng lặp tăng dần độ sâu $d = 1, 2, \dots, d_{\max}$ và kiểm tra `time.perf_counter()` tại mỗi nút; nếu hết giờ giữa chừng ở tầng $d$, kết quả hoàn chỉnh của tầng $d-1$ vẫn được bảo toàn an toàn.
+
+### 3.2. Nhóm tác tử Monte Carlo (`Level 4` MCTS-UCT 4 giai đoạn)
+
+Tác tử [`MCTSAgent`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/agents/mcts.py) xây dựng cây tìm kiếm bất đối xứng thông qua 4 giai đoạn lặp trong mỗi mô phỏng:
+1. **Selection (Chọn nhánh)**: Bắt đầu từ gốc, đi xuống các nút đã mở rộng hoàn toàn bằng cách cực đại hóa chỉ số **UCT** (Kocsis & Szepesvári, 2006):
+   $$\text{UCT}(s, a) = \frac{W(s, a)}{N(s, a)} + c \sqrt{\frac{\ln N(s)}{N(s, a)}}, \qquad c = 1,4 \approx \sqrt{2}$$
+   trong đó $W(s, a)$ luôn được lưu theo góc nhìn của người chơi thực hiện hành động $a$.
+2. **Expansion (Mở rộng)**: Khi gặp nút chưa kết thúc còn hành động chưa thử (`untried`), rút ngẫu nhiên một hành động $a \in \text{untried}$ để tạo nút con mới.
+3. **Simulation / Rollout (Giả lập)**: Từ nút con mới, thực hiện chuỗi nước đi ngẫu nhiên đồng đều trên bản sao bitboard đến khi ván cờ kết thúc để thu kết quả $z \in \{0; 0,5; 1\}$.
+4. **Backpropagation (Lan truyền ngược)**: Cập nhật $N \leftarrow N + 1$ và cộng dồn điểm thắng theo đúng người chơi vừa đi tại mỗi nút trên đường dẫn về gốc. Khi hết ngân sách, chọn hành động có số lượt thăm $N(\text{root}, a)$ lớn nhất (*Robust Child*).
+
+### 3.3. Đề xuất Tác tử Học sâu AlphaZero-lite (Dual-Head ResNet + PUCT Search Pseudocode)
+
+#### A. Đối chiếu Phương pháp Tích hợp Học máy vào MCTS: Từ Biased MCTS (KLTN tham khảo) đến PUCT-MCTS (AlphaZero-lite)
+Trong các nghiên cứu trước đây (như KLTN Reversi tích hợp mô hình Bradley-Terry vào MCTS), việc đưa tri thức máy học vào cây MCTS thường dựa trên hai phép hiệu chỉnh: *Biased Selection* (cộng thêm thành phần xác suất mẫu vào công thức UCB) và *Biased Simulation* (lấy mẫu rollout theo phân phối xác suất thay vì ngẫu nhiên thuần). Kế thừa tư tưởng định hướng cây tìm kiếm đó nhưng nâng cấp lên kiến trúc Học sâu hiện đại theo hướng **AlphaGo / AlphaZero** (Silver et al., 2016, 2017), nhóm thiết kế hệ thống gồm hai thành phần gắn kết chặt chẽ:
+
+| Tiêu chí so sánh | MCTS-UCT Thuần (`Level 4`) | Biased MCTS truyền thống (KLTN tham khảo) | **AlphaZero-lite `MixedMCTSAgent` (Đề xuất của Nhóm 13)** |
+|:---|:---|:---|:---|
+| **Mô hình biểu diễn tri thức** | Không có ($P(a)$ đồng đều) | Bảng tra xác suất mẫu cục bộ (*Pattern Dictionary*) | **Mạng `Connect4PolicyValueNet` (3 Residual Blocks, 278.952 tham số)** nhận diện cấu trúc toàn bàn cờ. |
+| **Định hướng bước Selection** | UCB1 chuẩn: $\frac{W}{N} + c\sqrt{\frac{\ln N_p}{N}}$ | Biased UCB: cộng trọng số xác suất mẫu vào nhánh con | **Công thức PUCT**: nhân trực tiếp xác suất tiên nghiệm **Policy Head $P_\theta(s, a)$** vào biên độ khám phá $c_{\text{puct}} P_\theta(s,a) \frac{\sqrt{\sum_b N(s,b)}}{1 + N(s,a)}$. |
+| **Đánh giá nút lá (Leaf Evaluation)** | Rollout ngẫu nhiên đồng đều tới cuối ván | *Biased Simulation*: Rollout lấy mẫu theo xác suất | Hỗ trợ cả 2 chế độ: **(1) Value Head $V_\theta(s) \in [-1, 1]$** (triệt tiêu hoàn toàn bước Rollout) hoặc **(2) Lai ghép Policy Prior + Fast Bitboard Rollout** (Ablation A3). |
+| **Tối ưu tra cứu $O(1)$** | Không có | Nén CSV sang Dictionary nhị phân | **Bảng băm Hoán vị `Transposition Cache` $O(1)$** theo khóa bitboard `key = pos + mask`, tránh gọi lại mạng CNN ở các trạng thái trùng lặp. |
+
+#### B. Kiến trúc Mạng Nơ-ron Hai đầu `Connect4PolicyValueNet` ([`src/c4/models/net.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/models/net.py))
+Mạng nhận đầu vào là tensor chuẩn hóa góc nhìn $X \in \{0, 1\}^{2 \times 6 \times 7}$ và đi qua:
+1. **Khối Stem**: `Conv2d(2 → 64, kernel_size=3×3, padding=1) + BatchNorm2d(64) + ReLU`.
+2. **Thân mạng gồm 3 Khối Phần dư (3 Residual Blocks)**: Mỗi khối thực hiện hai phép tích chập $3 \times 3$ với 64 kênh đặc trưng kèm kết nối tắt (*skip connection*) $H_{l+1} = \text{ReLU}(\mathcal{F}(H_l) + H_l)$ giúp lan truyền đạo hàm sâu mà không bị suy biến.
+3. **Đầu Chính sách (Policy Head)**: `Conv2d(64 → 2, 1×1) + BN + ReLU → Flatten(84) → Linear(84 → 7)` xuất vector logits $z \in \mathbb{R}^7$. Các cột đã đầy ($a \notin A(s)$) bị gán $-\infty$ trước khi lấy $\text{Softmax}$ để thu được xác suất hợp lệ $P_\theta(s, a)$.
+4. **Đầu Giá trị (Value Head)**: `Conv2d(64 → 1, 1×1) + BN + ReLU → Flatten(42) → Linear(42 → 64) + ReLU → Linear(64 → 1) + Tanh` xuất kỳ vọng thắng cuộc $V_\theta(s) \in [-1, +1]$.
+
+#### C. Mã giả chuẩn Thuật toán Tìm kiếm Cây `PUCT_SEARCH` ([`src/c4/agents/mixed_mcts.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/agents/mixed_mcts.py))
+
+```text
+THUẬT TOÁN 1: TÌM KIẾM CÂY MONTE CARLO ĐỊNH HƯỚNG MẠNG NƠ-RON (PUCT_SEARCH)
+---------------------------------------------------------------------------------
+Đầu vào : Trạng thái gốc s_root, Mạng Policy-Value f_theta, Ngân sách mô phỏng M,
+          Hằng số khám phá c_puct = 1.5, Bảng băm hoán vị Cache
+Đầu ra  : Hành động tối ưu a* thuộc A(s_root)
+
+1:  Nếu tồn tại a thuộc A(s_root) thắng ngay trong 1 nước (Win-in-1): trả về a
+2:  Nếu đối thủ đe dọa thắng ngay tại cột duy nhất a_block (Block-in-1): trả về a_block
+3:  Khởi tạo nút gốc root = Node(state = s_root)
+4:  MỞ_RỘNG_VÀ_LƯỢNG_GIÁ(root, s_root, is_root = True)
+5:  Lặp sim = 1 .. M (hoặc đến khi hết thời gian time_s):
+6:      node = root;  s = s_root.clone()
+7:      // --- Giai đoạn 1: SELECTION theo công thức PUCT ---
+8:      Khi node đã mở rộng và chưa phải trạng thái kết thúc:
+9:          N_total = sum_{b} node.children[b].N
+10:         Chọn nhánh con a cực đại hóa chỉ số PUCT:
+                PUCT(node, a) = Q(node, a) + c_puct * P(node, a) * sqrt(max(1, N_total)) / (1 + N(node, a))
+                trong đó Q(node, a) = W(node, a) / N(node, a) nếu N > 0, ngược lại bằng 0
+11:         node = node.children[a];  s.step(a)
+12:     // --- Giai đoạn 2 & 3: EXPANSION & LEAF EVALUATION (kèm O(1) Cache) ---
+13:     Nếu s là trạng thái kết thúc:
+14:         v_leaf = KẾT_QUẢ_CUỐI_VÁN(s)  // thuộc {-1, 0, +1}
+15:     Ngược lại:
+16:         v_leaf = MỞ_RỘNG_VÀ_LƯỢNG_GIÁ(node, s, is_root = False)
+17:     // --- Giai đoạn 4: BACKPROPAGATION ---
+18:     Khi node != None:
+19:         node.N += 1
+20:         node.W += Chuyển_Đổi_Hệ_Quy_Chiếu(v_leaf, node.player_just_moved)
+21:         node = node.parent
+22: Trả về argmax_{a thuộc A(s_root)} (root.children[a].N, root.children[a].Q, root.children[a].P)
+
+HÀM PHỤ: MỞ_RỘNG_VÀ_LƯỢNG_GIÁ(node, s, is_root)
+---------------------------------------------------------------------------------
+1:  key = s._pos + s._mask  // Khóa Bitboard 49-bit duy nhất O(1)
+2:  Nếu key có trong Cache:
+3:      (priors, v_net) = Cache[key]
+4:  Ngược lại:
+5:      (logits, v_net) = f_theta(s.encode_tensor_2x6x7())
+6:      priors = MaskedSoftmax(logits, s.legal_actions())
+7:      Cache[key] = (priors, v_net)
+8:  Nếu is_root và bật Dirichlet_Noise:
+9:      priors = (1 - eps) * priors.copy() + eps * Dirichlet(alpha)
+10: Tạo các nút con node.children[a] với xác suất tiên nghiệm P = priors[a] cho mọi a thuộc A(s)
+11: Trả về v_net (nếu dùng Value Head) hoặc FastBitboardRollout(s) (nếu dùng Rollout)
+```
+
+---
+
+## CHƯƠNG 4: QUY TRÌNH QUẢN TRỊ DỮ LIỆU VÀ MINH BẠCH HÓA AI (XAI)
+
+### 4.1. Data Pipeline: Mã hóa Tensor, Symmetry Augmentation & Game-level Splitting
+
+Khác với cờ Othello/Reversi có kho biên bản giải đấu quốc tế WTHOR sẵn có, đối với Connect Four, để đảm bảo tính tự chủ hoàn toàn và không phụ thuộc vào bộ giải bên ngoài, nhóm thiết kế **Quy trình Tự sinh và Quản trị Dữ liệu Chuyên gia 5 bước (`Data Pipeline`)** trong [`src/c4/train/gen_data.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/train/gen_data.py):
+
+```mermaid
+flowchart LR
+    A["Bước 1: Tự đấu Chuyên gia<br/>2.500 ván Alpha-Beta (d=4)<br/>Khai cuộc 4-6 ply + eps=0.14"] --> B["Bước 2: Gán Nhãn Sạch<br/>Policy pi = expert_action<br/>Value z in {-1, 0, +1}"]
+    B --> C["Bước 3: Chia theo Ván (70/15/15)<br/>1.750 Train | 375 Val | 375 Test<br/>(Chống rò rỉ cùng ván)"]
+    C --> D["Bước 4: Khử trùng & Lọc Gương<br/>Gộp trùng theo khóa Bitboard<br/>Loại bỏ Val/Test trùng gương Train"]
+    D --> E["Bước 5: Tăng cường Đối xứng<br/>Lật ngang c' = 6 - c trên Train<br/>Tổng: 87.725 mẫu sạch"]
+```
+
+1. **Cấu trúc mã hóa Tensor chuẩn hóa góc nhìn ($2 \times 6 \times 7$)**:
+   Mọi trạng thái bàn cờ $s$ đều được hàm `encode()` chuyển thành tensor nhị phân $X \in \{0, 1\}^{2 \times 6 \times 7}$ theo góc nhìn chuẩn hóa (*Canonical Perspective*):
+   - **Kênh 0 (`X[0, r, c]`)**: bằng `1` nếu ô $(r, c)$ là quân của **người chơi đang tới lượt đi**, ngược lại bằng `0`.
+   - **Kênh 1 (`X[1, r, c]`)**: bằng `1` nếu ô $(r, c)$ là quân của **đối phương**, ngược lại bằng `0`.
+   Cách mã hóa bất biến theo màu quân này giúp mạng nơ-ron học một bộ trọng số duy nhất áp dụng cho cả lượt Đỏ lẫn lượt Vàng.
+2. **Cơ chế Nhãn chuyên gia sạch (*Clean Expert Action Label*)**:
+   Trong `2.500` ván tự đấu của `AlphaBetaAgent(depth=4)` (`seed = 42`), sau 4–6 nước khai cuộc ngẫu nhiên an toàn, tại mỗi trạng thái trong 18 nước đầu tiên, chuyên gia luôn tính toán nước đi tối ưu nhất $a^* = \text{AlphaBeta}(s, d=4)$ để **lưu làm nhãn học có giám sát (`y_policy` = $a^*$)** trước khi tung đồng xu xác suất $\epsilon = 0,14$ để thỉnh thoảng rẽ sang nhánh phụ mở rộng vùng phủ trạng thái. Nhờ đó, tập dữ liệu vừa đa dạng vừa đạt **0% nhiễu nhãn ngẫu nhiên**.
+3. **Phân chia theo đơn vị ván đấu (`Game-level Splitting 70/15/15`) & Khử trùng lặp hai chiều gương**:
+   - Toàn bộ `2.500` ván được tách ở cấp độ ván thành **1.750 ván Train (70%)**, **375 ván Validation (15%)** và **375 ván Test (15%)**.
+   - Trong từng tập, các trạng thái trùng khóa bitboard được hợp nhất bằng biểu quyết đa số (*majority vote*) cho nhãn Policy và trung bình cộng cho nhãn Value.
+   - Đặc biệt, hệ thống loại bỏ triệt để mọi trạng thái trong `Val` và `Test` có khóa trùng với trạng thái gốc **hoặc ảnh lật gương ngang** của tập `Train` (`2.917` mẫu bị lọc khỏi `Val` và `3.468` mẫu bị lọc khỏi `Test`), đảm bảo **0% rò rỉ dữ liệu (*Zero Data Leakage*)**.
+4. **Tăng cường dữ liệu đối xứng lật ngang (`Horizontal Flip Symmetry`)**:
+   Do luật Connect Four bất biến qua phép phản xạ trục dọc cột giữa ($c' = 6 - c$), mỗi mẫu $(X, a^*, z)$ trong tập `Train` được nhân đôi thành $(X_{\text{flip}}, 6 - a^*, z)$, thu được tổng cộng **87.725 mẫu sạch** ([`data/dataset_summary.json`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/data/dataset_summary.json)):
+   - [`data/train.npz`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/data/train.npz): **75.036 mẫu** (`37.518` trạng thái gốc × 2 đối xứng gương).
+   - [`data/val.npz`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/data/val.npz): **6.396 mẫu độc lập**.
+   - [`data/test.npz`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/data/test.npz): **6.293 mẫu độc lập**.
+
+### 4.2. Quá trình huấn luyện Joint Loss & Trực quan hóa bản đồ độ nhạy Saliency Map
+
+#### A. Kiểm định Toán học trong Huấn luyện Đa mục tiêu (Joint Loss Validation)
+Mô hình `Connect4PolicyValueNet` được huấn luyện tối thiểu hóa hàm mất mát kết hợp đa mục tiêu (*Joint Loss*) trong [`src/c4/train/train_policy.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/train/train_policy.py):
+
+$$\mathcal{L}(\theta) = \underbrace{-\sum_{a=0}^{6} \tilde{\pi}_a \log P_\theta(a \mid s)}_{\text{Policy Cross-Entropy Loss}} + \lambda_v \underbrace{\left( z - V_\theta(s) \right)^2}_{\text{Value MSE Loss}} + c \|\theta\|_2^2$$
+
+với hệ số cân bằng $\lambda_v = 0,5$, làm mượt nhãn $\alpha_{\text{ls}} = 0,05$, điều chuẩn trọng số $c = 10^{-3}$, bộ tối ưu `Adam(lr = 0,0015)` và lịch giảm `CosineAnnealingLR` qua 10 epochs (`batch_size = 256`).
 
 ![Đường cong huấn luyện mạng Policy-Value ResNet](../results/figures/nn_learning_curves.png)
 
-Đánh giá độc lập checkpoint tốt nhất (Epoch 6) trên **tập `Test` gồm 6.293 thế cờ chưa từng xuất hiện** (từ 375 ván hoàn toàn tách biệt, 0% trùng lặp gốc và gương):
-- **Độ chính xác dự đoán nước đi chuyên gia Top-1 (`Test Top-1 Accuracy`)**: **71,68%** (cao gấp **5,02 lần** mức đoán ngẫu nhiên `14,29%` trên 7 cột).
-- **Độ chính xác Top-2 (`Test Top-2 Accuracy`)**: **89,07%** — tức trong gần 9/10 thế cờ bất kỳ, nước đi tối ưu của `Alpha-Beta (depth=4)` nằm trong 2 cột có xác suất cao nhất của mạng, tạo tiền đề lý tưởng làm phân phối tiên nghiệm $P(s,a)$ cho PUCT!
-- **Sai số đầu giá trị (`Test Value MSE / MAE`)**: `MSE = 0,7884`, `MAE = 0,6360` trên miền $[-1, +1]$; **Policy Cross-Entropy**: `0,7535`.
-- **Độ trễ suy luận đơn lẻ trên CPU**: Trung bình **`1,909 ms`**, phân vị `p95 = 2,475 ms`.
+| Epoch | `Train Joint Loss` | `Val Joint Loss` | `Train Policy CE` | `Val Policy CE` | `Train Value MSE` | `Val Value MSE` | `Train Top-1 Acc` | `Val Top-1 Acc` | `Val Top-2 Acc` |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **1** | `1,5463` | `1,3859` | `1,1585` | `0,9601` | `0,7755` | `0,8517` | `60,94%` | `64,56%` | `83,35%` |
+| **2** | `1,3283` | `1,2508` | `0,9566` | `0,8392` | `0,7435` | `0,8232` | `69,89%` | `69,62%` | `86,87%` |
+| **3** | `1,2594` | `1,1791` | `0,8999` | `0,7755` | `0,7190` | `0,8073` | `72,58%` | `70,58%` | `88,43%` |
+| **4** | `1,2102` | `1,1649` | `0,8608` | `0,7626` | `0,6989` | `0,8047` | `74,38%` | `71,56%` | `88,60%` |
+| **5** | `1,1723` | `1,1485` | `0,8331` | `0,7490` | `0,6784` | `0,7990` | `75,67%` | `71,72%` | `88,91%` |
+| **6 (Best)** | **`1,1411`** | **`1,1336`** | **`0,8107`** | **`0,7333`** | **`0,6609`** | **`0,8005`** | **`76,65%`** | **`72,09%`** | **`89,13%`** |
+| **8** | `1,0937` | `1,1360` | `0,7797` | `0,7366` | `0,6281` | `0,7988` | `78,02%` | `71,69%` | `89,13%` |
+| **10** | `1,0694` | `1,1354` | `0,7649` | `0,7349` | `0,6091` | `0,8010` | `78,74%` | `71,78%` | `89,18%` |
 
-### 4.4. Kết quả Giải đấu Round-Robin Toàn diện 6 Tác tử — Chế độ B (3.000 Ván)
-Bảng dưới đây trình bày kết quả toàn bộ **15 cặp đấu đối kháng** (200 ván/cặp, tổng cộng **3.000 ván**, trích xuất trực tiếp từ `results/tables/round_robin_default_summary.csv`) với cấu hình mặc định: `Alpha-Beta (depth = 5)`, `MCTS-UCT (1.000 sims)`, `Mixed-MCTS PUCT (200 sims, use_value_head = True)`, `Policy-Value NN (temperature = 0, 0 search)`.
+- **Kiểm định trên tập `Test` độc lập (`6.293` mẫu)**: Checkpoint tốt nhất tại Epoch 6 ([`checkpoints/policy_net_best.pt`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/checkpoints/policy_net_best.pt)) đạt **`Test Top-1 Accuracy = 71,68%`** (gấp `5,02` lần mức ngẫu nhiên `14,29%`) và **`Test Top-2 Accuracy = 89,07%`**, với `Test Policy CE = 0,7535`, `Test Value MSE = 0,7884` và độ trễ suy luận đơn lẻ trên CPU chỉ **`1,909 ms`** (`p95 = 2,475 ms`).
+
+#### B. Minh bạch hóa Quyết định Hộp đen bằng Bản đồ Độ nhạy (Gradient Saliency Map — XAI)
+Để giải thích trực quan vì sao mạng ResNet đưa ra quyết định chọn cột $a^* = \arg\max_a z_a(X)$, mô-đun [`src/c4/models/explain.py`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/src/c4/models/explain.py) tính đạo hàm bậc nhất của logit $z_{a^*}$ theo từng ô đầu vào (Simonyan et al., 2014):
+$$S_{r, c} = \sum_{k \in \{0, 1\}} \left| \frac{\partial z_{a^*}(X)}{\partial X_{k, r, c}} \right|, \qquad \hat{S}_{r, c} = \frac{S_{r, c}}{\max_{r', c'} S_{r', c'} + \varepsilon} \in [0, 1]$$
+
+![Explainable AI: Bản đồ độ nhạy Saliency trên hai tình huống chiến thuật](../results/figures/xai_saliency_double_threat.png)
+
+1. **Tình huống 1 — Phòng thủ sớm trước Đòn kép hàng đáy (`moves = [3, 0, 4]`, lượt Vàng)**:
+   - Quân Đỏ (`X`) đã chiếm 2 ô trung tâm liên tiếp `(Hàng 1, Cột 4)` và `(Hàng 1, Cột 5)` với hai đầu mở thông thoáng ở Cột 3 và Cột 6.
+   - `HeuristicAgent` (Level 2) bỏ lọt mối đe dọa này vì trên bàn chưa có chuỗi 3 quân nào của `X`, dẫn đến bị gài bẫy đôi ở nước kế tiếp và thua tất yếu.
+   - Ngược lại, `Connect4PolicyValueNet` dự đoán chính xác nước chặn sớm tại **Cột 3** (`P = 54,2%`) và bản đồ nhiệt Saliency đạt cực đại **`1,00` ngay tại ô trống khóa đòn kép `(Hàng 1, Cột 3)`**, chứng minh mạng thực sự hiểu cấu trúc hình học của đòn bẫy hai đầu mở.
+2. **Tình huống 2 — Đòn kết liễu Đường chéo Khe giữa (`moves = [0, 1, 1, 2, 3, 2, 3, 3, 3, 6]`, lượt Đỏ)**:
+   - Quân Đỏ có 3 quân trên đường chéo chính tại `(1,1)`, `(2,2)`, `(4,4)`, chỉ còn khuyết mắt xích khe giữa `(Hàng 3, Cột 3)`. Mạng dồn **98,9% xác suất vào Cột 3** (`Value = +0,601`) và làm sáng rực các ô dọc theo đường chéo chiến thắng.
+
+---
+
+## CHƯƠNG 5: THỰC NGHIỆM ĐỐI KHÁNG VÀ PHÂN TÍCH KẾT QUẢ
+
+### 5.1. Quy chuẩn Giải đấu Vòng tròn Round-Robin Đối xứng (200 ván/cặp, Wilson 95% CI)
+
+Mọi cặp đấu $(A, B)$ trong giải đấu vòng tròn 6 tác tử (**15 cặp × 200 ván = 3.000 ván**, lưu tại [`results/tables/round_robin_default_summary.csv`](file:///d:/AI_PREMIUM/ConnectFour_Game/connect4-ai/connect4-ai/results/tables/round_robin_default_summary.csv)) đều tuân thủ quy chuẩn đối xứng nghiêm ngặt:
+- **100 khai cuộc 4-ply chuẩn cố định theo `seed = 42`**: Với mỗi khai cuộc $o_i$, hai tác tử thi đấu **2 ván đổi màu quân** ($A$ cầm Đỏ đi trước 1 ván, $B$ cầm Đỏ đi trước 1 ván) để triệt tiêu hoàn toàn lợi thế đi trước và biến thiên khai cuộc.
+- **Độ đo thống kê**: Điểm tổng bằng không $\text{Score}_A = \frac{W_A + 0,5 D}{N}$ kèm **Khoảng tin cậy Bootstrap 95%** (`10.000` lần lấy mẫu) và tỷ lệ thắng nhị phân kèm **Khoảng tin cậy Wilson 95%**.
 
 | Cặp đấu (`Agent_A` vs `Agent_B`) | Số ván | `A` Thắng | Hòa | `B` Thắng | `A_Score` | Bootstrap 95% CI | `A_WinRate` (Wilson 95% CI) | `p95 A` (ms) | `p95 B` (ms) |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -178,31 +364,14 @@ Bảng dưới đây trình bày kết quả toàn bộ **15 cặp đấu đối
 
 ![Ma trận điểm đối đầu và Bảng xếp hạng tổng thể 6 tác tử](../results/figures/round_robin_heatmap.png)
 
-**Tổng hợp bảng xếp hạng trên 1.000 ván thi đấu của mỗi tác tử**:
-1. **Hạng 1 — `Mixed-MCTS PUCT (200 sims)`**: `705 Thắng – 90 Hòa – 205 Thua` $\rightarrow$ **Overall Score = 75,00%**. Đáng chú ý, dù chỉ dùng **200 mô phỏng** (ít hơn 5 lần so với `MCTS-UCT 1.000 sims`), `Mixed-MCTS` đánh bại `MCTS-UCT` với tỷ số thuyết phục `121W – 8D – 71L` (**Score = 62,50%**, khoảng tin cậy 95% `[0,560; 0,690]` nằm hoàn toàn trên ngưỡng `0,50`) và thậm chí nhỉnh hơn cả `Alpha-Beta depth 5` (`96W – 25D – 79L`, **Score = 54,25%**) dù mạng bên trong nó chỉ học từ chuyên gia `depth 4`!
-2. **Hạng 2 — `Alpha-Beta (depth 5)`**: `716 Thắng – 64 Hòa – 220 Thua` $\rightarrow$ **Overall Score = 74,80%**, với độ trễ cực kỳ gọn nhẹ (`Mean ~ 21,9 ms`, `p95 ~ 63 ms`).
-3. **Hạng 3 — `MCTS-UCT (1.000 sims)`**: `596 Thắng – 27 Hòa – 377 Thua` $\rightarrow$ **Overall Score = 60,95%** (`p95 ~ 153 ms`).
-4. **Hạng 4 — `Policy-Value NN (0 search)`**: `460 Thắng – 87 Hòa – 453 Thua` $\rightarrow$ **Overall Score = 50,35%**. Chỉ bằng một lượt truyền thẳng `~2,9 ms` không tìm kiếm cây, mạng học sâu thắng `Random` **98,50%**, đánh bại `Heuristic` có ý nghĩa thống kê với tỷ số `116W – 25D – 59L` (**Score = 64,25%**, CI `[0,580; 0,705]`), giành được **80 trận thắng (Score = 41,00%)** trước `MCTS-1000` và **38 trận thắng + 18 hòa (Score = 23,50%)** trước `Alpha-Beta depth 5`.
-5. **Hạng 5 — `Heuristic`**: `350 Thắng – 70 Hòa – 580 Thua` $\rightarrow$ **Overall Score = 38,50%** (thắng `Random` `199/200` ván = **99,50%** trong `0,12 ms/nước`).
-6. **Hạng 6 — `Random`**: `4 Thắng – 0 Hòa – 996 Thua` $\rightarrow$ **Overall Score = 0,40%**.
+### 5.2. Phân tích kết quả thí nghiệm Giải đấu Tính giờ (RQ1) & Ablation Studies (A1 – A4)
 
-### 4.5. Kết quả Giải đấu Cùng Ngân sách Thời gian (Chế độ A — RQ1) và Các Nghiên cứu Phân rã (Ablation A1–A4)
-
-#### 4.5.1. Giải đấu Giới hạn Thời gian Thực Chế độ A (`results/tables/round_robin_timed_summary.csv`)
-Để trả lời trực diện **RQ1**, `Alpha-Beta` (chế độ Iterative Deepening) và `MCTS-UCT` thi đấu đơn luồng độc lập ở 3 ngưỡng thời gian thực **50 ms, 100 ms và 300 ms / nước** (`100` ván/mức = `300` ván):
-
-| Ngân sách Thời gian | Số ván | `Alpha-Beta` Thắng | Hòa | `MCTS` Thắng | `Alpha-Beta Score` | Bootstrap 95% CI | `p95 Alpha-Beta` | `p95 MCTS` |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **50 ms / nước** | 100 | 64 | 2 | 34 | **0,6500** | `[0,5550; 0,7400]` | `51,59 ms` | `50,89 ms` |
-| **100 ms / nước** | 100 | 68 | 2 | 30 | **0,6900** | `[0,6000; 0,7750]` | `101,52 ms` | `100,93 ms` |
-| **300 ms / nước** | 100 | 59 | 3 | 38 | **0,6050** | `[0,5100; 0,7000]` | `301,22 ms` | `300,85 ms` |
+#### A. Thí nghiệm Giải đấu Giới hạn Thời gian Thực (RQ1 — `round_robin_timed_summary.csv`)
+Khi cấp cùng ngân sách thời gian suy nghĩ `50 ms`, `100 ms` và `300 ms / nước` (`100` ván/mức), `Alpha-Beta` (Iterative Deepening) đạt điểm số lần lượt **0,6500** (`CI [0,555; 0,740]`), **0,6900** (`CI [0,600; 0,775]`) và **0,6050** (`CI [0,510; 0,700]`) trước `MCTS-UCT`. Ở mức `300 ms`, `MCTS-UCT` bắt đầu thu hẹp khoảng cách từ `31,0%` lên `39,5%`.
 
 ![Chế độ A: Alpha-Beta vs MCTS dưới cùng ngân sách thời gian](../results/figures/timed_crossover_rq1.png)
 
-**Phân tích cơ chế**: Khác với cờ vây ($b \approx 250$) nơi Alpha-Beta gãy đổ do bùng nổ nhánh và thiếu hàm lượng giá tốt, Connect Four có hệ số nhánh rất hẹp ($b \le 7$) và cấu trúc hình học 69 cửa sổ 4 ô rõ ràng. Trong `50–100 ms`, Iterative Deepening trên bitboard dễ dàng đạt độ sâu 5–6 ply với độ chính xác chiến thuật tất định, nên thắng áp đảo `MCTS-UCT` (`0,650` và `0,690`). Khi nâng ngân sách lên `300 ms`, `MCTS-UCT` thực hiện được hàng chục nghìn mô phỏng mỗi nước nên thu hẹp đáng kể khoảng cách (tăng điểm từ `0,310` lên `0,395`), song `Alpha-Beta` vẫn giữ ưu thế có ý nghĩa thống kê (`CI [0,510; 0,700] > 0,50`).
-
-#### 4.5.2. Ablation A1: Đóng góp của Cắt tỉa Alpha-Beta và Thứ tự Center-First (`ablation_a1_results.csv`)
-Trên thế cờ trung tâm chuẩn sau 2 nước khai cuộc cột 4, bảng sau đối chiếu số nút duyệt và thời gian thực thi khi bật/tắt cắt tỉa và sắp xếp Center-First ở độ sâu `4, 5, 6`:
+#### B. Ablation A1: Hiệu quả Cắt tỉa Alpha-Beta và Sắp xếp Nước đi Center-First (`ablation_a1_results.csv`)
 
 | Độ sâu | Cấu hình | Số nút duyệt | Thời gian (ms) | Nước chọn | Giá trị Minimax | Mức giảm nút (%) |
 |:---:|:---|---:|---:|:---:|:---:|---:|
@@ -218,24 +387,14 @@ Trên thế cờ trung tâm chuẩn sau 2 nước khai cuộc cột 4, bảng sa
 
 ![Ablation A1: Hiệu quả cắt tỉa Alpha-Beta và Center-First](../results/figures/ablation_a1_nodes.png)
 
-**Nhận xét**: Cả 4 cấu hình ở cùng độ sâu luôn trả về **cùng một giá trị Minimax và cùng nước đi tối ưu**, chứng minh cắt tỉa $\alpha$-$\beta$ bảo toàn tính tối ưu toán học. Ở `Depth 6`, chỉ bật cắt tỉa giảm `79,09%` nút, nhưng khi kết hợp thêm sắp xếp **Center-First**, mức tiết kiệm vọt lên **93,07%** (`18.886` xuống `1.309` nút, tốc độ nhanh gấp **61,9 lần**: từ `3.306,8 ms` xuống `53,4 ms`), vì các cột trung tâm sớm thiết lập cận $\alpha$ cao làm gãy hàng loạt nhánh biên.
-
-#### 4.5.3. Ablation A2: Quy mô Mô phỏng MCTS đối đầu Alpha-Beta Cố định Depth 4 (`ablation_a2_results.csv`)
-Khi giữ đối thủ cố định là `Alpha-Beta (depth = 4)` (`100` ván mỗi mức):
-- `100 sims`: `5W – 3D – 92L` $\rightarrow$ `Score = 0,065` (`CI [0,025; 0,115]`, `p95 = 4,62 ms`)
-- `500 sims`: `29W – 3D – 68L` $\rightarrow$ `Score = 0,305` (`CI [0,220; 0,395]`, `p95 = 28,20 ms`)
-- `1.000 sims`: `42W – 0D – 58L` $\rightarrow$ `Score = 0,420` (`CI [0,320; 0,520]`, `p95 = 71,40 ms`)
-- **`2.000 sims`**: `51W – 6D – 43L` $\rightarrow$ **`Score = 0,540`** (`CI [0,445; 0,635]`, `p95 = 118,43 ms`) — **vượt mốc cân bằng 0,50!**
-- **`5.000 sims`**: `57W – 3D – 40L` $\rightarrow$ **`Score = 0,585`** (`CI [0,490; 0,680]`, `p95 = 287,94 ms`)
+#### C. Ablation A2: Quy mô Mô phỏng MCTS đối đầu Alpha-Beta Cố định Depth 4 (`ablation_a2_results.csv`)
+Khi tăng số mô phỏng của `MCTS-UCT` qua 5 mốc `100 → 500 → 1.000 → 2.000 → 5.000 sims` trước `Alpha-Beta (depth=4)`, điểm số của MCTS tăng đơn điệu từ `0,065 → 0,305 → 0,420 → 0,540 → 0,585`. **Điểm giao thoa (cross-over point) xuất hiện tại ~1.500–2.000 mô phỏng/nước**.
 
 ![Ablation A2: Quy mô mô phỏng MCTS đối đầu Alpha-Beta Depth 4](../results/figures/ablation_a2_scaling.png)
 
-Như vậy, đối với một chân trời tìm kiếm cố định `depth = 4`, điểm giao thoa (cross-over point) của `MCTS-UCT` nằm trong khoảng **1.500 – 2.000 mô phỏng/nước**.
+#### D. Ablation A3: Bóc tách Vai trò của Policy Prior và Value Head trong PUCT (`ablation_a3_results.csv`)
 
-#### 4.5.4. Ablation A3: Bóc tách Vai trò của Policy Prior và Value Head trong PUCT (`ablation_a3_results.csv` — Trả lời RQ2 & RQ3)
-Để tách bạch đóng góp của từng thành phần học sâu, 4 biến thể (`NN_Policy_Only` không tìm kiếm, `MCTS_UCT_Rollout` 200 sims, `PUCT_Prior_Rollout` 200 sims và `PUCT_Prior_ValueHead` 200 sims) cùng thi đấu `100` ván trước hai mốc chuẩn `MCTS (500 sims)` và tác tử thầy `Alpha-Beta (depth 4)`:
-
-| Biến thể Tác tử | Ngân sách | Đối thủ | W / D / L | `Score` | Bootstrap 95% CI | `Mean Time` (ms) |
+| Biến thể Tác tử | Số Playouts / Sims | Đối thủ Benchmark | W / D / L | `Score` | Bootstrap 95% CI | `Mean Time` (ms) |
 |:---|:---:|:---|:---:|:---:|:---:|---:|
 | `NN_Policy_Only` | `0 sims` | `mcts_500` | `43 / 2 / 55` | **0,4400** | `[0,3450; 0,5350]` | 2,99 |
 | `MCTS_UCT_Rollout` | `200 sims` | `mcts_500` | `32 / 1 / 67` | **0,3250** | `[0,2350; 0,4200]` | 12,92 |
@@ -248,59 +407,44 @@ Như vậy, đối với một chân trời tìm kiếm cố định `depth = 4`
 
 ![Ablation A3: Đóng góp của Policy Prior và Value Head trong PUCT](../results/figures/ablation_a3_puct_value.png)
 
-**Hai phát hiện khoa học nổi bật từ Ablation A3**:
-1. **Sức mạnh đột phá của Policy Prior**: Ở cùng mức `200` mô phỏng, `MCTS-UCT` thuần thua nặng cả `MCTS-500` (`0,325`) lẫn `Alpha-Beta d=4` (`0,145`) vì lãng phí ngân sách ít ỏi vào các cột biên kém chất lượng. Chỉ cần đưa phân phối tiên nghiệm $P_\theta(s,a)$ vào công thức PUCT, điểm số nhảy vọt **+37,0%** trước `MCTS-500` (`0,325 → 0,695`) và **+48,0%** trước `Alpha-Beta d=4` (`0,145 → 0,625`), giúp trò vượt qua chính thầy dạy mình có ý nghĩa thống kê (`CI [0,535; 0,710] > 0,50`)!
-2. **So sánh Rollout và Supervised Value Head (Liên hệ trực tiếp với AlphaGo 2016)**: Biến thể `PUCT_Prior_Rollout` nhanh hơn **2,8 lần** (`151 ms` so với `425 ms`) vì chỉ gọi mạng CNN khi mở rộng nút trong để lấy prior $P(s,a)$, còn tại nút lá tận dụng rollout bitboard siêu tốc thay vì tốn thêm một lượt truyền thẳng CNN. Hơn nữa, trước đối thủ chiến thuật sắc bén `Alpha-Beta d=4`, `PUCT_Prior_Rollout` đạt điểm cao hơn `PUCT_Prior_ValueHead` (`0,625` so với `0,510`). Nguyên nhân là đầu Value Head huấn luyện thuần túy có giám sát trên kết cục ván đấu (`Test Value MSE = 0,788`) đôi khi có sai số ước lượng ở các thế cờ chiến thuật hẹp, trong khi rollout ngẫu nhiên kiểm chứng trực tiếp điều kiện thắng/thua cuối ván — hoàn toàn tương đồng với phát hiện kinh điển của **AlphaGo (Silver et al., 2016)** khi kết hợp SL Policy Prior cùng Fast Rollout!
+**Minh chứng nguyên lý "Duyệt ít nút hơn nhưng chọn nước đi chất lượng hơn"**:
+Tại cùng mức ngân sách chỉ **200 mô phỏng** (ít hơn 2,5 lần so với đối thủ `MCTS-500`), `MCTS-UCT` thuần chỉ đạt `32,5%` điểm, nhưng ngay khi tích hợp xác suất tiên nghiệm Policy Head $P_\theta(s,a)$ vào công thức PUCT, tỷ lệ điểm vọt lên **69,5%** (+37% điểm số) và đánh bại luôn cả tác tử thầy `Alpha-Beta (depth=4)` với điểm số **62,5%**!
 
-#### 4.5.5. Ablation A4: Phân tích Lợi thế Người đi trước trên 3.000 Ván (`ablation_a4_first_player_bias.csv`)
-Tổng hợp toàn bộ `3.000` ván của 15 cặp đấu Round-Robin:
-- **Quân Đỏ (Đi trước — P1) thắng**: `1.554 / 3.000` ván (**51,80%**, khoảng tin cậy Wilson 95% `[50,01%; 53,58%]`).
-- **Quân Vàng (Đi sau — P2) thắng**: `1.277 / 3.000` ván (**42,57%**).
-- **Hòa**: `169 / 3.000` ván (**5,63%**).
-- **Độ chênh lệch tỷ lệ thắng ròng ($\Delta W = W_{\text{Đỏ}} - W_{\text{Vàng}}$)**: **+9,23%** nghiêng về người đi trước! Đặc biệt ở các cặp đấu giữa hai tác tử tìm kiếm mạnh ngang sức, ưu thế đi trước càng bộc lộ rõ rệt: trong `mcts` vs `mixed_mcts`, bên đi trước thắng tới **65,50%** so với **30,50%** của bên đi sau ($\Delta W = +35,0\%$); trong `alphabeta` vs `mixed_mcts`, bên đi trước thắng **55,00%** so với **32,50%** ($\Delta W = +22,5\%$). Kết quả này phù hợp hoàn toàn với định lý lý thuyết trò chơi của Allis (1988) và chứng minh thực nghiệm rằng bất kỳ giải đấu Connect Four nào không đổi bên đối xứng đều sẽ bị sai lệch nghiêm trọng.
+#### E. Ablation A4: Định lượng Lợi thế Người đi trước trên 3.000 Ván (`ablation_a4_first_player_bias.csv`)
+Trên toàn bộ `3.000` ván đấu Round-Robin, **Quân Đỏ (Đi trước)** thắng `1.554` ván (**51,80%**), **Quân Vàng (Đi sau)** thắng `1.277` ván (**42,57%**), Hòa `169` ván (**5,63%**) $\Rightarrow$ độ lệch ròng **$\Delta W = +9,23\%$** nghiêng về người đi trước, phù hợp hoàn toàn với định lý của Allis (1988).
 
 ![Ablation A4: Lợi thế người đi trước trên toàn bộ các cặp đấu](../results/figures/first_player_advantage.png)
 
-### 4.6. Phân tích Chiến thuật Tiêu biểu và Giải thích Mạng Nơ-ron (Explainable AI)
-Hình dưới đây trình bày bản đồ độ nhạy đạo hàm bậc nhất $|\partial z_{a^*} / \partial X|$ (`results/figures/xai_saliency_double_threat.png`) trên hai tình huống chiến thuật kinh điển phân hóa rõ năng lực của các cấp tác tử:
+### 5.3. Bảng Tiến hóa Đa Phiên bản Tác tử (Agent Progression Table) & Phân tích Đánh đổi: Thông lượng Duyệt nút, Độ trễ Suy luận vs Tỷ lệ Thắng
 
-![Explainable AI: Bản đồ độ nhạy Saliency trên hai tình huống chiến thuật](../results/figures/xai_saliency_double_threat.png)
+Tương tự phương pháp đánh giá tiến hóa đa phiên bản trong các công trình Game AI chuẩn mực, bảng dưới đây tổng hợp sự tiến hóa xuyên suốt của **6 phiên bản tác tử** trên `1.000` ván đối kháng mỗi tác tử trong giải đấu Round-Robin, đặt cạnh số nút/mô phỏng trung bình mỗi nước, độ trễ trung bình (`Mean Latency`) và độ trễ phân vị thứ 95 (`p95 Latency`):
 
-1. **Tình huống 1 — Phòng thủ sớm trước Đòn kép hàng đáy (`moves = [3, 0, 4]`, lượt O — Vàng)**:
-   - Quân Đỏ (`X`) đã chiếm hai ô trung tâm liên tiếp tại `(Hàng 1, Cột 4)` và `(Hàng 1, Cột 5)` với hai đầu mở thông thoáng ở Cột 3 và Cột 6.
-   - **Sai lầm điển hình của `HeuristicAgent` (Cấp 2)**: Do trên bàn chưa có chuỗi 3 quân nào của `X`, tầng luật chặn thua của `HeuristicAgent` không kích hoạt và tác tử ngây thơ thả quân vào Cột 4 (`Hàng 2`). Ngay lượt kế, `X` đánh vào Cột 3 tạo chuỗi 3 quân mở hai đầu `(Cột 3, 4, 5)` mà `O` không thể chặn đồng thời cả Cột 2 lẫn Cột 6 — dẫn tới thua tất yếu!
-   - **Quyết định & Giải thích của `Connect4PolicyValueNet` (Cấp 5) và `Alpha-Beta` (Cấp 3)**: Mạng dự đoán chính xác nước chặn sớm tại **Cột 3** với xác suất cao nhất **54,2%** (cùng phương án đối xứng Cột 6 đạt **14,9%**) và lượng giá thế cờ hơi bất lợi nhẹ cho bên đi sau (`Value = -0,188`). Bản đồ Saliency đạt cực đại chuẩn hóa **`1,00` ngay tại ô trống `(Hàng 1, Cột 3)`**, tiếp theo là `(Hàng 1, Cột 2)` (`0,62`) và quân `X` tại `(Hàng 1, Cột 4)` (`0,43`) — chứng minh mạng CNN đã thực sự học được cấu trúc hình học của đòn kép mở hai đầu chứ không chỉ học vẹt.
-2. **Tình huống 2 — Đòn kết liễu Đường chéo Khe giữa (`moves = [0, 1, 1, 2, 3, 2, 3, 3, 3, 6]`, lượt X — Đỏ)**:
-   - `X` đang sở hữu 3 quân nằm rải trên đường chéo chính tại `(Hàng 1, Cột 1)`, `(Hàng 2, Cột 2)` và `(Hàng 4, Cột 4)`, khuyết đúng mắt xích khe giữa tại `(Hàng 3, Cột 3)` (hiện đã có 2 quân lót sẵn ở Cột 3 nên thả Cột 3 sẽ rơi đúng vào Hàng 3).
-   - Mạng nơ-ron dồn gần như tuyệt đối xác suất **98,9% vào Cột 3** (`Value = +0,601`), đồng thời bản đồ nhiệt chiếu sáng dọc theo đường chéo chiến thắng và khu vực đỉnh Cột 3–4 (`1,00` tại `(Hàng 5, Cột 4)`, `0,85` tại `(Hàng 3, Cột 2)` và `(Hàng 5, Cột 3)`).
+| Phiên bản Tác tử (Incremental Version) | Cơ chế Suy luận Cốt lõi | Số Nút / Playouts TB mỗi nước | Độ trễ TB (`Mean ms`) | Độ trễ `p95` (`ms`) | Thành tích (`1.000` ván) | Điểm Tổng hợp (`Overall Score`) | Tỷ lệ thắng vs `MCTS-1000` (Baseline 1) | Tỷ lệ thắng vs `AlphaBeta d=5` (Baseline 2) |
+|:---|:---|---:|---:|---:|:---:|:---:|:---:|:---:|
+| **v1: `RandomAgent`** (Level 1) | Lấy mẫu ngẫu nhiên đồng đều | `1` | `0,006` | `0,012` | `4W - 0D - 996L` | **0,40%** | `0,00%` | `0,00%` |
+| **v2: `HeuristicAgent`** (Level 2) | Luật 4 tầng + Lọc chống tự sát 1-ply | `~14` | `0,121` | `0,248` | `350W - 70D - 580L` | **38,50%** | `23,25%` | `16,75%` |
+| **v3: `NNAgent` (ResNet 0-Search)** (Level 5) | Truyền thẳng `Connect4PolicyValueNet` (`0` cây tìm kiếm) | `1` (1 lượt CNN) | `2,910` | `3,864` | `460W - 87D - 453L` | **50,35%** | `41,00%` | `23,50%` |
+| **v4: `MCTSAgent` (UCT-1000)** (Level 4) | Cây MCTS 4 pha + Rollout ngẫu nhiên | `1.000` sims | `83,420` | `148,847` | `596W - 27D - 377L` | **60,95%** | *Mốc chuẩn (50%)* | `31,50%` |
+| **v5: `AlphaBetaAgent` (Depth 5)** (Level 3) | Negamax + Cắt tỉa $\alpha$-$\beta$ + Center-First + 69 cửa sổ | `~339` nút | `21,860` | `61,480` | `716W - 64D - 220L` | **74,80%** | **68,50%** | *Mốc chuẩn (50%)* |
+| **v6: `MixedMCTSAgent` (PUCT-200)** (AlphaZero-lite) | **ResNet Policy Prior + Value Head + PUCT + $O(1)$ Cache** | **Chỉ `200` sims** | `348,120` | `709,088` | **`705W - 90D - 205L`** | **75,00% (Hạng 1)** | **62,50%** | **54,25%** |
 
----
-
-## CHƯƠNG 5. KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
-
-### 5.1. Tổng kết Câu trả lời cho Ba Câu hỏi Nghiên cứu
-1. **Trả lời RQ1**: Trong miền Connect Four 7×6 có hệ số nhánh nhỏ ($b \le 7$), dưới cùng ngân sách thời gian suy nghĩ tương tác (`50 ms`, `100 ms`, `300 ms/nước`), `Alpha-Beta` tích hợp Iterative Deepening, cắt tỉa Center-First (giảm tới `93,07%` nút) và hàm lượng giá 69 cửa sổ luôn duy trì ưu thế có ý nghĩa thống kê trước `MCTS-UCT` thuần (`Score = 0,650; 0,690; 0,605`), dù khoảng cách thu hẹp dần khi ngân sách tăng lên `300 ms`. Khi cố định chân trời của `Alpha-Beta` ở `depth = 4` (Ablation A2), điểm giao thoa (cross-over point) để `MCTS-UCT` vượt lên nằm tại ngưỡng **1.500 – 2.000 mô phỏng/nước** (`Score = 0,540` ở 2.000 mô phỏng).
-2. **Trả lời RQ2**: Mạng `Connect4PolicyValueNet` học có giám sát từ nhãn sạch của `Alpha-Beta (depth = 4)` trên tập dữ liệu tách theo ván chống rò rỉ đạt **71,68% Top-1 Accuracy** và **89,07% Top-2 Accuracy** trên tập `Test` độc lập. Khi thi đấu trực tiếp không cần tìm kiếm cây (`0 search`, độ trễ `~2,8 ms/nước`), mạng thắng áp đảo `HeuristicAgent` (**64,25%**), đạt **41,00%** điểm trước `MCTS-1000` và đạt **39,50%** điểm trước chính tác tử thầy `Alpha-Beta (depth = 4)` (Ablation A3).
-3. **Trả lời RQ3**: Khi ghép mạng `Connect4PolicyValueNet` vào công thức tìm kiếm cây PUCT (`MixedMCTSAgent`), chỉ với **200 mô phỏng**, tác tử lai tăng vọt **+36% đến +37% điểm số** so với `MCTS-UCT` cùng ngân sách khi gặp `MCTS-500`, vượt qua cả tác tử thầy `Alpha-Beta depth 4` (`Score = 0,625` với `PUCT+Rollout`) và vươn lên dẫn đầu toàn giải đấu Round-Robin 3.000 ván (**Overall Score = 75,00%**, thắng `MCTS-1000` **62,50%** và vượt `Alpha-Beta depth 5` **54,25%**). Bên cạnh đó, bản đồ độ nhạy đạo hàm Saliency Map cung cấp lời giải thích trực quan, minh bạch cho từng quyết định chiến thuật của mạng nơ-ron.
-
-### 5.2. Đóng góp Thực tiễn của Đề tài
-- Xây dựng mã nguồn chuẩn kỹ thuật phần mềm (100% pass trên `57` bài test tự động, kiểm định chéo 10.000 ván và Perft), kèm bộ giao diện đa nền tảng (CLI, Pygame Desktop, FastAPI Web App + Docker).
-- Thiết lập quy trình chuẩn mực về chống rò rỉ dữ liệu đối xứng gương trong học máy cho trò chơi bàn cờ và khung giải đấu thống kê có khả năng tái lập 100% từ cấu hình YAML.
-
-### 5.3. Hạn chế và Hướng Phát triển
-- **Hạn chế**: Đầu ra Value Head hiện được huấn luyện có giám sát trên kết cục ván đấu của `Alpha-Beta (depth = 4)` trên CPU nên độ chính xác ước lượng thế cờ phức tạp chưa đạt mức tự chơi tăng cường quy mô lớn; mặt khác `AlphaBetaAgent` chưa tích hợp bảng băm hoán vị (Transposition Table Zobrist/Bitboard key) và sắp xếp nước đi động (Killer Moves / History Heuristic).
-- **Hướng phát triển**: (1) Bổ sung Transposition Table cho `AlphaBetaAgent` để đạt độ sâu 9–11 ply trong `100 ms`; (2) Triển khai vòng lặp **AlphaZero Self-Play Reinforcement Learning** sinh dữ liệu từ chính phân phối thăm $\pi_{\text{PUCT}}$ qua nhiều thế hệ; (3) Mở rộng kiến trúc ResNet + PUCT sang các trò chơi có hệ số nhánh lớn hơn như **Gomoku / Caro (15×15)** hoặc **Othello (8×8)** — nơi ưu thế của PUCT so với Alpha-Beta sẽ còn bộc lộ mạnh mẽ hơn nữa.
+**Ba kết luận đắt giá từ phân tích đánh đổi (Trade-off Analysis)**:
+1. **Duyệt ít hơn 5 lần nhưng thắng áp đảo nhờ tri thức học sâu (`v6` vs `v4`)**: So với `MCTS-UCT` phải chạy `1.000` mô phỏng ngẫu nhiên (`v4`, đạt `60,95%`), phiên bản `MixedMCTSAgent` (`v6`) giảm số lượng mô phỏng xuống **5 lần (chỉ `200` sims/nước)** nhưng tỷ lệ điểm tổng hợp tăng từ **60,95% lên 75,00%**, và thắng trực tiếp `MCTS-1000` với điểm số **62,50%** (`121W – 8D – 71L`). Điều này chứng minh rằng mạng ResNet đã cắt bỏ hiệu quả các nhánh rác ngay từ bước *Selection*.
+2. **Sự cộng hưởng giữa Tìm kiếm Cây và Học sâu (`v6` vs `v3` & `v5`)**: Khi đứng một mình không tìm kiếm cây (`v3`), mạng ResNet suy luận siêu tốc trong `2,91 ms/nước` và đạt `50,35%` điểm tổng hợp (thắng `Heuristic` `64,25%`), nhưng vẫn thua các thuật toán duyệt cây sâu ở những thế cờ bẫy nhiều bước. Ngược lại, khi ghép mạng `v3` vào cây tìm kiếm PUCT `200` mô phỏng (`v6`), sự kết hợp giữa **trực giác toàn cục của CNN** và **kiểm chứng chiến thuật ngắn hạn của cây tìm kiếm** giúp `v6` vượt qua cả `Alpha-Beta depth 5` (`54,25%`).
+3. **Khuyến nghị lựa chọn tác tử theo bài toán thực tế**:
+   - Nếu ưu tiên **thời gian phản hồi tức thì (`< 65 ms`) trên thiết bị cấu hình thấp**: `AlphaBetaAgent (depth=5)` (`v5`) hoặc biến thể lai `PUCT_Prior_Rollout (200 sims, ~151 ms)` là lựa chọn tối ưu về tỷ số Sức mạnh / Độ trễ.
+   - Nếu ưu tiên **sức mạnh chiến thuật cao nhất & khả năng giải thích trực quan (XAI)**: `MixedMCTSAgent (PUCT)` (`v6`) là tác tử mạnh nhất toàn hệ thống.
 
 ---
 
 ## TÀI LIỆU THAM KHẢO
 
 1. V. L. Allis, *A Knowledge-Based Approach of Connect-Four — The Game is Solved: White Wins*, Master's thesis, Vrije Universiteit Amsterdam, 1988.
-2. L. Kocsis and C. Szepesvári, "Bandit Based Monte-Carlo Planning," in *Proc. 17th European Conference on Machine Learning (ECML)*, Berlin, Heidelberg: Springer, 2006, pp. 282–293.
+2. L. Kocsis and C. Szepesvári, "Bandit Based Monte-Carlo Planning," in *Proc. 17th European Conference on Machine Learning (ECML)*, Springer, 2006, pp. 282–293.
 3. D. Silver et al., "Mastering the game of Go with deep neural networks and tree search," *Nature*, vol. 529, no. 7587, pp. 484–489, 2016.
 4. D. Silver et al., "Mastering the game of Go without human knowledge," *Nature*, vol. 550, no. 7676, pp. 354–359, 2017.
 5. S. Russell and P. Norvig, *Artificial Intelligence: A Modern Approach*, 4th ed. Hoboken, NJ: Pearson, 2021.
-6. R. S. Sutton and A. G. Barto, *Reinforcement Learning: An Introduction*, 2nd ed. Cambridge, MA: MIT Press, 2018.
-7. M. Liu, *AlphaGo Simplified: Rule-Based AI and Deep Learning in Everyday Games*, Boca Raton, FL: CRC Press, 2025.
-8. K. Simonyan, A. Vedaldi, and A. Zisserman, "Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps," in *ICLR Workshop*, 2014.
-9. S. Edelkamp and P. Kissmann, "Symbolic Classification of General Two-Player Games," in *KI 2008: Advances in Artificial Intelligence*, Springer, 2008, pp. 185–192.
+6. M. Liu, *AlphaGo Simplified: Rule-Based AI and Deep Learning in Everyday Games*, Boca Raton, FL: CRC Press, 2025.
+7. K. Simonyan, A. Vedaldi, and A. Zisserman, "Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps," in *ICLR Workshop*, 2014.
+8. S. Edelkamp and P. Kissmann, "Symbolic Classification of General Two-Player Games," in *KI 2008: Advances in Artificial Intelligence*, Springer, 2008, pp. 185–192.
+9. D. E. Knuth and R. W. Moore, "An analysis of alpha-beta pruning," *Artificial Intelligence*, vol. 6, no. 4, pp. 293–326, 1975.
