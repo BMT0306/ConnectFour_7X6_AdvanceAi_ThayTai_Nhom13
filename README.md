@@ -96,7 +96,7 @@ data/            Dữ liệu huấn luyện/kiểm định/kiểm tra (.npz) & d
 results/         logs/ (CSV từng ván), tables/ (bảng tổng hợp), figures/ (biểu đồ 300 DPI), test_results/
 tests/           57 unit tests tự động + tests/data/positions.csv (33 thế cờ chiến thuật kiểm thử thủ công)
 notebooks/       01_tournament_analysis.ipynb (phân tích thống kê & trực quan hóa kết quả)
-docs/            BAO_CAO_DO_AN_CUOI_KY.docx, BAO_CAO_DO_AN_CUOI_KY.md, DEMO_GUIDE.md, ConnectFour_Proposal_Nhom13.pdf, THIRD_PARTY.md
+docs/            BAO_CAO_DO_AN_CUOI_KY.docx, BAO_CAO_DO_AN_CUOI_KY.md, SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx, DEMO_GUIDE.md, ConnectFour_Proposal_Nhom13.pdf, THIRD_PARTY.md
 scripts/         Các script tự động hóa giải đấu, ablation, kiểm thử và đóng gói nộp bài
 ```
 
