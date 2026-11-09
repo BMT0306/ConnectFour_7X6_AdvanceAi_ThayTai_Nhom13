@@ -9,4 +9,6 @@ venv/
 # checkpoint lớn: chỉ commit nếu < 50MB, còn lại để Google Drive và ghi link trong README
 checkpoints/*.pt
 !checkpoints/.gitkeep
+!checkpoints/policy_net_best.pt
+!checkpoints/training_history.json
 *.zip

@@ -1,0 +1,9 @@
+﻿Variant,Simulations_Budget,Opponent,Games,Wins,Draws,Losses,Score,Score_CI_Low,Score_CI_High,WinRate,Win_Wilson_Low,Win_Wilson_High,Mean_Time_ms,p95_Time_ms,Simulations_Per_Sec
+NN_Policy_Only,0,mcts_500,100,43,2,55,0.44,0.345,0.535,0.43,0.3373,0.5278,2.987,3.746,0.0
+NN_Policy_Only,0,alphabeta_d4,100,33,13,54,0.395,0.305,0.485,0.33,0.2456,0.4269,2.845,3.761,0.0
+MCTS_UCT_Rollout,200,mcts_500,100,32,1,67,0.325,0.235,0.42,0.32,0.2367,0.4166,12.917,23.534,15483.7
+MCTS_UCT_Rollout,200,alphabeta_d4,100,13,3,84,0.145,0.08,0.215,0.13,0.0776,0.2098,13.298,24.146,15039.5
+PUCT_Prior_Rollout,200,mcts_500,100,68,3,29,0.695,0.605,0.78,0.68,0.5834,0.7633,151.091,230.519,1323.7
+PUCT_Prior_Rollout,200,alphabeta_d4,100,56,13,31,0.625,0.535,0.71,0.56,0.4623,0.6533,151.233,244.626,1322.5
+PUCT_Prior_ValueHead,200,mcts_500,100,67,3,30,0.685,0.595,0.77,0.67,0.5731,0.7544,447.533,654.477,446.9
+PUCT_Prior_ValueHead,200,alphabeta_d4,100,45,12,43,0.51,0.415,0.605,0.45,0.3561,0.5476,425.473,655.755,470.1

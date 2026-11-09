@@ -1,0 +1,27 @@
+# Cấu hình sinh dữ liệu chuyên gia & huấn luyện mạng hai đầu Connect4PolicyValueNet
+dataset:
+  teacher: "alphabeta"
+  depth: 4
+  num_games: 2500
+  opening_plies: 4
+  epsilon: 0.14
+  pure_after_ply: 18
+  split_ratio: [0.70, 0.15, 0.15]   # Train / Val / Test tách theo ván
+  deduplicate: true
+  horizontal_flip_train_only: true
+  seed: 42
+  out_dir: "data"
+
+training:
+  architecture: "Connect4PolicyValueNet"
+  num_res_blocks: 3
+  num_filters: 64
+  epochs: 10
+  batch_size: 256
+  learning_rate: 0.0015
+  weight_decay: 0.001
+  label_smoothing: 0.05
+  value_loss_weight: 0.5
+  seed: 42
+  checkpoint_out: "checkpoints/policy_net_best.pt"
+

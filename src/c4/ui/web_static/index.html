@@ -588,13 +588,21 @@
           <div class="mode-btn" id="mode-H_H" onclick="setMode('H_H')">2 Người</div>
         </div>
 
+        <div id="side-setting" style="margin-top: 12px;">
+          <div class="card-title" style="margin-bottom: 8px;">🎯 Lượt Đi (Người vs Máy)</div>
+          <div class="mode-group" style="grid-template-columns: 1fr 1fr;">
+            <div class="mode-btn active" id="side-1" onclick="setHumanSide(1)">🔴 Bạn đi trước</div>
+            <div class="mode-btn" id="side--1" onclick="setHumanSide(-1)">🟡 Máy đi trước</div>
+          </div>
+        </div>
+
         <div class="card-title" style="margin-top: 14px;">🤖 Cấp Độ Tác Tử AI</div>
         <select class="agent-select" id="agent-select" onchange="onAgentChange()">
-          <option value="alphabeta" selected>Level 3: Alpha-Beta (Minimax + Transposition)</option>
+          <option value="alphabeta" selected>Level 3: Alpha-Beta (Negamax + Cắt tỉa 69 cửa sổ)</option>
           <option value="heuristic">Level 2: Rule-Based Heuristic (4 tầng luật)</option>
           <option value="mcts">Level 4: MCTS-UCT (Duyệt cây Monte Carlo)</option>
-          <option value="mixed_mcts">Level 5: Mixed MCTS (PUCT + Value Head)</option>
-          <option value="nn">Level 5: Deep CNN (Mạng nơ-ron tích chập)</option>
+          <option value="nn">Level 5: Deep ResNet (Policy-Value suy luận trực tiếp)</option>
+          <option value="mixed_mcts">Mở rộng: Mixed MCTS (PUCT + Policy-Value ResNet)</option>
           <option value="random">Level 1: Random (Nước đi ngẫu nhiên)</option>
         </select>
 
@@ -640,6 +648,7 @@
     const COLS = 7;
     let gameState = null;
     let currentMode = "H_AI";
+    let humanSide = 1;
     let isThinking = false;
     let soundEnabled = true;
 
@@ -796,10 +805,14 @@
 
       if (state.current_player === 1) {
         turnDisc.className = 'disc-icon red';
-        turnText.innerText = currentMode === 'H_AI' ? 'Lượt của bạn (Đỏ)' : 'Lượt Quân Đỏ (P1)';
+        turnText.innerText = currentMode === 'H_AI'
+          ? (humanSide === 1 ? 'Lượt của bạn (Đỏ - Đi trước)' : 'Lượt Máy AI (Đỏ - Đi trước)')
+          : 'Lượt Quân Đỏ (P1)';
       } else {
         turnDisc.className = 'disc-icon yellow';
-        turnText.innerText = currentMode === 'H_AI' ? 'Lượt Máy AI (Vàng)' : 'Lượt Quân Vàng (P2)';
+        turnText.innerText = currentMode === 'H_AI'
+          ? (humanSide === -1 ? 'Lượt của bạn (Vàng - Đi sau)' : 'Lượt Máy AI (Vàng - Đi sau)')
+          : 'Lượt Quân Vàng (P2)';
       }
     }
 
@@ -808,7 +821,8 @@
       if (!gameState || gameState.is_terminal || isThinking) return;
       if (!gameState.legal_actions.includes(col)) return;
 
-      if (currentMode === 'H_AI' && gameState.current_player !== 1) return;
+      if (currentMode === 'H_AI' && gameState.current_player !== humanSide) return;
+      if (currentMode === 'AI_AI') return;
 
       await makeHumanMove(col);
     }
@@ -825,7 +839,7 @@
         renderBoard(state);
 
         if (!state.is_terminal) {
-          if (currentMode === 'H_AI' && state.current_player === -1) {
+          if (currentMode === 'H_AI' && state.current_player !== humanSide) {
             triggerAIMove();
           } else if (currentMode === 'AI_AI') {
             triggerAIMove();
@@ -845,6 +859,7 @@
 
       const agent = document.getElementById('agent-select').value;
       const depth = parseInt(document.getElementById('depth-slider').value);
+      const sims = agent === 'mixed_mcts' ? 200 : 1000;
 
       try {
         const res = await fetch('/api/ai_move', {
@@ -853,8 +868,7 @@
           body: JSON.stringify({
             agent: agent,
             depth: depth,
-            simulations: 1000,
-            time_s: 0.25
+            simulations: sims
           })
         });
 
@@ -864,7 +878,8 @@
           renderBoard(state);
 
           document.getElementById('tele-latency').innerText = `${state.elapsed_ms} ms`;
-          document.getElementById('tele-nodes').innerText = state.stats || 'Xong';
+          document.getElementById('tele-nodes').innerText =
+            typeof state.stats === 'object' ? JSON.stringify(state.stats) : (state.stats || 'Xong');
 
           if (currentMode === 'AI_AI' && !state.is_terminal) {
             setTimeout(triggerAIMove, 400);
@@ -887,7 +902,7 @@
         renderBoard(state);
         document.getElementById('tele-latency').innerText = '0.0 ms';
         document.getElementById('tele-nodes').innerText = '-';
-        if (currentMode === 'AI_AI') {
+        if (currentMode === 'AI_AI' || (currentMode === 'H_AI' && humanSide === -1)) {
           setTimeout(triggerAIMove, 300);
         }
       }
@@ -904,13 +919,24 @@
       if (res.ok) {
         const state = await res.json();
         renderBoard(state);
+        if (currentMode === 'H_AI' && !state.is_terminal && state.current_player !== humanSide) {
+          setTimeout(triggerAIMove, 250);
+        }
       }
     }
 
     function setMode(mode) {
       currentMode = mode;
-      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#mode-H_AI, #mode-AI_AI, #mode-H_H').forEach(b => b.classList.remove('active'));
       document.getElementById(`mode-${mode}`).classList.add('active');
+      document.getElementById('side-setting').style.display = mode === 'H_AI' ? 'block' : 'none';
+      resetGame();
+    }
+
+    function setHumanSide(side) {
+      humanSide = side;
+      document.getElementById('side-1').classList.toggle('active', side === 1);
+      document.getElementById('side--1').classList.toggle('active', side === -1);
       resetGame();
     }
 

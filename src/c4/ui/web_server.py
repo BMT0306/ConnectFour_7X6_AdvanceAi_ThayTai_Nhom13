@@ -134,12 +134,12 @@ class Connect4HTTPHandler(BaseHTTPRequestHandler):
 
         if self.path == "/api/agents":
             agents_info = [
-                {"id": "random", "name": "Random Baseline", "desc": "Nước đi ngẫu nhiên, đối chứng cơ bản", "level": 1},
+                {"id": "random", "name": "Random Baseline", "desc": "Nước đi ngẫu nhiên có seed, mốc cơ sở", "level": 1},
                 {"id": "heuristic", "name": "Rule-Based Heuristic", "desc": "4 tầng luật: Thắng ngay -> Chặn -> Tránh bẫy -> Cột giữa", "level": 2},
-                {"id": "alphabeta", "name": "Alpha-Beta Pruning", "desc": "Minimax cắt tỉa 69 cửa sổ + Transposition Table", "level": 3},
-                {"id": "mcts", "name": "MCTS-UCT", "desc": "Monte Carlo Tree Search mô phỏng ngẫu nhiên UCB1", "level": 4},
-                {"id": "mixed_mcts", "name": "Mixed MCTS / AlphaZero", "desc": "PUCT MCTS + Value Head + Dirichlet Noise", "level": 5},
-                {"id": "nn", "name": "Deep CNN Policy", "desc": "Mạng tích chập đánh giá bàn cờ trực tiếp", "level": 5},
+                {"id": "alphabeta", "name": "Alpha-Beta Pruning", "desc": "Negamax cắt tỉa Alpha-Beta + 69 cửa sổ + Iterative Deepening", "level": 3},
+                {"id": "mcts", "name": "MCTS-UCT", "desc": "Monte Carlo Tree Search 4 bước với công thức UCB1", "level": 4},
+                {"id": "nn", "name": "Deep Policy-Value ResNet", "desc": "Mạng tích chập phần dư suy luận trực tiếp", "level": 5},
+                {"id": "mixed_mcts", "name": "Mixed MCTS (PUCT + ResNet)", "desc": "AlphaZero-inspired PUCT + Policy-Value Head + Cache", "level": 6},
             ]
             self._set_headers()
             self.wfile.write(json.dumps({"agents": agents_info}).encode("utf-8"))
@@ -213,12 +213,18 @@ class Connect4HTTPHandler(BaseHTTPRequestHandler):
                 return
 
             agent_name = data.get("agent", "alphabeta")
-            depth = data.get("depth", 5)
-            sims = data.get("simulations", 1000)
-            time_limit = data.get("time_s", 0.2)
+            depth = int(data.get("depth", 5))
+            default_sims = 200 if agent_name in ("mixed_mcts", "puct", "alphazero") else 1000
+            sims = int(data.get("simulations", default_sims))
+            time_limit = data.get("time_s")
 
             agent = get_agent(agent_name)
-            budget = Budget(depth=depth, simulations=sims, time_s=time_limit)
+            if agent_name == "alphabeta":
+                budget = Budget(depth=depth, time_s=time_limit if time_limit else None)
+            elif agent_name in ("mcts", "mixed_mcts", "puct", "alphazero"):
+                budget = Budget(simulations=sims, time_s=time_limit if time_limit else None)
+            else:
+                budget = Budget()
 
             t0 = time.perf_counter()
             chosen_col = agent.choose_action(SESSION.game.clone(), budget)
@@ -226,10 +232,27 @@ class Connect4HTTPHandler(BaseHTTPRequestHandler):
 
             SESSION.step(chosen_col)
 
+            raw_stats = getattr(agent, "last_stats", None)
+            if isinstance(raw_stats, dict):
+                if "nodes" in raw_stats:
+                    stats_text = f"Depth {raw_stats.get('depth')} · {raw_stats.get('nodes')} nút"
+                elif "cache_hits" in raw_stats:
+                    wr = float(raw_stats.get("best_winrate", 0.5)) * 100
+                    stats_text = f"{raw_stats.get('simulations')} sims · WR {wr:.1f}% · Cache {raw_stats.get('cache_hits')}"
+                elif "simulations" in raw_stats:
+                    stats_text = f"{raw_stats.get('simulations')} mô phỏng"
+                elif "value" in raw_stats:
+                    stats_text = f"Value {float(raw_stats.get('value', 0.0)):+.2f}"
+                else:
+                    stats_text = str(raw_stats)
+            else:
+                stats_text = str(raw_stats) if raw_stats else f"{elapsed_ms:.1f} ms"
+
             res = SESSION.to_dict()
             res["ai_col"] = chosen_col
             res["elapsed_ms"] = round(elapsed_ms, 2)
-            res["stats"] = getattr(agent, "last_stats", None) or f"{elapsed_ms:.1f} ms"
+            res["stats"] = stats_text
+            res["stats_raw"] = raw_stats
 
             self._set_headers()
             self.wfile.write(json.dumps(res).encode("utf-8"))
@@ -260,6 +283,12 @@ def run_server(host: str = "0.0.0.0", port: int = 5000, open_browser: bool = Tru
 
 
 if __name__ == "__main__":
+    if sys.platform == "win32":
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+            sys.stderr.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="0.0.0.0", help="Host binding")
     parser.add_argument("--port", type=int, default=5000, help="Port binding")

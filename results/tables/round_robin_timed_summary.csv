@@ -1,0 +1,4 @@
+﻿Pair,Agent_A,Agent_B,Time_Limit_s,Games,A_Wins,Draws,B_Wins,A_Score,A_Score_CI_Low,A_Score_CI_High,A_WinRate,A_Win_Wilson_Low,A_Win_Wilson_High,A_Score_First,A_Score_Second,A_Mean_Time_ms,A_p95_Time_ms,B_Mean_Time_ms,B_p95_Time_ms
+alphabeta_vs_mcts_50ms,alphabeta,mcts,0.05,100,64,2,34,0.65,0.555,0.74,0.64,0.5424,0.7273,0.71,0.59,38.215,51.585,49.479,50.891
+alphabeta_vs_mcts_100ms,alphabeta,mcts,0.1,100,68,2,30,0.69,0.6,0.775,0.68,0.5834,0.7633,0.84,0.54,73.576,101.524,99.429,100.932
+alphabeta_vs_mcts_300ms,alphabeta,mcts,0.3,100,59,3,38,0.605,0.51,0.7,0.59,0.492,0.6813,0.63,0.58,206.666,301.22,296.723,300.846

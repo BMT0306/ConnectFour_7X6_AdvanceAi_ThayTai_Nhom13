@@ -40,6 +40,7 @@ EXCLUDE_EXTS = {
     ".pyc",
     ".pyo",
     ".pyd",
+    ".zip",
 }
 
 

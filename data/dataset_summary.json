@@ -1,0 +1,39 @@
+{
+  "seed": 42,
+  "teacher": "AlphaBetaAgent(depth=4)",
+  "num_games_total": 2500,
+  "split_games": {
+    "train": 1750,
+    "val": 375,
+    "test": 375
+  },
+  "opening_plies_default": 4,
+  "epsilon_exploration": 0.14,
+  "clean_expert_labels": true,
+  "deduplicated": true,
+  "horizontal_flip_train_only": true,
+  "raw_samples_total": 64230,
+  "split_details": {
+    "train": {
+      "raw": 45038,
+      "cross_filtered": 0,
+      "duplicates_merged": 7520,
+      "unique": 37518,
+      "augmented_final": 75036
+    },
+    "val": {
+      "raw": 9405,
+      "cross_filtered": 2917,
+      "duplicates_merged": 92,
+      "unique": 6396
+    },
+    "test": {
+      "raw": 9787,
+      "cross_filtered": 3468,
+      "duplicates_merged": 26,
+      "unique": 6293
+    }
+  },
+  "generation_time_s": 53.91,
+  "platform": "Windows-11-10.0.26300-SP0"
+}

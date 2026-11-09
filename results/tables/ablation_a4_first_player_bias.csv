@@ -1,0 +1,17 @@
+﻿Pair,Games,Red_P1_Wins,Draws,Yellow_P2_Wins,Red_P1_WinRate,Yellow_P2_WinRate,Delta_WinRate_Red_Minus_Yellow,Red_P1_Wilson95_Low,Red_P1_Wilson95_High
+alphabeta_vs_mcts,200,113,4,83,0.565,0.415,0.15,0.4957,0.6318
+alphabeta_vs_mixed_mcts,200,110,25,65,0.55,0.325,0.225,0.4808,0.6174
+alphabeta_vs_nn,200,109,18,73,0.545,0.365,0.18,0.4758,0.6125
+heuristic_vs_alphabeta,200,103,17,80,0.515,0.4,0.115,0.4461,0.5833
+heuristic_vs_mcts,200,90,11,99,0.45,0.495,-0.045,0.3826,0.5192
+heuristic_vs_mixed_mcts,200,87,17,96,0.435,0.48,-0.045,0.3682,0.5043
+heuristic_vs_nn,200,92,25,83,0.46,0.415,0.045,0.3923,0.5292
+mcts_vs_mixed_mcts,200,131,8,61,0.655,0.305,0.35,0.5868,0.7174
+mcts_vs_nn,200,120,4,76,0.6,0.38,0.22,0.5308,0.6654
+nn_vs_mixed_mcts,200,95,40,65,0.475,0.325,0.15,0.4069,0.544
+random_vs_alphabeta,200,100,0,100,0.5,0.5,0.0,0.4314,0.5686
+random_vs_heuristic,200,101,0,99,0.505,0.495,0.01,0.4363,0.5735
+random_vs_mcts,200,100,0,100,0.5,0.5,0.0,0.4314,0.5686
+random_vs_mixed_mcts,200,100,0,100,0.5,0.5,0.0,0.4314,0.5686
+random_vs_nn,200,103,0,97,0.515,0.485,0.03,0.4461,0.5833
+OVERALL_ALL_PAIRS,3000,1554,169,1277,0.518,0.4257,0.0923,0.5001,0.5358

@@ -1,0 +1,18 @@
+# Cấu hình Ablation A3: Đóng góp của Policy Prior & Value Head trong PUCT-MCTS (RQ2 & RQ3)
+ablation: "A3_puct_prior_and_value_head"
+seed: 2026
+openings: 50          # 50 khai cuộc x 2 lượt đổi bên = 100 ván/cặp
+opening_plies: 4
+simulations: 200
+variants:
+  - "NN_Policy_Only"          # Cấp 5: Mạng Policy-Value suy luận trực tiếp (0 duyệt cây)
+  - "MCTS_UCT_Rollout"        # Cấp 4: MCTS-UCT chuẩn với rollout ngẫu nhiên
+  - "PUCT_Prior_Rollout"      # Mở rộng: PUCT dùng Policy Prior + rollout ngẫu nhiên (use_value_head=False)
+  - "PUCT_Prior_ValueHead"    # Mở rộng: PUCT dùng Policy Prior + Value Head thay thế rollout (use_value_head=True)
+opponents:
+  - name: "mcts"
+    simulations: 500
+  - name: "alphabeta"
+    depth: 4
+output_csv: "results/tables/ablation_a3_results.csv"
+

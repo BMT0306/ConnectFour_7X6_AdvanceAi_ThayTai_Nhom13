@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-11-08T20:58:51",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python_version": "3.13.2",
+  "return_code": 0,
+  "total_duration_s": 34.715,
+  "total_tests": 57,
+  "passed": 57,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "pass_rate_pct": 100.0,
+  "manual_positions_count": 33,
+  "trained_checkpoint_present": true,
+  "trained_checkpoint_size_kb": 1113.06
+}

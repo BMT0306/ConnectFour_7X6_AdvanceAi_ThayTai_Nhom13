@@ -1,0 +1,13 @@
+# Mã nguồn, Thư viện và Ý tưởng Kế thừa (Academic Attribution)
+
+Nhóm cam kết **không sử dụng bất kỳ bộ giải sẵn (solver) Connect Four nào** trong quá trình xây dựng tác tử và đánh giá giải đấu. Toàn bộ mã nguồn Engine, 6 tác tử AI, quy trình sinh dữ liệu/huấn luyện, khung giải đấu và giao diện đều do nhóm tự cài đặt và kiểm thử.
+
+| Nguồn tham khảo / Thư viện | Giấy phép | Phần ý tưởng / công cụ kế thừa | Phần nhóm tự thiết kế & hiện thực hóa |
+|---|---|---|---|
+| M. Liu, *AlphaGo Simplified: Rule-Based AI and Deep Learning in Everyday Games* (CRC Press, 2025) & `markhliu/AlphaGoSimplified` | MIT (mã minh họa) | Ý tưởng phân tầng tác tử Game AI từ phản xạ luật đến MCTS và CNN (Ch. 3, 5–8, 10–12) | Tự viết toàn bộ API `Connect4Base`, `HeuristicAgent`, `AlphaBetaAgent`, `MCTSAgent`, `NNAgent`, `MixedMCTSAgent` và bộ unit test độc lập |
+| Kỹ thuật Bitboard Connect Four — Pascal Pons (*Solving Connect 4: how to build a perfect AI*) | Kiến thức công khai | Ý tưởng bố trí 7 bit/cột (6 ô hợp lệ + 1 bit đệm đỉnh cột) và kiểm tra 4 quân bằng dịch bit `O(1)` | Tự cài đặt lớp `Connect4` (`src/c4/game/engine.py`) gồm `step`, `undo`, `winning_moves`, `bitboards` và đối chiếu chéo 10.000 ván với `ReferenceConnect4` (**không** dùng opening book hay solver của Pons) |
+| Silver et al. (*Nature*, 2016; *Science*, 2018 — AlphaGo / AlphaZero) | Bài báo khoa học | Công thức chọn nút PUCT, kiến trúc mạng phần dư hai đầu (Policy + Value Heads) và nhiễu Dirichlet tại gốc | Tự thiết kế `Connect4PolicyValueNet` (3 khối Residual, 64 kênh) và `MixedMCTSAgent` có bộ nhớ đệm chuyển vị + chế độ bật/tắt Value Head cho Ablation A3 |
+| Kocsis & Szepesvári (*ECML*, 2006) | Bài báo khoa học | Công thức UCB1 áp dụng trên cây (UCT) | Tự cài đặt cây `_Node` nhiều tầng trong `src/c4/agents/mcts.py` hỗ trợ ngân sách kép (`simulations` và `time_s`) |
+| E. B. Wilson (*JASA*, 1927) & Efron (*Bootstrap*, 1979) | Công thức thống kê | Khoảng tin cậy nhị thức Wilson 95% và Bootstrap percentile 95% CI | Tự cài đặt từ đầu bằng Python thuần trong `src/c4/eval/metrics.py` (không phụ thuộc `scipy`), có unit test đối chiếu giá trị chuẩn |
+| Simonyan et al. (*ICLR Workshop*, 2014) | Bài báo khoa học | Ý tưởng trích xuất đạo hàm bậc nhất đầu vào `|d logit(a*) / dX|` làm bản đồ độ nhạy Saliency | Tự cài đặt hàm `compute_saliency_map` (`src/c4/models/explain.py`) và trực quan hóa trên bàn cờ Connect Four |
+| PyTorch, NumPy, Pandas, Matplotlib, Pygame, PyYAML, Pytest | BSD / MIT / LGPL | Thư viện nền tảng tính toán tensor, xử lý bảng CSV, vẽ biểu đồ, đồ họa 2D và khung chạy kiểm thử | Kiến trúc mô hình, vòng lặp huấn luyện, giao diện đồ họa 60 FPS, Web Server RESTful và kịch bản thực nghiệm |

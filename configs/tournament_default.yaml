@@ -1,8 +1,8 @@
-# Cấu hình giải đấu mặc định (Chế độ B - Round-robin)
+# Cấu hình giải đấu mặc định toàn diện 6 tác tử (Chế độ B - Round-Robin)
 tournament:
   name: "round_robin_default"
-  openings: 100       # 100 khai cuộc x 2 lượt đổi bên = 200 ván/cặp
-  opening_plies: 4    # 4 nước đầu ngẫu nhiên theo seed
+  openings: 100       # 100 khai cuộc x 2 lượt đổi bên = 200 ván/cặp (tổng 15 cặp = 3.000 ván)
+  opening_plies: 4    # 4 nước đầu ngẫu nhiên cố định theo seed
   seed: 42
 
 agents:
@@ -14,6 +14,10 @@ agents:
   - name: "mcts"
     budget:
       simulations: 1000
+  - name: "nn"
+  - name: "mixed_mcts"
+    budget:
+      simulations: 200
 
 output:
   log_dir: "results/logs"

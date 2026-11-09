@@ -1,0 +1,77 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.2, pytest-9.1.1, pluggy-1.7.0 -- D:\AI_PREMIUM\ConnectFour_Game\connect4-ai\connect4-ai\.venv\Scripts\python.exe
+rootdir: D:\AI_PREMIUM\ConnectFour_Game\connect4-ai\connect4-ai
+configfile: pyproject.toml
+collecting ... collected 57 items
+
+tests/test_agents.py::test_random_agent_returns_legal_moves_and_is_seeded PASSED [  1%]
+tests/test_agents.py::test_same_seed_same_choices PASSED                 [  3%]
+tests/test_agents.py::test_unknown_agent_message PASSED                  [  5%]
+tests/test_alphabeta.py::test_matches_independent_plain_minimax PASSED   [  7%]
+tests/test_alphabeta.py::test_pruning_changes_node_count_not_the_result PASSED [  8%]
+tests/test_alphabeta.py::test_move_ordering_reduces_nodes PASSED         [ 10%]
+tests/test_alphabeta.py::test_finds_forced_win_in_three_plies PASSED     [ 12%]
+tests/test_alphabeta.py::test_takes_immediate_win_and_blocks_single_threat PASSED [ 14%]
+tests/test_alphabeta.py::test_evaluation_is_mirror_symmetric_and_zero_on_empty_board PASSED [ 15%]
+tests/test_alphabeta.py::test_time_budget_is_respected_and_returns_legal_move PASSED [ 17%]
+tests/test_alphabeta.py::test_depth_budget_overrides_default_and_reports_stats PASSED [ 19%]
+tests/test_crosscheck.py::test_bitboard_matches_reference_on_random_games PASSED [ 21%]
+tests/test_engine.py::test_initial_state PASSED                          [ 22%]
+tests/test_engine.py::test_gravity_and_turns PASSED                      [ 24%]
+tests/test_engine.py::test_all_win_types_detected_only_on_last_move PASSED [ 26%]
+tests/test_engine.py::test_full_board_draw PASSED                        [ 28%]
+tests/test_engine.py::test_win_on_last_move_counts_as_win_not_draw PASSED [ 29%]
+tests/test_engine.py::test_result_before_terminal_raises PASSED          [ 31%]
+tests/test_engine.py::test_illegal_moves PASSED                          [ 33%]
+tests/test_engine.py::test_numpy_int_actions_accepted PASSED             [ 35%]
+tests/test_engine.py::test_undo_restores_every_state PASSED              [ 36%]
+tests/test_engine.py::test_clone_is_independent PASSED                   [ 38%]
+tests/test_engine.py::test_relative_array_and_encode PASSED              [ 40%]
+tests/test_engine.py::test_key_identifies_positions_regardless_of_move_order PASSED [ 42%]
+tests/test_engine.py::test_winning_moves_for_both_sides PASSED           [ 43%]
+tests/test_engine.py::test_perft_depth_has_no_wins_before_ply_7 PASSED   [ 45%]
+tests/test_heuristic.py::test_heuristic_follows_priority_on_handwritten_positions PASSED [ 47%]
+tests/test_heuristic.py::test_heuristic_never_hands_over_an_immediate_win_when_it_can_avoid_it PASSED [ 49%]
+tests/test_heuristic.py::test_heuristic_does_not_modify_the_game_it_receives PASSED [ 50%]
+tests/test_heuristic.py::test_heuristic_beats_random PASSED              [ 52%]
+tests/test_match.py::test_openings_distinct_nonterminal_and_reproducible PASSED [ 54%]
+tests/test_match.py::test_match_plays_each_opening_with_both_colours PASSED [ 56%]
+tests/test_match.py::test_match_is_reproducible_with_same_seeds PASSED   [ 57%]
+tests/test_match.py::test_illegal_agent_move_raises PASSED               [ 59%]
+tests/test_match.py::test_csv_log_written PASSED                         [ 61%]
+tests/test_mcts.py::test_same_seed_same_result_and_reports_simulations PASSED [ 63%]
+tests/test_mcts.py::test_finds_immediate_win PASSED                      [ 64%]
+tests/test_mcts.py::test_single_legal_move_needs_no_search PASSED        [ 66%]
+tests/test_mcts.py::test_time_budget_is_respected PASSED                 [ 68%]
+tests/test_mcts.py::test_does_not_modify_the_game_it_receives PASSED     [ 70%]
+tests/test_mcts.py::test_invalid_rollout_rejected PASSED                 [ 71%]
+tests/test_mcts.py::test_greedy_rollout_returns_legal_moves PASSED       [ 73%]
+tests/test_mcts.py::test_beats_random PASSED                             [ 75%]
+tests/test_metrics.py::test_score PASSED                                 [ 77%]
+tests/test_metrics.py::test_wilson_known_values PASSED                   [ 78%]
+tests/test_metrics.py::test_bootstrap_ci_contains_score_and_is_reproducible PASSED [ 80%]
+tests/test_metrics.py::test_summarize_and_percentile PASSED              [ 82%]
+tests/test_nn_and_puct.py::test_policy_value_net_shapes_and_legal_mask PASSED [ 84%]
+tests/test_nn_and_puct.py::test_nn_agent_legality_and_temperature PASSED [ 85%]
+tests/test_nn_and_puct.py::test_mixed_mcts_dirichlet_noise_and_reference_engine_compatibility PASSED [ 87%]
+tests/test_nn_and_puct.py::test_mixed_mcts_rollout_mode_finds_immediate_win PASSED [ 89%]
+tests/test_nn_and_puct.py::test_xai_saliency_map_output PASSED           [ 91%]
+tests/test_nn_and_puct.py::test_trained_checkpoint_tactical_sanity PASSED [ 92%]
+tests/test_positions.py::test_positions_csv_is_valid_and_matches_engines PASSED [ 94%]
+tests/test_train_pipeline.py::test_generate_game_keeps_clean_expert_labels_under_high_epsilon PASSED [ 96%]
+tests/test_train_pipeline.py::test_horizontal_flip_symmetry PASSED       [ 98%]
+tests/test_train_pipeline.py::test_dataset_split_zero_cross_leakage PASSED [100%]
+
+- generated xml file: C:\Users\LENOVO\.gemini\antigravity\brain\0c5b4cbf-b9cf-4071-bdc7-27b85dd90041\scratch\workspace_out\results\test_results\pytest_junit.xml -
+============================ slowest 10 durations =============================
+15.54s call     tests/test_crosscheck.py::test_bitboard_matches_reference_on_random_games
+3.90s call     tests/test_agents.py::test_random_agent_returns_legal_moves_and_is_seeded
+1.68s call     tests/test_mcts.py::test_beats_random
+1.14s call     tests/test_alphabeta.py::test_move_ordering_reduces_nodes
+1.09s call     tests/test_alphabeta.py::test_pruning_changes_node_count_not_the_result
+0.70s call     tests/test_alphabeta.py::test_matches_independent_plain_minimax
+0.41s call     tests/test_engine.py::test_perft_depth_has_no_wins_before_ply_7
+0.35s call     tests/test_train_pipeline.py::test_dataset_split_zero_cross_leakage
+0.35s call     tests/test_nn_and_puct.py::test_trained_checkpoint_tactical_sanity
+0.15s call     tests/test_nn_and_puct.py::test_mixed_mcts_dirichlet_noise_and_reference_engine_compatibility
+============================= 57 passed in 32.91s =============================

@@ -17,9 +17,18 @@ Các tính năng nổi bật:
 from __future__ import annotations
 
 import math
+import os
 import sys
 import time
 from typing import Optional
+
+if sys.platform == "win32":
+    os.environ.setdefault("SDL_VIDEO_CENTERED", "1")
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 import pygame
 
@@ -105,6 +114,7 @@ class Connect4GUI:
         # Trạng thái game
         self.game = Connect4()
         self.mode = "H_VS_AI"  # "H_VS_AI", "AI_VS_AI", "H_VS_H"
+        self.human_player = PLAYER1  # PLAYER1 (+1: Đỏ đi trước) hoặc PLAYER2 (-1: Vàng đi sau)
         self.ai_agent_name = "alphabeta"  # random, heuristic, alphabeta, mcts, nn, mixed_mcts
         self.ai_budget = Budget(depth=5, simulations=1000, time_s=0.2)
         self.agent = make_agent(self.ai_agent_name)
@@ -167,7 +177,7 @@ class Connect4GUI:
         is_ai = False
         active_agent = self.agent
 
-        if self.mode == "H_VS_AI" and current == PLAYER2:
+        if self.mode == "H_VS_AI" and current == -self.human_player:
             is_ai = True
             active_agent = self.agent
         elif self.mode == "AI_VS_AI":
@@ -179,8 +189,17 @@ class Connect4GUI:
             self.draw()
             pygame.display.flip()
 
+            if active_agent.name == "alphabeta":
+                budget = Budget(depth=5)
+            elif active_agent.name == "mixed_mcts":
+                budget = Budget(simulations=200)
+            elif active_agent.name == "mcts":
+                budget = Budget(simulations=1000)
+            else:
+                budget = Budget()
+
             t0 = time.perf_counter()
-            col = active_agent.choose_action(self.game.clone(), self.ai_budget)
+            col = active_agent.choose_action(self.game.clone(), budget)
             dt = (time.perf_counter() - t0) * 1000.0
 
             self.last_ai_time_ms = dt
@@ -259,7 +278,7 @@ class Connect4GUI:
 
         # Vẽ preview quân cờ hover ở trên bàn cờ
         if not self.game.is_terminal() and not self.falling_piece and self.mode != "AI_VS_AI":
-            if (self.mode == "H_VS_AI" and self.game.current_player == PLAYER1) or self.mode == "H_VS_H":
+            if (self.mode == "H_VS_AI" and self.game.current_player == self.human_player) or self.mode == "H_VS_H":
                 if self.hover_col in self.game.legal_actions():
                     hx = BOARD_OFFSET_X + self.hover_col * SLOT_SIZE + SLOT_SIZE // 2
                     hy = BOARD_OFFSET_Y - 45
@@ -320,6 +339,9 @@ class Connect4GUI:
         # Move count & Turn badge
         info_str = f"Tổng số nước: {self.game.move_count} / 42"
         self.screen.blit(self.font_main.render(info_str, True, COLOR_WHITE), (panel_x + 20, status_y + 55))
+        if self.mode == "H_VS_AI":
+            side_txt = "Phe bạn: Đỏ (Đi trước) [Phím S đổi bên]" if self.human_player == PLAYER1 else "Phe bạn: Vàng (Đi sau) [Phím S đổi bên]"
+            self.screen.blit(self.font_small.render(side_txt, True, COLOR_MUTED), (panel_x + 20, status_y + 78))
 
         # 3. Mode selector
         mode_y = panel_y + 195
@@ -406,7 +428,7 @@ class Connect4GUI:
                     is_human = False
                     if self.mode == "H_VS_H":
                         is_human = True
-                    elif self.mode == "H_VS_AI" and self.game.current_player == PLAYER1:
+                    elif self.mode == "H_VS_AI" and self.game.current_player == self.human_player:
                         is_human = True
 
                     if is_human:
@@ -498,11 +520,24 @@ class Connect4GUI:
                         running = False
                     elif event.key == pygame.K_r:
                         self.reset_game()
+                    elif event.key == pygame.K_s and self.mode == "H_VS_AI":
+                        self.human_player = -self.human_player
+                        self.reset_game()
                     elif event.key == pygame.K_u:
                         self.undo_move()
                     elif pygame.K_1 <= event.key <= pygame.K_7:
                         col = event.key - pygame.K_1
-                        if col in self.game.legal_actions() and not self.falling_piece and not self.is_thinking:
+                        can_human_play = (
+                            self.mode == "H_VS_H"
+                            or (self.mode == "H_VS_AI" and self.game.current_player == self.human_player)
+                        )
+                        if (
+                            can_human_play
+                            and not self.game.is_terminal()
+                            and col in self.game.legal_actions()
+                            and not self.falling_piece
+                            and not self.is_thinking
+                        ):
                             arr = self.game.to_array()
                             target_row = 0
                             for r in range(ROWS):

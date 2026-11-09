@@ -40,16 +40,17 @@ class NNAgent(Agent):
         self.model.eval()
 
         # Nạp weights từ checkpoint nếu có
-        ckpt = Path(checkpoint_path) if checkpoint_path else DEFAULT_CKPT
+        env_ckpt = os.environ.get("C4_CHECKPOINT_PATH")
+        ckpt = Path(checkpoint_path) if checkpoint_path else (Path(env_ckpt) if env_ckpt else DEFAULT_CKPT)
         self.has_checkpoint = False
 
         if ckpt.exists():
             try:
-                data = torch.load(ckpt, map_location=self.device)
-                state_dict = data["model_state_dict"] if "model_state_dict" in data else data
+                data = torch.load(ckpt, map_location=self.device, weights_only=False)
+                state_dict = data["model_state_dict"] if isinstance(data, dict) and "model_state_dict" in data else data
                 self.model.load_state_dict(state_dict)
                 self.has_checkpoint = True
-            except Exception as e:
+            except Exception:
                 # Nếu file lỗi, giữ mô hình khởi tạo mặc định
                 pass
 
@@ -57,39 +58,37 @@ class NNAgent(Agent):
         start_t = time.perf_counter()
         legal = game.legal_actions()
         if len(legal) == 1:
-            self.last_stats = {"value": 0.0, "chosen": legal[0], "time_ms": 0.0}
+            self.last_stats = {
+                "value": 0.0,
+                "chosen": legal[0],
+                "time_ms": 0.0,
+                "has_checkpoint": self.has_checkpoint,
+            }
             return legal[0]
 
         # 1. Chuẩn bị tensor input (1, 2, 6, 7)
         state_np = game.encode()  # relative encoding: shape (2, 6, 7)
         state_t = torch.from_numpy(state_np).unsqueeze(0).to(self.device)
 
-        # 2. Tạo legal mask
-        mask = np.zeros(7, dtype=bool)
-        for c in legal:
-            mask[c] = True
-
-        # 3. Dự đoán policy và value
-        with torch.no_grad():
+        # 2. Dự đoán policy và value với inference_mode tốc độ cao
+        with torch.inference_mode():
             policy_logits, value_t = self.model(state_t)
-            val = float(value_t.squeeze().item())
+            logits = policy_logits[0].detach().cpu().numpy()
+            val = float(value_t.item())
 
-            # Mask các cột không hợp lệ bằng -1e9
-            mask_t = torch.from_numpy(mask).unsqueeze(0).to(self.device)
-            masked_logits = torch.where(mask_t, policy_logits, torch.tensor(-1e9, device=self.device))
-
-            if self.temperature <= 1e-4:
-                chosen = int(torch.argmax(masked_logits, dim=-1).item())
+        legal_logits = logits[legal]
+        if self.temperature <= 1e-4:
+            best_idx = int(np.argmax(legal_logits))
+            chosen = legal[best_idx]
+        else:
+            scaled = (legal_logits - float(legal_logits.max())) / self.temperature
+            probs_legal = np.exp(scaled).astype(np.float64)
+            s = float(probs_legal.sum())
+            if s > 0:
+                probs_legal /= s
+                chosen = self.rng.choices(legal, weights=probs_legal, k=1)[0]
             else:
-                probs = torch.softmax(masked_logits / self.temperature, dim=-1).cpu().numpy().squeeze(0)
-                # Đảm bảo phân phối tổng = 1 trên legal actions
-                probs_legal = np.array([probs[c] for c in legal], dtype=np.float64)
-                s = probs_legal.sum()
-                if s > 0:
-                    probs_legal /= s
-                    chosen = self.rng.choices(legal, weights=probs_legal, k=1)[0]
-                else:
-                    chosen = self.rng.choice(legal)
+                chosen = self.rng.choice(legal)
 
         # Kiểm tra tính an toàn: nước đi bắt buộc phải nằm trong legal actions
         if chosen not in legal:

@@ -1,13 +1,14 @@
-# Cấu hình giải đấu cùng ngân sách thời gian (Chế độ A: 100ms và 300ms/nước)
+# Cấu hình giải đấu cùng ngân sách thời gian (Chế độ A - RQ1: 50ms, 100ms, 300ms/nước)
 tournament:
   name: "round_robin_timed"
-  openings: 100       # 100 khai cuộc x 2 lượt đổi bên = 200 ván/cặp
+  openings: 50        # 50 khai cuộc x 2 lượt đổi bên = 100 ván/cặp (đạt chuẩn tối thiểu 100 ván/cặp)
   opening_plies: 4
   seed: 100
 
 time_levels:
-  - time_s: 0.1       # 100 ms/nước
-  - time_s: 0.3       # 300 ms/nước
+  - time_s: 0.05      # 50 ms/nước
+  - time_s: 0.10      # 100 ms/nước
+  - time_s: 0.30      # 300 ms/nước
 
 agents:
   - name: "alphabeta"
