@@ -20,7 +20,7 @@ echo.
 echo   [1] Web App         (Mac dinh - Choi ngay tren Trinh duyet port 5000)
 echo   [2] Desktop Pygame  (Giao dien do hoa Desktop 60 FPS)
 echo   [3] Terminal CLI    (Choi nhanh tren cua so dong lenh)
-echo   [4] Chay Unit Tests (Kiem tra 57 bai test tu dong Pytest)
+echo   [4] Chay Unit Tests (Kiem tra 59 bai test tu dong Pytest)
 echo   [0] Thoat
 echo.
 set "choice="
