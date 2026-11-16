@@ -1,8 +1,23 @@
 # Connect Four Game AI (7×6) — Nhóm 13
 
-Đồ án cuối kỳ học phần **Trí tuệ nhân tạo nâng cao (Advanced Artificial Intelligence)** — Trường Đại học Sài Gòn (SGU): Xây dựng và đánh giá thực nghiệm hệ thống **Game AI đa cấp độ** trên trò chơi **Connect Four (7 cột × 6 hàng)**, từ tác tử phản xạ luật, duyệt cây đối kháng kinh điển, tìm kiếm Monte Carlo đến mạng nơ-ron phần dư hai đầu (**Policy-Value ResNet**) và tìm kiếm định hướng **PUCT-MCTS** (*AlphaGo-/AlphaZero-inspired*), kèm khung giải đấu đối xứng gương (mirror matching), khoảng tin cậy thống kê và phân tích độ nhạy **Explainable AI (Saliency Heatmap)**.
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Pytest](https://img.shields.io/badge/Tests-59%2F59%20Passed-brightgreen.svg)](results/TEST_AND_EVALUATION_REPORT.md)
+[![Agents](https://img.shields.io/badge/Game%20AI-6%20Levels-orange.svg)](#4-cấu-trúc-thư-mục-dự-án)
+
+Đồ án cuối kỳ học phần **Trí tuệ nhân tạo nâng cao (Advanced Artificial Intelligence)** — Trường Đại học Sài Gòn (SGU): Xây dựng và đánh giá thực nghiệm hệ thống **Game AI đa cấp độ** trên trò chơi **Connect Four (7 cột × 6 hàng)**, từ tác tử phản xạ luật, duyệt cây đối kháng kinh điển, tìm kiếm Monte Carlo đến mạng nơ-ron phần dư hai đầu (**Policy-Value ResNet**) và tìm kiếm định hướng **PUCT-MCTS** (*AlphaGo-/AlphaZero-inspired*), kèm khung giải đấu đối xứng gương (mirror matching), cơ chế timeout an toàn (`best_or_random`), khoảng tin cậy thống kê và phân tích độ nhạy **Explainable AI (Saliency Heatmap)**.
 
 > **Trạng thái**: **v1.1 Hoàn chỉnh** — Engine Bitboard 49-bit + 6 tác tử AI (`random`, `heuristic`, `alphabeta`, `mcts`, `nn`, `mixed_mcts`) + Chính sách timeout an toàn (`best_or_random`) + Checkpoint mạng đã huấn luyện (`checkpoints/policy_net_best.pt`) + 3 giao diện (CLI, Pygame GUI, Web UI) + Giải đấu 3.000 ván, 1.500 ván 6-Level 100ms & 4 Ablations (A1–A4) + 100% Unit Tests Passed (`59/59`).
+
+* **Repository GitHub chính thức**: https://github.com/BMT0306/ConnectFour_7X6_AdvanceAi_ThayTai_Nhom13
+* **Kho lưu trữ Thực nghiệm & Video (Google Drive)**: https://drive.google.com/drive/folders/1k-q-cuTi3Rb_eYnrmfmrr_6-C35j7M6K?usp=sharing
+* **Tài liệu Nộp & Quản lý Cộng tác Nhóm 13**:
+  [Báo cáo Word (.docx)](docs/BAO_CAO_DO_AN_CUOI_KY.docx) ·
+  [Báo cáo Markdown](docs/BAO_CAO_DO_AN_CUOI_KY.md) ·
+  [Slide Thuyết trình 36 Slides (.pptx)](docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx) ·
+  [Kịch bản Trình bày](docs/KICH_BAN_TRINH_BAY.md) ·
+  [Nhật ký Thí nghiệm (.xlsx)](docs/NHAT_KY_THI_NGHIEM.xlsx) ·
+  [Quản lý Trục Dọc/Ngang & Người Yếu Nhất](docs/QUAN_LY_CONG_TAC_VA_NHAT_KY.md) ·
+  [Chuẩn Đóng góp (CONTRIBUTING)](CONTRIBUTING.md)
 
 ---
 
@@ -68,8 +83,11 @@ python -m c4.train.train_policy --data-dir data --checkpoint-dir checkpoints --e
 # Bước 3: Chạy Giải đấu Round-Robin 6 tác tử (15 cặp x 200 ván = 3.000 ván)
 python scripts/run_tournament.py --config configs/tournament_default.yaml
 
-# Bước 4: Chạy Giải đấu cùng ngân sách thời gian 50ms / 100ms / 300ms (RQ1)
+# Bước 4a: Chạy Giải đấu cùng ngân sách thời gian 50ms / 100ms / 300ms (RQ1)
 python scripts/run_tournament.py --config configs/tournament_timed.yaml
+
+# Bước 4b: Chạy Giải đấu đầy đủ 6 Cấp độ giới hạn 100 ms/nước (1.500 ván, best_or_random)
+python scripts/run_tournament.py --config configs/tournament_levels_timed.yaml --resume
 
 # Bước 5: Chạy đầy đủ 4 nghiên cứu phân rã Ablation A1, A2, A3, A4
 python scripts/run_ablation.py --all
@@ -96,8 +114,10 @@ data/            Dữ liệu huấn luyện/kiểm định/kiểm tra (.npz) & d
 results/         logs/ (CSV từng ván), tables/ (bảng tổng hợp), figures/ (biểu đồ 300 DPI), test_results/
 tests/           59 unit tests tự động + tests/data/positions.csv (33 thế cờ chiến thuật kiểm thử thủ công)
 notebooks/       01_tournament_analysis.ipynb (phân tích thống kê & trực quan hóa kết quả)
-docs/            BAO_CAO_DO_AN_CUOI_KY.docx/.md, SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx, KICH_BAN_TRINH_BAY.md, QUAN_LY_CONG_TAC_VA_NHAT_KY.md, NHAT_KY_THI_NGHIEM.csv, DEMO_GUIDE.md, ConnectFour_Proposal_Nhom13.pdf, THIRD_PARTY.md
+docs/            BAO_CAO_DO_AN_CUOI_KY.docx/.md, SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx, KICH_BAN_TRINH_BAY.md, QUAN_LY_CONG_TAC_VA_NHAT_KY.md, NHAT_KY_THI_NGHIEM.xlsx/.csv, DEMO_GUIDE.md, ConnectFour_Proposal_Nhom13.pdf, THIRD_PARTY.md
 scripts/         Các script tự động hóa giải đấu, ablation, kiểm thử và đóng gói nộp bài
+.github/         GitHub Actions CI (pytest tự động), Issue Template (Trục Dọc/Ngang) & Pull Request Checklist
+CONTRIBUTING.md  Quy trình 5 nền tảng cộng tác (GitHub, Drive, Sheets, Slides/PPT, Docs) và quy tắc nhánh Git
 ```
 
 ---

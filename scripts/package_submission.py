@@ -52,6 +52,8 @@ def should_exclude(path: Path) -> bool:
             return True
     if path.suffix in EXCLUDE_EXTS:
         return True
+    if path.name.startswith("~$") or path.name.endswith(".tmp"):
+        return True
     if path.name == ZIP_NAME:
         return True
     return False

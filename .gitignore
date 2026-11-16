@@ -12,3 +12,5 @@ checkpoints/*.pt
 !checkpoints/policy_net_best.pt
 !checkpoints/training_history.json
 *.zip
+~$*
+*.tmp
