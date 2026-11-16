@@ -1,7 +1,7 @@
 # BÁO CÁO KẾT QUẢ KIỂM THỬ TỰ ĐỘNG & ĐÁNH GIÁ THỰC NGHIỆM TOÀN DIỆN
 **Dự án**: Xây dựng và Đánh giá Game AI Đa Cấp Độ — Connect Four (7×6)  
 **Nhóm thực hiện**: Nhóm 13 (Nhóm trưởng: Bùi Minh Trung — MSSV `3124720074`)  
-**Thời điểm ghi nhận**: `2026-11-08T20:58:51` | **Nền tảng**: `Windows-11-10.0.26300-SP0` | **Python**: `3.13.2`
+**Thời điểm ghi nhận**: `2026-11-16` | **Nền tảng**: `Windows-11-10.0.26300-SP0` | **Python**: `3.13.2`
 
 ---
 
@@ -9,15 +9,15 @@
 
 Toàn bộ bộ kiểm thử tự động được thực thi qua kịch bản `scripts/run_test_suite_and_save.py` và lưu biên bản gốc tại thư mục `results/test_results/`:
 - `results/test_results/test_evaluation_summary.json` — Tóm tắt chỉ số kiểm thử dạng JSON.
-- `results/test_results/unit_test_cases.csv` — Bảng kết quả và thời gian chạy từng test case (57 dòng).
+- `results/test_results/unit_test_cases.csv` — Bảng kết quả và thời gian chạy từng test case (59 dòng).
 - `results/test_results/pytest_junit.xml` — Biên bản chuẩn JUnit XML.
 - `results/test_results/pytest_full_output.txt` — Log console đầy đủ.
 
 | Chỉ số Kiểm thử | Giá trị Đạt được | Đánh giá Chuẩn Nghiệm thu |
 |:---|:---:|:---:|
-| **Tổng số bài kiểm thử (`total_tests`)** | **57** | Bao phủ toàn bộ 9 phân hệ cốt lõi |
-| **Số bài đạt (`passed`)** | **57 / 57 (100,0%)** | Đạt tuyệt đối (`0 failed, 0 errors, 0 skipped`) |
-| **Tổng thời gian chạy** | `34,72 giây` | Nhanh, tự động hóa hoàn toàn |
+| **Tổng số bài kiểm thử (`total_tests`)** | **59** | Bao phủ toàn bộ 11 tệp kiểm thử cốt lõi |
+| **Số bài đạt (`passed`)** | **59 / 59 (100,0%)** | Đạt tuyệt đối (`0 failed, 0 errors, 0 skipped`) |
+| **Tổng thời gian chạy** | `~50,5 giây` | Nhanh, tự động hóa hoàn toàn |
 | **Số thế cờ chiến thuật thủ công (`positions.csv`)** | **33 thế cờ** | Vượt xa ngưỡng tối thiểu 30 thế cờ của rubric |
 | **Đối chiếu chéo Bitboard vs Reference Engine** | **10.000 ván ngẫu nhiên** | Khớp 100% ở mọi bước đi và hoàn tác `undo()` |
 | **Trạng thái Checkpoint Mạng Nơ-ron** | `policy_net_best.pt` (`1.113,06 KB`) | Đã nạp tự động và vượt qua kiểm thử chiến thuật |
@@ -71,12 +71,21 @@ Trên `100` ván mỗi mức đơn luồng độc lập, `Alpha-Beta` (Iterative
 - **Ablation A3 (`ablation_a3_results.csv`)**: Ở cùng `200` mô phỏng khi gặp `MCTS-500`, bổ sung Policy Prior giúp nhảy vọt từ `0,325` (`MCTS-UCT`) lên **0,695** (`PUCT+Rollout`) và **0,685** (`PUCT+ValueHead`); khi gặp chính tác tử thầy `Alpha-Beta depth 4`, `PUCT+Rollout` đạt **0,625** (`CI [0,535; 0,710]`) và `PUCT+ValueHead` đạt **0,510**.
 - **Ablation A4 (`ablation_a4_first_player_bias.csv`)**: Trên toàn bộ `3.000` ván, quân Đỏ (đi trước) thắng **51,80%** (`1.554` ván) so với quân Vàng **42,57%** (`1.277` ván), Hòa `5,63%` ($\Delta W = +9,23\%$).
 
+### 3.4. Giải đấu Đối kháng Đầy đủ 6 Cấp độ Giới hạn 100 ms/nước (`round_robin_levels_timed_summary.csv`)
+Thi đấu vòng tròn 15 cặp × 100 ván (`50` ván Đỏ đi trước + `50` ván Vàng đi trước = **1.500 ván**), áp dụng chính sách timeout `best_or_random` ở mức `100 ms/nước`:
+1. **`AlphaBetaAgent`**: `372W – 44D – 84L` $\rightarrow$ **Score = 78,80%** (`Mean = 73,04 ms`, `p95 = 101,66 ms`, `Timeouts = 68,9%`, `Fallback_Random = 0`).
+2. **`MCTSAgent`**: `310W – 10D – 180L` $\rightarrow$ **Score = 63,00%** (`Mean = 99,93 ms`, `p95 = 101,03 ms`, `Timeouts = 98,7%`, `Fallback_Random = 0`).
+3. **`MixedMCTSAgent`**: `282W – 47D – 171L` $\rightarrow$ **Score = 61,10%** (`Mean = 98,41 ms`, `p95 = 103,57 ms`, `Timeouts = 96,3%`, `Fallback_Random = 0`).
+4. **`NNAgent`**: `239W – 54D – 207L` $\rightarrow$ **Score = 53,20%** (`Mean = 3,32 ms`, `p95 = 4,62 ms`, `Fallback_Random = 0`).
+5. **`HeuristicAgent`**: `191W – 53D – 256L` $\rightarrow$ **Score = 43,50%** (`Mean = 0,12 ms`, `p95 = 0,26 ms`, `Fallback_Random = 0`).
+6. **`RandomAgent`**: `2W – 0D – 498L` $\rightarrow$ **Score = 0,40%** (`Mean = 0,01 ms`, `p95 = 0,02 ms`, `Fallback_Random = 0`).
+
 ---
 
 ## 4. Kết luận Nghiệm thu Đề tài theo Bảng chấm điểm Học phần
 
-1. **Tính đúng đắn kỹ thuật & Kiểm thử**: Đạt xuất sắc (`57/57` unit tests pass `100%`, đối chiếu chéo `10.000` ván, Perft ply 1–5, `33` thế cờ chiến thuật).
+1. **Tính đúng đắn kỹ thuật & Kiểm thử**: Đạt xuất sắc (`59/59` unit tests trên `11` tệp kiểm thử pass `100%`, đối chiếu chéo `10.000` ván, Perft ply 1–6, `33` thế cờ chiến thuật, xử lý timeout `best_or_random` không lỗi).
 2. **Độ sâu thuật toán & Giá trị mở rộng**: Hoàn thiện đầy đủ 6 cấp tác tử (bao gồm Policy-Value ResNet có checkpoint thực tế, PUCT-MCTS vượt tác tử thầy và Explainable AI Saliency Heatmap).
-3. **Phương pháp thực nghiệm & Thống kê**: Hơn `4.600` ván thực nghiệm có log CSV thô, kiểm soát khai cuộc & đổi bên đối xứng, khoảng tin cậy Wilson/Bootstrap 95%, độ trễ `p95`, đủ 4 Ablations A1–A4 và 7 biểu đồ 300 DPI.
-4. **Mức điểm kỳ vọng theo Rubric**: **Đạt vững chắc mức 9,0 – 9,5 / 10** (khi nhóm kết hợp bảo vệ tốt và cập nhật lịch sử commit đồng đều cho TV4).
+3. **Phương pháp thực nghiệm & Thống kê**: Hơn `6.100` ván thực nghiệm có log CSV thô, kiểm soát khai cuộc & đổi bên đối xứng, khoảng tin cậy Wilson/Bootstrap 95%, độ trễ `p95`, đủ 4 Ablations A1–A4 và bộ biểu đồ/sơ đồ 300 DPI.
+4. **Mức điểm kỳ vọng theo Rubric**: **Đạt vững chắc mức 9,0 – 9,5 / 10** (với phân công cộng tác `45% – 35% – 10% – 10%` và đánh giá đạt chuẩn theo thành viên yếu nhất).
 

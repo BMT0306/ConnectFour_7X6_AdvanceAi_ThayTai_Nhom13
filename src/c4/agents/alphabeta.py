@@ -160,7 +160,13 @@ class AlphaBetaAgent(Agent):
         legal = game.legal_actions()
         self.nodes = 0
         if len(legal) == 1:
-            self.last_stats = {"nodes": 0, "depth": 0, "value": None}
+            self.last_stats = {
+                "nodes": 0,
+                "depth": 0,
+                "value": None,
+                "timed_out": False,
+                "fallback_random": False,
+            }
             return legal[0]
         max_depth = (budget.depth if budget and budget.depth else None)
         time_s = budget.time_s if budget else None
@@ -168,25 +174,50 @@ class AlphaBetaAgent(Agent):
         if time_s is None:
             depth = max_depth or self.default_depth
             value, move = self.search_fixed_depth(game, depth)
-            self.last_stats = {"nodes": self.nodes, "depth": depth, "value": value}
+            self.last_stats = {
+                "nodes": self.nodes,
+                "depth": depth,
+                "value": value,
+                "timed_out": False,
+                "fallback_random": False,
+            }
             return move
 
-        # iterative deepening theo thời gian
+        # iterative deepening theo thời gian: luôn giữ nước tạm tốt nhất trước deadline;
+        # nếu hết giờ trước khi hoàn thành tầng 1 thì fallback sang nước đi ngẫu nhiên hợp lệ.
         start = time.perf_counter()
         self._deadline = start + time_s
-        best_move = self._ordered(game)[0]
+        best_move: int | None = None
         best_value, done_depth = None, 0
+        timed_out = False
+        fallback_random = False
         try:
             for d in range(1, (max_depth or ROWS * COLS) + 1):
+                if time.perf_counter() > self._deadline:
+                    timed_out = True
+                    break
                 value, move = self.search_fixed_depth(game, d, first=best_move)
                 best_move, best_value, done_depth = move, value, d
                 if abs(value) >= WIN - ROWS * COLS:  # đã thấy thắng/thua cưỡng bức: không cần sâu thêm
                     break
                 if time.perf_counter() > self._deadline:
+                    timed_out = True
                     break
         except _Timeout:
-            pass
+            timed_out = True
         finally:
             self._deadline = None
-        self.last_stats = {"nodes": self.nodes, "depth": done_depth, "value": best_value}
+
+        if best_move is None:
+            best_move = self.rng.choice(legal)
+            timed_out = True
+            fallback_random = True
+
+        self.last_stats = {
+            "nodes": self.nodes,
+            "depth": done_depth,
+            "value": best_value,
+            "timed_out": timed_out,
+            "fallback_random": fallback_random,
+        }
         return best_move

@@ -27,15 +27,18 @@ class HeuristicAgent(Agent):
 
     def choose_action(self, game: Connect4Base, budget: Budget | None = None) -> int:
         legal = game.legal_actions()
+        if budget and budget.time_s is not None and budget.time_s <= 0:
+            self.last_stats = {"rule": "timeout_random", "timed_out": True, "fallback_random": True}
+            return self.rng.choice(legal)
 
         wins = game.winning_moves()
         if wins:
-            self.last_stats = {"rule": "win"}
+            self.last_stats = {"rule": "win", "timed_out": False, "fallback_random": False}
             return _center_order(wins)[0]
 
         blocks = game.winning_moves(-game.current_player)
         if blocks:
-            self.last_stats = {"rule": "block", "double_threat": len(blocks) > 1}
+            self.last_stats = {"rule": "block", "double_threat": len(blocks) > 1, "timed_out": False, "fallback_random": False}
             return _center_order(blocks)[0]
 
         safe = []
@@ -46,7 +49,7 @@ class HeuristicAgent(Agent):
             if not gives_win:
                 safe.append(c)
         if safe:
-            self.last_stats = {"rule": "safe"}
+            self.last_stats = {"rule": "safe", "timed_out": False, "fallback_random": False}
             return safe[0]
-        self.last_stats = {"rule": "forced"}
+        self.last_stats = {"rule": "forced", "timed_out": False, "fallback_random": False}
         return _center_order(legal)[0]

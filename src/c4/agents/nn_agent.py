@@ -57,14 +57,29 @@ class NNAgent(Agent):
     def choose_action(self, game: Connect4Base, budget: Budget | None = None) -> int:
         start_t = time.perf_counter()
         legal = game.legal_actions()
+        time_s = budget.time_s if budget else None
         if len(legal) == 1:
             self.last_stats = {
                 "value": 0.0,
                 "chosen": legal[0],
                 "time_ms": 0.0,
                 "has_checkpoint": self.has_checkpoint,
+                "timed_out": False,
+                "fallback_random": False,
             }
             return legal[0]
+
+        if time_s is not None and time_s <= 0:
+            chosen = self.rng.choice(legal)
+            self.last_stats = {
+                "value": 0.0,
+                "chosen": chosen,
+                "time_ms": 0.0,
+                "has_checkpoint": self.has_checkpoint,
+                "timed_out": True,
+                "fallback_random": True,
+            }
+            return chosen
 
         # 1. Chuẩn bị tensor input (1, 2, 6, 7)
         state_np = game.encode()  # relative encoding: shape (2, 6, 7)
@@ -94,11 +109,15 @@ class NNAgent(Agent):
         if chosen not in legal:
             chosen = self.rng.choice(legal)
 
-        elapsed_ms = (time.perf_counter() - start_t) * 1000.0
+        elapsed_s = time.perf_counter() - start_t
+        elapsed_ms = elapsed_s * 1000.0
+        timed_out = bool(time_s is not None and elapsed_s > time_s)
         self.last_stats = {
             "value": round(val, 3),
             "chosen": chosen,
             "time_ms": round(elapsed_ms, 2),
             "has_checkpoint": self.has_checkpoint,
+            "timed_out": timed_out,
+            "fallback_random": False,
         }
         return chosen

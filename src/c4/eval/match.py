@@ -62,8 +62,20 @@ def play_game(
     budget_first: Budget | None = None,
     budget_second: Budget | None = None,
     game_factory: Callable[[], Connect4Base] = Connect4,
+    timeout_policy: str = "best_or_random",
+    fallback_seed: int = 0,
 ) -> GameRecord:
-    """Một ván: `first` cầm PLAYER1 (đi trước), `second` cầm PLAYER2. Agent đi sai -> ném lỗi."""
+    """Một ván: `first` cầm PLAYER1 (đi trước), `second` cầm PLAYER2.
+
+    `timeout_policy`:
+      * "none"           : không can thiệp khi vượt giờ (agent đi sai vẫn ném IllegalMoveError).
+      * "best_or_random" : ưu tiên nước tạm tốt nhất trước deadline do agent tự trả về; nếu hết giờ
+                           mà agent chưa kịp chọn hoặc vượt quá ngưỡng cứng thì fallback random hợp lệ.
+      * "strict_random"  : hễ vượt `budget.time_s` là hủy nước đi và ép chọn random hợp lệ.
+    """
+    if timeout_policy not in ("none", "best_or_random", "strict_random"):
+        raise ValueError(f"timeout_policy không hợp lệ: {timeout_policy}")
+    fallback_rng = random.Random(fallback_seed)
     g = game_factory()
     for m in opening:
         g.step(m)
@@ -78,8 +90,36 @@ def play_game(
         view = g.clone()
         t0 = time.perf_counter()
         action = agent.choose_action(view, budget)
-        times.append(time.perf_counter() - t0)
-        stats.append(dict(agent.last_stats))
+        elapsed = time.perf_counter() - t0
+        move_stats = dict(agent.last_stats)
+
+        if timeout_policy != "none" and budget is not None and budget.time_s is not None:
+            legal = g.legal_actions()
+            limit_s = budget.time_s
+            hard_limit_s = limit_s + max(0.05, limit_s * 0.5)
+            over_soft = elapsed > limit_s
+            over_hard = elapsed > hard_limit_s
+
+            if timeout_policy == "strict_random" and over_soft:
+                action = fallback_rng.choice(legal)
+                move_stats["timed_out"] = True
+                move_stats["fallback_random"] = True
+                move_stats["hard_timeout_override"] = True
+            elif timeout_policy == "best_or_random":
+                if over_hard and not move_stats.get("timed_out", False):
+                    action = fallback_rng.choice(legal)
+                    move_stats["timed_out"] = True
+                    move_stats["fallback_random"] = True
+                    move_stats["hard_timeout_override"] = True
+                elif over_soft:
+                    move_stats["timed_out"] = True
+                    move_stats.setdefault("fallback_random", False)
+                else:
+                    move_stats.setdefault("timed_out", False)
+                    move_stats.setdefault("fallback_random", False)
+
+        times.append(elapsed)
+        stats.append(move_stats)
         g.step(action)  # IllegalMoveError nếu agent chọn sai -> lỗi rõ ràng, không im lặng
         rec.moves.append(action)
     rec.winner = g.winner
@@ -108,19 +148,21 @@ def run_match(
     budget_a: Budget | None = None,
     budget_b: Budget | None = None,
     pair: str | None = None,
+    timeout_policy: str = "best_or_random",
 ) -> list[MatchRecord]:
     """Mỗi khai cuộc chơi 2 ván (A đi trước, rồi B đi trước) => 2 x len(openings) ván."""
     pair = pair or f"{a.name}_vs_{b.name}"
     out: list[MatchRecord] = []
     for i, op in enumerate(openings):
         for a_first in (True, False):
+            fb_seed = i * 2 + (0 if a_first else 1)
             if a_first:
-                rec = play_game(a, b, op, budget_a, budget_b)
+                rec = play_game(a, b, op, budget_a, budget_b, timeout_policy=timeout_policy, fallback_seed=fb_seed)
                 a_times, b_times = rec.times_first, rec.times_second
                 a_stats, b_stats = rec.stats_first, rec.stats_second
                 a_result = rec.winner
             else:
-                rec = play_game(b, a, op, budget_b, budget_a)
+                rec = play_game(b, a, op, budget_b, budget_a, timeout_policy=timeout_policy, fallback_seed=fb_seed)
                 a_times, b_times = rec.times_second, rec.times_first
                 a_stats, b_stats = rec.stats_second, rec.stats_first
                 a_result = -rec.winner

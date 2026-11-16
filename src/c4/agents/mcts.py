@@ -70,7 +70,7 @@ class MCTSAgent(Agent):
     def choose_action(self, game: Connect4Base, budget: Budget | None = None) -> int:
         legal = game.legal_actions()
         if len(legal) == 1:
-            self.last_stats = {"simulations": 0}
+            self.last_stats = {"simulations": 0, "timed_out": False, "fallback_random": False}
             return legal[0]
         max_sims = budget.simulations if budget and budget.simulations else None
         time_s = budget.time_s if budget else None
@@ -80,8 +80,10 @@ class MCTSAgent(Agent):
 
         root = _Node(None, None, -game.current_player, list(legal))
         sims = 0
+        timed_out = False
         while (max_sims is None or sims < max_sims):
-            if deadline is not None and sims > 0 and (sims & 7) == 0 and time.perf_counter() > deadline:
+            if deadline is not None and (sims == 0 or (sims & 7) == 0) and time.perf_counter() > deadline:
+                timed_out = True
                 break
             g = game.clone()
             node = root
@@ -108,6 +110,23 @@ class MCTSAgent(Agent):
                 node = node.parent
             sims += 1
 
+        if not root.children:
+            chosen = self.rng.choice(legal)
+            self.last_stats = {
+                "simulations": sims,
+                "best_visits": 0,
+                "best_value": None,
+                "timed_out": True,
+                "fallback_random": True,
+            }
+            return chosen
+
         best = max(root.children, key=lambda ch: (ch.N, ch.W / ch.N))
-        self.last_stats = {"simulations": sims, "best_visits": best.N, "best_value": best.W / best.N}
+        self.last_stats = {
+            "simulations": sims,
+            "best_visits": best.N,
+            "best_value": best.W / best.N,
+            "timed_out": timed_out,
+            "fallback_random": False,
+        }
         return best.move

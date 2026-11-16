@@ -97,8 +97,13 @@ def _run_pair_job(job: dict) -> dict:
         ]
         times_a = [t for r in loaded_rows for t in json.loads(r["a_times_s"])]
         times_b = [t for r in loaded_rows for t in json.loads(r["b_times_s"])]
+        a_stat_list = [s for r in loaded_rows for s in json.loads(r["a_stats"])]
+        b_stat_list = [s for r in loaded_rows for s in json.loads(r["b_stats"])]
     else:
-        recs = run_match(agent_a, agent_b, openings, budget_a, budget_b, pair=pair_name)
+        timeout_policy = job.get("timeout_policy", "best_or_random")
+        recs = run_match(
+            agent_a, agent_b, openings, budget_a, budget_b, pair=pair_name, timeout_policy=timeout_policy
+        )
         save_records_csv(recs, str(log_file))
 
         stats_a = summarize([r.a_result for r in recs], seed=seed)
@@ -107,6 +112,13 @@ def _run_pair_job(job: dict) -> dict:
 
         times_a = [t for r in recs for t in r.a_times]
         times_b = [t for r in recs for t in r.b_times]
+        a_stat_list = [s for r in recs for s in r.a_stats]
+        b_stat_list = [s for r in recs for s in r.b_stats]
+
+    a_timeouts = sum(1 for s in a_stat_list if isinstance(s, dict) and s.get("timed_out"))
+    b_timeouts = sum(1 for s in b_stat_list if isinstance(s, dict) and s.get("timed_out"))
+    a_fallbacks = sum(1 for s in a_stat_list if isinstance(s, dict) and s.get("fallback_random"))
+    b_fallbacks = sum(1 for s in b_stat_list if isinstance(s, dict) and s.get("fallback_random"))
 
     return {
         "Pair": pair_name,
@@ -129,6 +141,12 @@ def _run_pair_job(job: dict) -> dict:
         "A_p95_Time_ms": round(1000 * percentile(times_a, 95), 3),
         "B_Mean_Time_ms": round(1000 * sum(times_b) / max(len(times_b), 1), 3),
         "B_p95_Time_ms": round(1000 * percentile(times_b, 95), 3),
+        "A_Moves": len(times_a),
+        "B_Moves": len(times_b),
+        "A_Timeouts": a_timeouts,
+        "B_Timeouts": b_timeouts,
+        "A_Fallback_Randoms": a_fallbacks,
+        "B_Fallback_Randoms": b_fallbacks,
     }
 
 
@@ -151,6 +169,7 @@ def run_tournament(
     n_openings = t_cfg.get("openings", 20)
     plies = t_cfg.get("opening_plies", 4)
     seed = t_cfg.get("seed", 42)
+    timeout_policy = t_cfg.get("timeout_policy", "best_or_random")
 
     log_dir = base_out / cfg.get("output", {}).get("log_dir", "results/logs")
     summary_dir = base_out / cfg.get("output", {}).get("summary_dir", "results/tables")
@@ -187,6 +206,7 @@ def run_tournament(
                 "log_dir": str(log_dir),
                 "ckpt_env": ckpt_env,
                 "resume": resume,
+                "timeout_policy": timeout_policy,
             })
 
     summary_rows = []

@@ -158,6 +158,8 @@ class MixedMCTSAgent(Agent):
                 "cache_hits": 0,
                 "use_value_head": self.use_value_head,
                 "has_checkpoint": self.has_checkpoint,
+                "timed_out": False,
+                "fallback_random": False,
             }
             return legal[0]
 
@@ -170,6 +172,20 @@ class MixedMCTSAgent(Agent):
         if max_sims is None and time_s is None:
             max_sims = self.default_simulations
         deadline = time.perf_counter() + time_s if time_s is not None else None
+
+        if deadline is not None and time.perf_counter() > deadline:
+            chosen = self.rng.choice(legal)
+            self.last_stats = {
+                "simulations": 0,
+                "best_visits": 0,
+                "best_winrate": None,
+                "cache_hits": 0,
+                "use_value_head": self.use_value_head,
+                "has_checkpoint": self.has_checkpoint,
+                "timed_out": True,
+                "fallback_random": True,
+            }
+            return chosen
 
         # Khởi tạo gốc với bản sao priors để không làm bẩn Transposition Cache khi trộn nhiễu
         base_priors, _ = self._get_priors(game)
@@ -193,8 +209,10 @@ class MixedMCTSAgent(Agent):
         root = _PUCTNode(None, None, -game.current_player, list(legal), priors=root_priors)
 
         sims = 0
+        timed_out = False
         while max_sims is None or sims < max_sims:
-            if deadline is not None and sims > 0 and (sims & 7) == 0 and time.perf_counter() > deadline:
+            if deadline is not None and time.perf_counter() > deadline:
+                timed_out = True
                 break
 
             g = game.clone()
@@ -270,6 +288,20 @@ class MixedMCTSAgent(Agent):
 
             sims += 1
 
+        if not root.children:
+            chosen = self.rng.choice(legal)
+            self.last_stats = {
+                "simulations": sims,
+                "best_visits": 0,
+                "best_winrate": None,
+                "cache_hits": self._cache_hits,
+                "use_value_head": self.use_value_head,
+                "has_checkpoint": self.has_checkpoint,
+                "timed_out": True,
+                "fallback_random": True,
+            }
+            return chosen
+
         best = max(root.children, key=lambda ch: (ch.N, ch.W / max(ch.N, 1)))
         self.last_stats = {
             "simulations": sims,
@@ -278,6 +310,8 @@ class MixedMCTSAgent(Agent):
             "cache_hits": self._cache_hits,
             "use_value_head": self.use_value_head,
             "has_checkpoint": self.has_checkpoint,
+            "timed_out": timed_out,
+            "fallback_random": False,
         }
         return best.move
 

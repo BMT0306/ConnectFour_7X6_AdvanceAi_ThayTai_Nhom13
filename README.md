@@ -2,7 +2,7 @@
 
 Đồ án cuối kỳ học phần **Trí tuệ nhân tạo nâng cao (Advanced Artificial Intelligence)** — Trường Đại học Sài Gòn (SGU): Xây dựng và đánh giá thực nghiệm hệ thống **Game AI đa cấp độ** trên trò chơi **Connect Four (7 cột × 6 hàng)**, từ tác tử phản xạ luật, duyệt cây đối kháng kinh điển, tìm kiếm Monte Carlo đến mạng nơ-ron phần dư hai đầu (**Policy-Value ResNet**) và tìm kiếm định hướng **PUCT-MCTS** (*AlphaGo-/AlphaZero-inspired*), kèm khung giải đấu đối xứng gương (mirror matching), khoảng tin cậy thống kê và phân tích độ nhạy **Explainable AI (Saliency Heatmap)**.
 
-> **Trạng thái**: **v1.0 Hoàn chỉnh** — Engine Bitboard 49-bit + 6 tác tử AI (`random`, `heuristic`, `alphabeta`, `mcts`, `nn`, `mixed_mcts`) + Checkpoint mạng đã huấn luyện (`checkpoints/policy_net_best.pt`) + 3 giao diện (CLI, Pygame GUI, Web UI) + Giải đấu 3.000 ván & 4 Ablations (A1–A4) + 100% Unit Tests Passed (`57/57`).
+> **Trạng thái**: **v1.1 Hoàn chỉnh** — Engine Bitboard 49-bit + 6 tác tử AI (`random`, `heuristic`, `alphabeta`, `mcts`, `nn`, `mixed_mcts`) + Chính sách timeout an toàn (`best_or_random`) + Checkpoint mạng đã huấn luyện (`checkpoints/policy_net_best.pt`) + 3 giao diện (CLI, Pygame GUI, Web UI) + Giải đấu 3.000 ván, 1.500 ván 6-Level 100ms & 4 Ablations (A1–A4) + 100% Unit Tests Passed (`59/59`).
 
 ---
 
@@ -21,7 +21,7 @@ pip install -e .
 
 ### Kiểm tra tính đúng đắn (Unit Tests & Lưu báo cáo kiểm thử)
 ```bash
-pytest -v                                     # chạy nhanh toàn bộ 57 bài kiểm thử tự động
+pytest -v                                     # chạy nhanh toàn bộ 59 bài kiểm thử tự động
 python scripts/run_test_suite_and_save.py     # chạy kiểm thử & xuất báo cáo vào results/test_results/
 ```
 
@@ -29,7 +29,7 @@ python scripts/run_test_suite_and_save.py     # chạy kiểm thử & xuất bá
 
 ## 2. Chạy chương trình & Chơi thử (Khởi chạy nhanh 1 chạm)
 
-Trên Windows, bạn chỉ cần nhấp đúp duy nhất tệp **`RUN_FAST.bat`** ở thư mục gốc để mở menu chọn nhanh mọi chế độ (Web App, Desktop Pygame, Terminal CLI hoặc chạy 57 Unit Tests).
+Trên Windows, bạn chỉ cần nhấp đúp duy nhất tệp **`RUN_FAST.bat`** ở thư mục gốc để mở menu chọn nhanh mọi chế độ (Web App, Desktop Pygame, Terminal CLI hoặc chạy 59 Unit Tests).
 
 Hoặc chạy trực tiếp bằng lệnh Python:
 
@@ -86,17 +86,17 @@ python scripts/generate_figures_and_xai.py
 src/c4/
   game/          base.py (API chuẩn), engine.py (Bitboard 49-bit O(1)), reference.py (Mảng 2D đối chiếu)
   agents/        random_agent.py, heuristic.py, alphabeta.py, mcts.py, nn_agent.py, mixed_mcts.py (PUCT)
-  models/        net.py (Connect4PolicyValueNet - 3 ResBlocks), explain.py (Gradient Saliency Map)
+  models/        model.py (Connect4PolicyValueNet - 3 ResBlocks), explain.py (Gradient Saliency Map)
   train/         gen_data.py (sinh dữ liệu nhãn sạch & loại trùng), train_policy.py (huấn luyện đa mục tiêu)
-  eval/          match.py (đấu cặp đổi bên theo khai cuộc), metrics.py (Wilson 95%, Bootstrap 95%, p95), cli.py
-  ui/            gui.py (Pygame 60 FPS), web_server.py + web_static/index.html (Web RESTful UI)
-configs/         Cấu hình YAML cho giải đấu và các bài toán Ablation
+  eval/          match.py (đấu cặp đổi bên + kiểm soát timeout fallback), metrics.py (Wilson 95%, Bootstrap 95%, p95), cli.py
+  ui/            gui.py (Pygame 60 FPS), web_server.py + web_static/index.html (Web RESTful qua Python http.server)
+configs/         Cấu hình YAML cho giải đấu (200 ván không giới hạn thời gian, 100 ván giới hạn 100ms, Ablation A1–A4)
 checkpoints/     policy_net_best.pt (mô hình đã huấn luyện) & training_history.json
 data/            Dữ liệu huấn luyện/kiểm định/kiểm tra (.npz) & dataset_summary.json
 results/         logs/ (CSV từng ván), tables/ (bảng tổng hợp), figures/ (biểu đồ 300 DPI), test_results/
-tests/           57 unit tests tự động + tests/data/positions.csv (33 thế cờ chiến thuật kiểm thử thủ công)
+tests/           59 unit tests tự động + tests/data/positions.csv (33 thế cờ chiến thuật kiểm thử thủ công)
 notebooks/       01_tournament_analysis.ipynb (phân tích thống kê & trực quan hóa kết quả)
-docs/            BAO_CAO_DO_AN_CUOI_KY.docx, BAO_CAO_DO_AN_CUOI_KY.md, SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx, DEMO_GUIDE.md, ConnectFour_Proposal_Nhom13.pdf, THIRD_PARTY.md
+docs/            BAO_CAO_DO_AN_CUOI_KY.docx/.md, SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx, KICH_BAN_TRINH_BAY.md, QUAN_LY_CONG_TAC_VA_NHAT_KY.md, NHAT_KY_THI_NGHIEM.csv, DEMO_GUIDE.md, ConnectFour_Proposal_Nhom13.pdf, THIRD_PARTY.md
 scripts/         Các script tự động hóa giải đấu, ablation, kiểm thử và đóng gói nộp bài
 ```
 
@@ -109,17 +109,20 @@ scripts/         Các script tự động hóa giải đấu, ablation, kiểm t
 
 ---
 
-## 6. Danh sách Thành viên & Tỷ lệ Đóng góp (Nhóm 13)
+## 6. Quản lý Cộng tác, Phân công Trục Dọc/Ngang & Danh sách Thành viên (Nhóm 13)
 
-* **Giảng viên hướng dẫn**: Thầy Đỗ Như Tài
-* **Repository chính thức**: https://github.com/BMT0306/ConnectFour_7X6_AdvanceAi_ThayTai_Nhom13
+* **Giảng viên hướng dẫn**: TS. Đỗ Như Tài
+* **Quản lý mã nguồn (GitHub)**: https://github.com/BMT0306/ConnectFour_7X6_AdvanceAi_ThayTai_Nhom13
+* **Kho lưu trữ kết quả thí nghiệm (Google Drive)**: https://drive.google.com/drive/folders/1k-q-cuTi3Rb_eYnrmfmrr_6-C35j7M6K?usp=sharing
+* **Hệ thống công cụ cộng tác**: GitHub (Code) · Google Drive + Google Sheets/Excel (Kết quả & Nhật ký thí nghiệm) · Google Slides/PowerPoint/Canva (Vẽ sơ đồ visual & Slide) · Google Docs (Kế hoạch & Soạn thảo báo cáo).
+* **Nguyên tắc đánh giá**: Phân công theo ma trận **Trục dọc** (đầu mối nhóm việc) × **Trục ngang** (chia nhỏ task cho từng thành viên có nhật ký kiểm chứng), kết hợp đánh giá năng lực dựa trên **thành viên yếu nhất** qua số liệu quá trình học tập (chi tiết tại [docs/QUAN_LY_CONG_TAC_VA_NHAT_KY.md](docs/QUAN_LY_CONG_TAC_VA_NHAT_KY.md)).
 
-| STT | Họ và tên | MSSV | Vai trò | Nhiệm vụ & Công việc thực hiện (khớp Đề cương & Git) | Tỷ lệ đóng góp |
+| STT | Họ và tên | MSSV | Vai trò | Trục dọc phụ trách & Công việc thực hiện | Tỷ lệ đóng góp |
 |:---:|---|:---:|:---:|---|:---:|
-| 1 | **Bùi Minh Trung** | `3124720074` | Nhóm Trưởng (TV1) | Engine (`bitboard` + `reference`), API & bộ unit test; `HeuristicAgent`; `AlphaBetaAgent` (cắt tỉa, sắp xếp nước đi, iterative deepening); khung giải đấu & thống kê (`Wilson`, `Bootstrap`, `p95`); Ablation A1 & A3; Web UI; quản lý GitHub, review PR & đóng gói nộp bài | **32%** |
-| 2 | **Trần Lê Minh Tâm** | `3124720064` | Thành viên (TV2) | `RandomAgent`, `MCTSAgent` (UCT 4 bước); kiến trúc mạng hai đầu `Connect4PolicyValueNet`, pipeline huấn luyện & `MixedMCTSAgent` (PUCT + Transposition Cache + Dirichlet noise); giao diện Pygame GUI; Ablation A2 & A4 | **32%** |
-| 3 | **Nguyễn Thành Tài** | `3124720062` | Thành viên (TV3) | Chạy thực nghiệm giải đấu & ablation, thu thập log CSV thô; xây dựng & chạy notebook phân tích (`01_tournament_analysis.ipynb`); bổ sung vị trí kiểm thử thủ công (`positions.csv`); phân tích ván đấu & viết Chương 4 | **18%** |
-| 4 | **Chương Gia Thịnh** | `3124720067` | Thành viên (TV4) | Biên soạn Chương 1, 2, 3, 5 của báo cáo cuối kỳ; thiết kế Slide thuyết trình, Poster khổ A0, kịch bản/quay Video Demo; rà soát tài liệu tham khảo, `THIRD_PARTY.md`, `README.md` và chuẩn bị bản in | **18%** |
+| 1 | **Bùi Minh Trung** | `3124720074` | Nhóm Trưởng (TV1) | **Trục Code, Hạ tầng & Kiến trúc hệ thống**: Thiết kế lõi `Bitboard` 49-bit + `ReferenceConnect4`, bộ unit test, `HeuristicAgent`, `AlphaBetaAgent`, khung giải đấu `match.py` (kèm cơ chế timeout/fallback), thống kê (`Wilson`, `Bootstrap`, `p95`), Web UI, Saliency XAI, cấu hình Ablation & quản lý GitHub/Google Docs tổng thể | **45%** |
+| 2 | **Trần Lê Minh Tâm** | `3124720064` | Thành viên (TV2) | **Trục Mô hình AI, Test Game & Demo**: Cài đặt `RandomAgent`, `MCTSAgent`, mạng hai đầu `Connect4PolicyValueNet`, pipeline sinh dữ liệu/huấn luyện & `MixedMCTSAgent` (PUCT + Cache + Dirichlet); giao diện Pygame; **hỗ trợ test game thực tế, quay video demo và đề xuất ý tưởng/fix lỗi code** | **35%** |
+| 3 | **Nguyễn Thành Tài** | `3124720062` | Thành viên (TV3) | **Trục Báo cáo, Slide & Nhật ký thí nghiệm**: Chỉnh sửa, chuẩn hóa nội dung báo cáo trên Google Docs và file PowerPoint thuyết trình; tham gia ghi nhận nhật ký thí nghiệm lên Google Sheets/Drive và rà soát số liệu đối chiếu | **10%** |
+| 4 | **Chương Gia Thịnh** | `3124720067` | Thành viên (TV4) | **Trục Báo cáo, Slide & Tư liệu thuyết trình**: Chỉnh sửa, hoàn thiện bố cục báo cáo trên Google Docs và file PowerPoint thuyết trình; rà soát tài liệu tham khảo, kịch bản trình bày và chuẩn bị tài liệu bảo vệ | **10%** |
 | | **TỔNG CỘNG** | | | | **100%** |
 
 ---

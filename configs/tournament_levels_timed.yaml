@@ -1,0 +1,24 @@
+# Cấu hình giải đấu vòng tròn ĐẦY ĐỦ 6 cấp độ tác tử (Level 1 -> Level 6)
+# Cùng giới hạn thời gian mức trung bình 100 ms/nước, thay phiên nhau đi trước (50 Đỏ + 50 Vàng = 100 ván/cặp)
+# Khi hết thời gian: giữ nước tạm thời tốt nhất trước deadline (best_or_random), fallback random nếu chưa kịp chọn
+tournament:
+  name: "round_robin_levels_timed"
+  openings: 50        # 50 khai cuộc x 2 lượt đổi bên = 100 ván/cặp (15 cặp = 1.500 ván)
+  opening_plies: 4
+  seed: 2026
+  timeout_policy: "best_or_random"
+
+time_levels:
+  - time_s: 0.10      # 100 ms/nước (mức trung bình)
+
+agents:
+  - name: "random"      # Level 1
+  - name: "heuristic"   # Level 2
+  - name: "alphabeta"   # Level 3
+  - name: "mcts"        # Level 4
+  - name: "nn"          # Level 5
+  - name: "mixed_mcts"  # Level 6
+
+output:
+  log_dir: "results/logs"
+  summary_dir: "results/tables"
