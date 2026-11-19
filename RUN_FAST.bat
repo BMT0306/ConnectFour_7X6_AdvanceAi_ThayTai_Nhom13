@@ -18,19 +18,21 @@ echo.
 echo   Chon che do khoi chay nhanh:
 echo.
 echo   [1] Web App         (Mac dinh - Choi ngay tren Trinh duyet port 5000)
-echo   [2] Desktop Pygame  (Giao dien do hoa Desktop 60 FPS)
+echo   [2] Desktop Pygame  (Giao dien do hoa Desktop 60 FPS, co che do May vs May)
 echo   [3] Terminal CLI    (Choi nhanh tren cua so dong lenh)
 echo   [4] Chay Unit Tests (Kiem tra 59 bai test tu dong Pytest)
+echo   [5] Bang Xep Hang Elo va Solo AI (Bradley-Terry Elo va 1v1 AI)
 echo   [0] Thoat
 echo.
 set "choice="
-set /p choice="Nhap lua chon [0-4] (Nhan Enter de chon 1): "
+set /p choice="Nhap lua chon [0-5] (Nhan Enter de chon 1): "
 if "%choice%"=="" set "choice=1"
 
 if "%choice%"=="1" goto RUN_WEB
 if "%choice%"=="2" goto RUN_GUI
 if "%choice%"=="3" goto RUN_CLI
 if "%choice%"=="4" goto RUN_TESTS
+if "%choice%"=="5" goto RUN_ELO
 if "%choice%"=="0" exit /b 0
 goto MENU
 
@@ -57,5 +59,16 @@ goto MENU
 :RUN_TESTS
 echo.
 "%PY_CMD%" -m pytest -v
+pause
+goto MENU
+
+:RUN_ELO
+echo.
+echo [*] Dang tinh toan Bang Xep Hang Elo tu 3.000 tran giai dau...
+"%PY_CMD%" scripts/compute_elo.py
+echo.
+echo [*] Meo: De cho 2 may solo voi nhau, chay lenh:
+echo     python scripts/compute_elo.py --solo alphabeta mixed_mcts --openings 5 --time 0.1
+echo.
 pause
 goto MENU
