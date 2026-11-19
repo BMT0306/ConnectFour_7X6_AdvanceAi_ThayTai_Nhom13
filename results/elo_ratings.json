@@ -1,0 +1,66 @@
+{
+  "updated_at": "2026-11-19 22:12:16",
+  "formula": "FIDE Standard Logistic Elo: E = 1 / (1 + 10^((R_b - R_a)/400)), delta = K * (S - E)",
+  "ratings": {
+    "random": {
+      "name": "random",
+      "display": "Level 1: Random Baseline",
+      "elo": 1000.0,
+      "score_pct": 0.4,
+      "total_games": 1002,
+      "wins": 4,
+      "draws": 0,
+      "losses": 998
+    },
+    "heuristic": {
+      "name": "heuristic",
+      "display": "Level 2: Priority Heuristic",
+      "elo": 1812.3,
+      "score_pct": 38.42,
+      "total_games": 1002,
+      "wins": 350,
+      "draws": 70,
+      "losses": 582
+    },
+    "nn": {
+      "name": "nn",
+      "display": "Level 5: Policy-Value ResNet",
+      "elo": 1911.7,
+      "score_pct": 50.35,
+      "total_games": 1007,
+      "wins": 460,
+      "draws": 90,
+      "losses": 457
+    },
+    "mcts": {
+      "name": "mcts",
+      "display": "Level 4: MCTS-UCT (1.000 sims)",
+      "elo": 1995.3,
+      "score_pct": 60.95,
+      "total_games": 1001,
+      "wins": 596,
+      "draws": 27,
+      "losses": 378
+    },
+    "alphabeta": {
+      "name": "alphabeta",
+      "display": "Level 3: Alpha-Beta Pruning",
+      "elo": 2100.5,
+      "score_pct": 74.9,
+      "total_games": 1016,
+      "wins": 725,
+      "draws": 64,
+      "losses": 227
+    },
+    "mixed_mcts": {
+      "name": "mixed_mcts",
+      "display": "Level 6: Mixed-MCTS (PUCT)",
+      "elo": 2156.9,
+      "score_pct": 74.85,
+      "total_games": 1016,
+      "wins": 715,
+      "draws": 93,
+      "losses": 208
+    }
+  }
+}
