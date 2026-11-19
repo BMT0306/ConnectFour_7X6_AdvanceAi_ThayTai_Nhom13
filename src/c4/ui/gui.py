@@ -39,10 +39,10 @@ def get_elo_dict() -> dict[str, float]:
     return {
         "random": 1000.0,
         "heuristic": 1812.3,
-        "alphabeta": 2152.8,
-        "mcts": 2004.3,
-        "nn": 1922.3,
-        "mixed_mcts": 2085.0,
+        "nn": 1911.7,
+        "mcts": 1995.3,
+        "alphabeta": 2100.5,
+        "mixed_mcts": 2156.9,
     }
 
 if sys.platform == "win32":
