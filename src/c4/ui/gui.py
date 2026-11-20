@@ -38,11 +38,11 @@ def get_elo_dict() -> dict[str, float]:
             pass
     return {
         "random": 1000.0,
-        "heuristic": 1812.3,
-        "nn": 1911.7,
-        "mcts": 1995.3,
-        "alphabeta": 2100.5,
-        "mixed_mcts": 2156.9,
+        "heuristic": 1822.2,
+        "nn": 1922.3,
+        "mcts": 2004.3,
+        "alphabeta": 2113.1,
+        "mixed_mcts": 2114.8,
     }
 
 if sys.platform == "win32":
@@ -156,6 +156,7 @@ class Connect4GUI:
         self.elo_processed = False
         self.last_elo_msg = ""
         self.random_opening_mode = True  # Mặc định bật thế cờ ngẫu nhiên cho Solo để ván cờ không bị lặp lại
+        self.elo_dict = get_elo_dict()
 
     def reset_game(self, force_empty: bool = False) -> None:
         self.game.reset()
@@ -168,6 +169,7 @@ class Connect4GUI:
         self.battle_started = False
         self.elo_processed = False
         self.last_elo_msg = ""
+        self.elo_dict = get_elo_dict()
         if self.random_opening_mode and not force_empty and self.mode == "AI_VS_AI":
             import random
             rng = random.Random()
@@ -210,6 +212,8 @@ class Connect4GUI:
             p2_name = self.ai_agent_name_p2
             if p1_name not in ratings or p2_name not in ratings:
                 return ""
+            if p1_name == p2_name:
+                return f"Self-play ({p1_name}): Elo không đổi"
             r1 = ratings[p1_name]["elo"]
             r2 = ratings[p2_name]["elo"]
             e1 = 1.0 / (1.0 + 10.0 ** ((r2 - r1) / 400.0))
@@ -229,8 +233,14 @@ class Connect4GUI:
             else:
                 ratings[p1_name]["draws"] = ratings[p1_name].get("draws", 0) + 1
                 ratings[p2_name]["draws"] = ratings[p2_name].get("draws", 0) + 1
+            for p in (p1_name, p2_name):
+                tg = ratings[p]["total_games"]
+                pts = ratings[p].get("wins", 0) + 0.5 * ratings[p].get("draws", 0)
+                ratings[p]["score_pct"] = round((pts / max(tg, 1)) * 100.0, 2)
+            data["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
             with open(DATABASE_FILE, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
+            self.elo_dict = {k: float(v.get("elo", 1500.0)) for k, v in ratings.items()}
             sign = "+" if delta >= 0 else ""
             return f"Elo: {p1_name} ({sign}{delta}) | {p2_name} ({-delta:+.1f})"
         except Exception:
@@ -455,7 +465,7 @@ class Connect4GUI:
 
         # 4. AI Level Picker (Section 3)
         ai_y = 236
-        elo_dict = get_elo_dict()
+        elo_dict = self.elo_dict
 
         ai_levels = [
             ("random", "Cấp 1: Random"),

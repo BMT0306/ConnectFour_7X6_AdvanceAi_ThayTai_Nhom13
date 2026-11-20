@@ -334,6 +334,10 @@ def run_live_solo(
         print(f"   Kết quả: {result_str} | Tổng số nước: {game.move_count} | Thời gian: {total_game_time:.2f}s")
 
         # CẬP NHẬT ELO THẬT THEO CÔNG THỨC FIDE
+        if p1_name == p2_name:
+            print(f"   📈 SELF-PLAY ({p1_name}): Điểm Elo giữ nguyên ({ratings[p1_name]['elo']:.1f} Elo)")
+            continue
+
         elo_p1_before = ratings[p1_name]["elo"]
         elo_p2_before = ratings[p2_name]["elo"]
 

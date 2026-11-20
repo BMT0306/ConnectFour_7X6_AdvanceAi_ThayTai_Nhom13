@@ -68,7 +68,7 @@ echo [*] Dang tinh toan Bang Xep Hang Elo tu 3.000 tran giai dau...
 "%PY_CMD%" scripts/compute_elo.py
 echo.
 echo [*] Meo: De cho 2 may solo voi nhau, chay lenh:
-echo     python scripts/compute_elo.py --solo alphabeta mixed_mcts --openings 5 --time 0.1
+echo     python scripts/compute_elo.py --solo alphabeta mixed_mcts --games 4 --time 0.1 --watch
 echo.
 pause
 goto MENU
