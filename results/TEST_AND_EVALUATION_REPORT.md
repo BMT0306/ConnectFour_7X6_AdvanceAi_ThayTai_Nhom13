@@ -80,6 +80,11 @@ Thi đấu vòng tròn 15 cặp × 100 ván (`50` ván Đỏ đi trước + `50`
 5. **`HeuristicAgent`**: `191W – 53D – 256L` $\rightarrow$ **Score = 43,50%** (`Mean = 0,12 ms`, `p95 = 0,26 ms`, `Fallback_Random = 0`).
 6. **`RandomAgent`**: `2W – 0D – 498L` $\rightarrow$ **Score = 0,40%** (`Mean = 0,01 ms`, `p95 = 0,02 ms`, `Fallback_Random = 0`).
 
+### 3.5. Chuẩn hóa Xếp hạng Elo Bradley-Terry MLE (`scripts/compute_elo.py` & `results/elo_ratings.json`)
+- **Giải Mặc định (3.000 ván, neo `Random = 1000,0`)**: `#1 Mixed-MCTS 2114,8` (*Grandmaster*) | `#2 Alpha-Beta 2113,1` (*Grandmaster*) | `#3 MCTS 2004,3` (*Master*) | `#4 NN 1922,3` (*Expert*) | `#5 Heuristic 1822,2` (*Club*) | `#6 Random 1000,0` (*Novice*).
+- **Giải 100 ms/nước (1.500 ván, `--timed`)**: `#1 Alpha-Beta 2125,8` (`+12,7 Elo`) | `#2 MCTS 2002,2` (`-2,1 Elo`) | `#3 Mixed-MCTS 1988,1` (`-126,7 Elo`) | `#4 NN 1929,6` (`+7,3 Elo`) | `#5 Heuristic 1854,3` (`+32,1 Elo`) | `#6 Random 1000,0`.
+- **Kiểm chứng chế độ Solo & Self-play**: Đã kiểm thử `--reset-elo`, `--timed` và `--solo heuristic heuristic --games 2` xác nhận self-play bảo toàn `+0,0 Elo`, `py_compile` sạch trên `gui.py` & `compute_elo.py`.
+
 ---
 
 ## 4. Kết luận Nghiệm thu Đề tài theo Bảng chấm điểm Học phần

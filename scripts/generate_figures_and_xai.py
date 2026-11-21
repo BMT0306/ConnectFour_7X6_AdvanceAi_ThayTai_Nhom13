@@ -601,6 +601,82 @@ def plot_architecture_diagrams() -> None:
     print("[+] Đã xuất: diagram_resnet_dualhead.png")
 
 
+def plot_elo_comparison() -> None:
+    """Vẽ biểu đồ so sánh xếp hạng Elo (Bradley-Terry MLE) giữa giải Mặc định (3.000 ván) và 100 ms/nước (1.500 ván)."""
+    default_csv = TABLES_DIR / "round_robin_default_summary.csv"
+    timed_csv = TABLES_DIR / "round_robin_levels_timed_summary.csv"
+    if not default_csv.exists() or not timed_csv.exists():
+        print("[!] Thiếu dữ liệu CSV cho biểu đồ Elo.")
+        return
+
+    sys.path.insert(0, str(ROOT_DIR / "scripts"))
+    from compute_elo import compute_bradley_terry_elo
+
+    elo_def = compute_bradley_terry_elo(default_csv)
+    elo_100 = compute_bradley_terry_elo(timed_csv)
+
+    order = ["random", "heuristic", "nn", "mcts", "alphabeta", "mixed_mcts"]
+    labels = [
+        "Cấp 1: Random\n(Anchor = 1000)",
+        "Cấp 2: Heuristic",
+        "Cấp 5: ResNet NN\n(0-search)",
+        "Cấp 4: MCTS-UCT",
+        "Cấp 3: Alpha-Beta",
+        "Cấp 6: Mixed-MCTS\n(PUCT)",
+    ]
+    vals_def = [elo_def[k]["elo"] for k in order]
+    vals_100 = [elo_100[k]["elo"] for k in order]
+    deltas = [round(t - d, 1) for d, t in zip(vals_def, vals_100)]
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13.2, 5.4), gridspec_kw={"width_ratios": [1.45, 1.0]})
+
+    y = np.arange(len(order))
+    h = 0.36
+    b1 = ax1.barh(y + h / 2, vals_def, height=h, label="Giải Mặc định (3.000 ván, không ép giờ)", color="#2563EB", edgecolor="#1E293B")
+    b2 = ax1.barh(y - h / 2, vals_100, height=h, label="Giải 100 ms/nước (1.500 ván, best_or_random)", color="#10B981", edgecolor="#1E293B")
+
+    for thr, name in [(1800, "Club"), (1900, "Expert"), (2000, "Master"), (2100, "GM")]:
+        ax1.axvline(thr, color="#94A3B8", linestyle=":", linewidth=1.1)
+        ax1.text(thr + 8, len(order) - 0.34, name, fontsize=8.2, color="#475569", fontweight="bold", va="top")
+
+    ax1.set_yticks(y)
+    ax1.set_yticklabels(labels, fontsize=9.2, fontweight="bold")
+    ax1.set_xlim(900, 2320)
+    ax1.set_ylim(-0.72, len(order) - 0.15)
+    ax1.set_xlabel("Điểm xếp hạng Bradley-Terry MLE Elo (neo Random = 1000,0)")
+    ax1.set_title("So sánh Sức mạnh Elo: Mặc định vs Giới hạn 100 ms/nước", fontsize=11, fontweight="bold")
+    ax1.grid(axis="x", linestyle="--", alpha=0.45)
+    ax1.legend(loc="lower right", fontsize=8.5, framealpha=0.95)
+
+    for bar, v in zip(b1, vals_def):
+        ax1.text(v + 12, bar.get_y() + bar.get_height() / 2, f"{v:.1f}", va="center", fontsize=8.4, color="#1D4ED8", fontweight="bold")
+    for bar, v in zip(b2, vals_100):
+        ax1.text(v + 12, bar.get_y() + bar.get_height() / 2, f"{v:.1f}", va="center", fontsize=8.4, color="#047857", fontweight="bold")
+
+    # Right panel: Delta Elo (100ms - Default)
+    d_colors = ["#DC2626" if d < -10 else ("#059669" if d > 5 else "#64748B") for d in deltas]
+    bars_d = ax2.barh(y, deltas, height=0.52, color=d_colors, edgecolor="#1E293B")
+    ax2.axvline(0, color="#0F172A", linewidth=1.2)
+    ax2.set_yticks(y)
+    ax2.set_yticklabels([""] * len(order))
+    ax2.set_xlim(-198, 95)
+    ax2.set_ylim(-0.72, len(order) - 0.15)
+    ax2.set_xlabel("Biến động Δ Elo = Elo(100 ms) − Elo(Mặc định)")
+    ax2.set_title("Tác động của Giới hạn 100 ms CPU lên Thứ hạng", fontsize=11, fontweight="bold")
+    ax2.grid(axis="x", linestyle="--", alpha=0.45)
+    for bar, d in zip(bars_d, deltas):
+        offset = -6 if d < 0 else 5
+        ha = "right" if d < 0 else "left"
+        col = "#B91C1C" if d < -10 else ("#047857" if d > 5 else "#334155")
+        ax2.text(d + offset, bar.get_y() + bar.get_height() / 2, f"{d:+.1f} Elo", va="center", ha=ha, fontsize=9, fontweight="bold", color=col)
+
+    plt.tight_layout()
+    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+    plt.savefig(FIGURES_DIR / "elo_comparison_default_vs_100ms.png", dpi=300)
+    plt.close(fig)
+    print("[+] Đã xuất: elo_comparison_default_vs_100ms.png")
+
+
 def main() -> None:
     global ROOT_DIR, TABLES_DIR, FIGURES_DIR, CKPT_FILE
     p = argparse.ArgumentParser()
@@ -620,6 +696,7 @@ def main() -> None:
     plot_first_player_bias()
     plot_xai_saliency()
     plot_architecture_diagrams()
+    plot_elo_comparison()
 
 
 if __name__ == "__main__":

@@ -13,9 +13,9 @@
 * **Tài liệu Nộp & Quản lý Cộng tác Nhóm 13**:
   [Báo cáo Word (.docx)](docs/BAO_CAO_DO_AN_CUOI_KY.docx) ·
   [Báo cáo Markdown](docs/BAO_CAO_DO_AN_CUOI_KY.md) ·
-  [Slide Thuyết trình 36 Slides (.pptx)](docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx) ·
+  [Slide Thuyết trình 37 Slides (.pptx)](docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx) ·
   [Kịch bản Trình bày](docs/KICH_BAN_TRINH_BAY.md) ·
-  [Nhật ký Thí nghiệm (.xlsx)](docs/NHAT_KY_THI_NGHIEM.xlsx) ·
+  [Nhật ký Thí nghiệm 5 Sheets (.xlsx)](docs/NHAT_KY_THI_NGHIEM.xlsx) ·
   [Quản lý Trục Dọc/Ngang & Người Yếu Nhất](docs/QUAN_LY_CONG_TAC_VA_NHAT_KY.md) ·
   [Chuẩn Đóng góp (CONTRIBUTING)](CONTRIBUTING.md)
 

@@ -15,10 +15,10 @@
 
 | STT | Họ và tên sinh viên | Mã số SV | Vai trò | Công việc thực hiện | Tỷ lệ đóng góp |
 |:---:|:---|:---:|:---:|:---|:---:|
-| 1 | Bùi Minh Trung | 3124720074 | Nhóm trưởng | Thiết kế lõi `Connect4` Bitboard 49-bit và `ReferenceConnect4`; viết bộ unit test; cài đặt `HeuristicAgent`, `AlphaBetaAgent`, cơ chế kiểm soát timeout `best_or_random`; xây dựng khung giải đấu & thống kê (`Wilson`, `Bootstrap`, `p95`), chạy giải 6 cấp độ 100 ms & Ablation A1, A3; cài đặt Saliency XAI, Web UI (`http.server`), quản lý GitHub, khung báo cáo Google Docs và đóng gói bài nộp. | **45%** |
-| 2 | Trần Lê Minh Tâm | 3124720064 | Thành viên | Cài đặt `RandomAgent`, `MCTSAgent` (UCT 4 bước); xây dựng Data Pipeline chống rò rỉ gương, mạng `Connect4PolicyValueNet` (`model.py`), `MixedMCTSAgent` (PUCT + `Transposition Cache` + Dirichlet); làm giao diện Pygame 60 FPS; chạy Ablation A2, A4; **trực tiếp test game thực tế, quay Video Demo và đề xuất ý tưởng fix code (cache & timeout fallback)**. | **35%** |
-| 3 | Nguyễn Thành Tài | 3124720062 | Thành viên | Đồng bộ log CSV lên Google Drive, cập nhật Nhật ký thí nghiệm Google Sheets/Excel (`docs/NHAT_KY_THI_NGHIEM.xlsx`), soạn bộ 33 thế cờ kiểm thử thủ công (`positions.csv`); **trực tiếp chỉnh sửa nội dung Báo cáo trên Google Docs (Chương 4–5, bảng biểu số liệu) và hoàn thiện file Slide thuyết trình PPTX**. | **10%** |
-| 4 | Chương Gia Thịnh | 3124720067 | Thành viên | Chuẩn hóa Danh mục tài liệu tham khảo, Danh mục từ viết tắt, tệp `THIRD_PARTY.md`, `README.md`; **trực tiếp chỉnh sửa nội dung Báo cáo trên Google Docs (Chương 1–3, văn phong/trình bày), chỉnh sửa Slide PPTX và hoàn thiện Kịch bản trình bày (`KICH_BAN_TRINH_BAY.md`)**. | **10%** |
+| 1 | Bùi Minh Trung | 3124720074 | Nhóm trưởng | Thiết kế lõi `Connect4` Bitboard 49-bit và `ReferenceConnect4`; viết bộ unit test; cài đặt `HeuristicAgent`, `AlphaBetaAgent`, cơ chế kiểm soát timeout `best_or_random`; xây dựng khung giải đấu & thống kê (`Wilson`, `Bootstrap`, `p95`), chạy giải 6 cấp độ 100 ms & Ablation A1, A3; cài đặt Saliency XAI, Web UI (`http.server`), review/fix lỗi self-play Elo & cache 60 FPS, quản lý GitHub, khung báo cáo Google Docs và đóng gói bài nộp. | **45%** |
+| 2 | Trần Lê Minh Tâm | 3124720064 | Thành viên | Cài đặt `RandomAgent`, `MCTSAgent` (UCT 4 bước); xây dựng Data Pipeline chống rò rỉ gương, mạng `Connect4PolicyValueNet` (`model.py`), `MixedMCTSAgent` (PUCT + `Transposition Cache` + Dirichlet); xây dựng **Hệ thống Xếp hạng Elo Bradley-Terry MLE (`compute_elo.py`)** và nâng cấp giao diện Pygame 60 FPS (**chế độ Solo 2-Slot AI vs AI, Start/Pause, khai cuộc 4-ply ngẫu nhiên, cập nhật Elo thực tế**); chạy Ablation A2, A4; **trực tiếp test game thực tế, quay Video Demo và đề xuất ý tưởng fix code**. | **35%** |
+| 3 | Nguyễn Thành Tài | 3124720062 | Thành viên | Đồng bộ log CSV/Elo lên Google Drive, cập nhật Nhật ký thí nghiệm Google Sheets/Excel 5 sheets (`docs/NHAT_KY_THI_NGHIEM.xlsx`), soạn bộ 33 thế cờ kiểm thử thủ công (`positions.csv`); **trực tiếp chỉnh sửa nội dung Báo cáo trên Google Docs (Chương 4–5, bảng biểu số liệu & Elo) và hoàn thiện file Slide thuyết trình PPTX**. | **10%** |
+| 4 | Chương Gia Thịnh | 3124720067 | Thành viên | Chuẩn hóa Danh mục tài liệu tham khảo (bổ sung Hunter 2004, Elo 1978), Danh mục từ viết tắt, tệp `THIRD_PARTY.md`, `README.md`; **trực tiếp chỉnh sửa nội dung Báo cáo trên Google Docs (Chương 1–3, văn phong/trình bày), chỉnh sửa Slide PPTX và hoàn thiện Kịch bản trình bày (`KICH_BAN_TRINH_BAY.md`)**. | **10%** |
 | **Tổng** | | | | | **100%** |
 
 ### QUY TRÌNH QUẢN LÝ CỘNG TÁC, PHÂN CÔNG TRỤC DỌC – NGANG VÀ ĐÁNH GIÁ QUÁ TRÌNH
@@ -29,12 +29,12 @@
 |---|---|---|
 | **Quản lý mã nguồn (Code)** | **GitHub** | `https://github.com/BMT0306/ConnectFour_7X6_AdvanceAi_ThayTai_Nhom13` |
 | **Lưu trữ kết quả thí nghiệm** | **Google Drive** | `https://drive.google.com/drive/folders/1k-q-cuTi3Rb_eYnrmfmrr_6-C35j7M6K?usp=sharing` |
-| **Nhật ký thí nghiệm** | **Google Sheets / Excel** | `docs/NHAT_KY_THI_NGHIEM.xlsx` & `.csv` (ghi đủ 10 đợt thực nghiệm EXP-01..EXP-10) |
-| **Vẽ hình & Slide thuyết trình** | **Google Slides / PowerPoint** | `docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx` (36 slides + sơ đồ khối vector) |
+| **Nhật ký thí nghiệm** | **Google Sheets / Excel** | `docs/NHAT_KY_THI_NGHIEM.xlsx` (5 sheets chuẩn đối chiếu Baseline–Variant, EXP-01..EXP-11) |
+| **Vẽ hình & Slide thuyết trình** | **Google Slides / PowerPoint** | `docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx` (37 slides + sơ đồ khối vector) |
 | **Kế hoạch & Viết báo cáo** | **Google Docs** | Bản soạn thảo trực tuyến đồng chỉnh sửa cho 4 thành viên (`BAO_CAO_DO_AN_CUOI_KY.docx`) |
 
-- **Phân công Trục dọc × Trục ngang**: Trục dọc phân định người đầu mối chịu trách nhiệm cho từng nhóm công việc (Code & Hạ tầng AI: Trung; Test Game, Demo & Fix Idea: Tâm; Nhật ký thí nghiệm & Rà soát số liệu: Tài; Báo cáo Google Docs, Slide & Kịch bản: Tài & Thịnh dưới sự rà soát của Nhóm trưởng). Trục ngang chia nhỏ từ giai đoạn M1 (Engine) đến M5 (UI, Video & Tài liệu) kèm **Nhật ký công việc hàng tuần** cho mọi thành viên.
-- **Đánh giá dựa vào người yếu nhất (Weakest-Link Evaluation)**: Mọi thành viên được kiểm tra chéo 4 chỉ số quá trình học tập (C1: Hiểu thuật toán & Bitboard; C2: Tự chạy test/log CSV; C3: Độ chính xác khi chỉnh sửa Google Docs/PPT; C4: Kỷ luật cập nhật nhật ký tuần). Mức điểm nền tối thiểu của thành viên thấp nhất trong nhóm phải đạt $\ge 7,0/10$ (kết quả đánh giá chéo toàn nhóm hiện tại đạt ngưỡng tối thiểu `8,00/10`).
+- **Phân công Trục dọc × Trục ngang**: Trục dọc phân định người đầu mối chịu trách nhiệm cho từng nhóm công việc (Code & Hạ tầng AI: Trung; Mô hình AI, Elo, Test Game, Demo & Fix Idea: Tâm; Nhật ký thí nghiệm & Rà soát số liệu: Tài; Báo cáo Google Docs, Slide & Kịch bản: Tài & Thịnh dưới sự rà soát của Nhóm trưởng). Trục ngang chia nhỏ từ giai đoạn M1 (Engine) đến M5 (UI, Video & Tài liệu) kèm **Nhật ký công việc 7 tuần** cho mọi thành viên (ghi nhận cả chu trình review PR nhánh `feature/tam-ai-solo-elo`).
+- **Đánh giá dựa vào người yếu nhất (Weakest-Link Evaluation)**: Mọi thành viên được kiểm tra chéo 4 chỉ số quá trình học tập (C1: Hiểu thuật toán, Bitboard & thang Elo Bradley-Terry; C2: Tự chạy test/Elo/log CSV; C3: Độ chính xác khi chỉnh sửa Google Docs/PPT; C4: Kỷ luật cập nhật nhật ký tuần). Mức điểm nền tối thiểu của thành viên thấp nhất trong nhóm phải đạt $\ge 7,0/10$ (kết quả đánh giá chéo toàn nhóm hiện tại đạt ngưỡng tối thiểu `8,00/10`).
 
 ---
 
@@ -52,9 +52,9 @@ Trong quá trình thực hiện đề tài, mặc dù nhóm đã cố gắng ki�
 
 Báo cáo trình bày quá trình thiết kế, cài đặt và đánh giá thực nghiệm hệ thống tác tử trí tuệ nhân tạo đa cấp độ cho trò chơi Connect Four (7 cột × 6 hàng). Ở tầng hạ tầng, nhóm cài đặt song song hai bộ máy quản lý luật chơi: bản `ReferenceConnect4` dùng mảng hai chiều thông thường để làm chuẩn đối chiếu và bản `Connect4` dùng kỹ thuật Bitboard 49-bit để tăng tốc độ duyệt cây. Kết quả kiểm chuẩn Perft đến độ sâu 6 và kiểm thử chéo 10.000 ván ngẫu nhiên cho thấy hai phiên bản cho kết quả khớp nhau hoàn toàn.
 
-Trên nền tảng engine đó, nhóm triển khai tuần tự 6 cấp độ tác tử gồm: `RandomAgent` (đi ngẫu nhiên), `HeuristicAgent` (dựa trên 4 quy tắc ưu tiên một bước), `AlphaBetaAgent` (duyệt cây Negamax có cắt tỉa Alpha-Beta, sắp xếp nước đi ưu tiên cột giữa và tìm kiếm sâu dần theo thời gian), `MCTSAgent` (tìm kiếm cây Monte Carlo dùng công thức UCT), `NNAgent` (mạng nơ-ron hai đầu `Connect4PolicyValueNet` gồm 3 khối Residual học có giám sát từ dữ liệu của Alpha-Beta độ sâu 4) và `MixedMCTSAgent` (kết hợp đầu ra của mạng nơ-ron vào công thức chọn nhánh PUCT kèm bộ nhớ đệm trạng thái). Ngoài ra, nhóm cũng cài đặt thêm phương pháp tính bản đồ độ nhạy đạo hàm (Saliency Map) để quan sát xem mạng nơ-ron tập trung vào các ô cờ nào khi đưa ra quyết định.
+Trên nền tảng engine đó, nhóm triển khai tuần tự 6 cấp độ tác tử gồm: `RandomAgent` (đi ngẫu nhiên), `HeuristicAgent` (dựa trên 4 quy tắc ưu tiên một bước), `AlphaBetaAgent` (duyệt cây Negamax có cắt tỉa Alpha-Beta, sắp xếp nước đi ưu tiên cột giữa và tìm kiếm sâu dần theo thời gian), `MCTSAgent` (tìm kiếm cây Monte Carlo dùng công thức UCT), `NNAgent` (mạng nơ-ron hai đầu `Connect4PolicyValueNet` gồm 3 khối Residual học có giám sát từ dữ liệu của Alpha-Beta độ sâu 4) và `MixedMCTSAgent` (kết hợp đầu ra của mạng nơ-ron vào công thức chọn nhánh PUCT kèm bộ nhớ đệm trạng thái). Ngoài ra, nhóm còn xây dựng mô-đun giải thích bản đồ độ nhạy đạo hàm (Saliency Map XAI), **hệ thống chuẩn hóa thứ hạng Elo theo mô hình Bradley-Terry MLE** (`scripts/compute_elo.py`) và **chế độ đấu Solo AI-vs-AI 2 khe** trên giao diện Pygame 60 FPS có cập nhật Elo thời gian thực.
 
-Quá trình đánh giá được thực hiện thông qua giải đấu vòng tròn 3.000 ván không giới hạn thời gian (15 cặp, 200 ván/cặp), giải đấu giới hạn thời gian thực 300 ván (`50 / 100 / 300 ms`), **giải đấu vòng tròn đầy đủ 6 cấp độ ở mức 100 ms/nước gồm 1.500 ván** (15 cặp × 100 ván = 50 Đỏ trước + 50 Vàng trước, áp dụng cơ chế `best_or_random` giữ nước tạm thời tốt nhất trước deadline) và 4 thí nghiệm khảo sát thành phần (Ablation A1 đến A4). Kết quả cho thấy kỹ thuật cắt tỉa Alpha-Beta kết hợp sắp xếp ưu tiên cột giữa giúp giảm 93,07% số nút phải duyệt ở độ sâu 6. Đối với phần học sâu, mạng `Connect4PolicyValueNet` đạt độ chính xác dự đoán nước đi Top-1 là 71,68% và Top-2 là 89,07% trên tập kiểm tra độc lập. Khi ghép mạng này vào thuật toán tìm kiếm cây PUCT với ngân sách 200 mô phỏng/nước (không ép giờ), tác tử `MixedMCTSAgent` đứng đầu giải đấu vòng tròn với điểm số 75,00%, vượt qua `MCTSAgent` (60,95%) và nhỉnh hơn `AlphaBetaAgent` độ sâu 5 (74,80%); ngược lại, khi giới hạn chặt `100 ms/nước` trên CPU, `AlphaBetaAgent` vươn lên hạng 1 áp đảo với **78,80%** (`372W–44D–84L`, 0 lần fallback random), trong khi `MixedMCTSAgent` đạt **61,10%** do độ trễ truyền thẳng CNN giới hạn số mô phỏng trong 100 ms.
+Quá trình đánh giá được thực hiện thông qua giải đấu vòng tròn 3.000 ván không giới hạn thời gian (15 cặp, 200 ván/cặp), giải đấu giới hạn thời gian thực 300 ván (`50 / 100 / 300 ms`), **giải đấu vòng tròn đầy đủ 6 cấp độ ở mức 100 ms/nước gồm 1.500 ván** (15 cặp × 100 ván = 50 Đỏ trước + 50 Vàng trước, áp dụng cơ chế `best_or_random` giữ nước tạm thời tốt nhất trước deadline) và 4 thí nghiệm khảo sát thành phần (Ablation A1 đến A4). Kết quả cho thấy cắt tỉa Alpha-Beta kết hợp sắp xếp Center-First giảm 93,07% số nút ở độ sâu 6; mạng `Connect4PolicyValueNet` đạt Top-1 `71,68%` và Top-2 `89,07%` trên tập kiểm tra độc lập. Khi quy đổi sang thang **Bradley-Terry MLE Elo** (neo `Random = 1000,0`), ở chế độ không giới hạn thời gian, `MixedMCTSAgent` (200 sims) dẫn đầu với **2114,8 Elo** (`75,00%`), nhỉnh hơn `AlphaBetaAgent` độ sâu 5 (**2113,1 Elo**, `74,80%`) và `MCTSAgent` 1.000 sims (**2004,3 Elo**, `60,95%`). Ngược lại, khi giới hạn chặt `100 ms/nước` trên CPU, `AlphaBetaAgent` vươn lên hạng 1 áp đảo với **2125,8 Elo** (`78,80%`, `+12,7 Elo`, 0 lần fallback random), trong khi `MixedMCTSAgent` giảm mạnh **`-126,7 Elo`** xuống **1988,1 Elo** (`61,10%`) do độ trễ suy luận CNN giới hạn số lượt mô phỏng trong 100 ms.
 
 ---
 
@@ -65,10 +65,12 @@ Quá trình đánh giá được thực hiện thông qua giải đấu vòng tr
 | **AI** | Artificial Intelligence | Trí tuệ nhân tạo |
 | **CI** | Confidence Interval | Khoảng tin cậy thống kê (Bootstrap 95%, Wilson 95%) |
 | **CNN** | Convolutional Neural Network | Mạng nơ-ron tích chập |
+| **FIDE** | Fédération Internationale des Échecs | Hệ thống cập nhật Elo Logistic chuẩn quốc tế ($K = 32$) |
 | **GUI** | Graphical User Interface | Giao diện đồ họa người dùng (Pygame 60 FPS) |
 | **ID** | Iterative Deepening | Tìm kiếm sâu dần theo giới hạn thời gian |
 | **MAE / MSE** | Mean Absolute / Squared Error | Sai số tuyệt đối / bình phương trung bình |
 | **MCTS** | Monte Carlo Tree Search | Tìm kiếm cây Monte Carlo |
+| **MLE** | Maximum Likelihood Estimation | Ước lượng Hợp lý Cực đại (thuật toán Bradley-Terry MM) |
 | **NN** | Neural Network | Mạng nơ-ron học sâu (`Connect4PolicyValueNet`) |
 | **PUCT** | Predictor + Upper Confidence Bounds applied to Trees | Công thức chọn nhánh có dẫn đường xác suất tiên nghiệm |
 | **RQ** | Research Question | Câu hỏi nghiên cứu định lượng |
@@ -117,11 +119,12 @@ Quá trình đánh giá được thực hiện thông qua giải đấu vòng tr
     - 5.2.4. Thí nghiệm Ablation A3: Bóc tách vai trò của Policy Prior và Value Head trong PUCT ... Trang 40
     - 5.2.5. Thí nghiệm Ablation A4: Định lượng lợi thế của người đi trước trên 3.000 ván đấu ... Trang 42
     - 5.2.6. Giải đấu Vòng tròn 6 Cấp độ Giới hạn 100 ms/nước (1.500 ván, best_or_random) ... Trang 43
-  - 5.3. Đánh giá mối quan hệ đánh đổi: Thông lượng duyệt nút, Độ trễ suy luận và Tỷ lệ thắng ... Trang 46
-- **KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN** ............................................... **Trang 49**
-  - 1. Kết luận chung ........................................................ Trang 49
-  - 2. Hạn chế và hướng phát triển tiếp theo ................................. Trang 49
-- **TÀI LIỆU THAM KHẢO** ......................................................... **Trang 51**
+    - 5.2.7. Chuẩn hóa Sức mạnh Bằng Hệ thống Xếp hạng Elo (Bradley-Terry MLE & FIDE Logistic) ... Trang 46
+  - 5.3. Đánh giá mối quan hệ đánh đổi: Thông lượng duyệt nút, Độ trễ suy luận và Tỷ lệ thắng ... Trang 48
+- **KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN** ............................................... **Trang 51**
+  - 1. Kết luận chung ........................................................ Trang 51
+  - 2. Hạn chế và hướng phát triển tiếp theo ................................. Trang 51
+- **TÀI LIỆU THAM KHẢO** ......................................................... **Trang 53**
 
 ---
 
@@ -140,6 +143,7 @@ Quá trình đánh giá được thực hiện thông qua giải đấu vòng tr
 - **Hình 5.5: Kết quả Ablation A3 bóc tách đóng góp của Policy Prior và Value Head ở mức 200 mô phỏng** ... Trang 41
 - **Hình 5.6: Tỷ lệ thắng của người đi trước (Quân Đỏ) và người đi sau (Quân Vàng) trên từng cặp đấu** ... Trang 42
 - **Hình 5.7: Giải đấu vòng tròn 6 cấp độ giới hạn 100 ms/nước (1.500 ván) và phân tích tỷ lệ timeout** ... Trang 45
+- **Hình 5.8: So sánh điểm xếp hạng Bradley-Terry MLE Elo và biến động Δ Elo giữa giải Mặc định và 100 ms/nước** ... Trang 47
 
 ### Danh mục Bảng biểu
 
@@ -154,7 +158,8 @@ Quá trình đánh giá được thực hiện thông qua giải đấu vòng tr
 - **Bảng 5.5: Kết quả Ablation A3 — So sánh 4 biến thể trước hai mốc chuẩn mcts_500 và alphabeta_d4** ... Trang 40
 - **Bảng 5.6: Bảng xếp hạng 6 cấp độ trong giải đấu giới hạn 100 ms/nước (1.500 ván, best_or_random)** ... Trang 43
 - **Bảng 5.7: Kết quả đối đầu chi tiết 15 cặp trong giải đấu 6 cấp độ giới hạn 100 ms/nước (100 ván/cặp)** ... Trang 44
-- **Bảng 5.8: Bảng tổng hợp tiến hóa 6 phiên bản tác tử AI và sự đánh đổi giữa độ trễ suy luận với tỷ lệ thắng** ... Trang 46
+- **Bảng 5.8: Đối chiếu điểm xếp hạng Bradley-Terry MLE Elo giữa Giải Mặc định (3.000 ván) và Giải 100 ms/nước (1.500 ván)** ... Trang 47
+- **Bảng 5.9: Bảng tổng hợp tiến hóa 6 phiên bản tác tử AI và sự đánh đổi giữa độ trễ suy luận, tỷ lệ thắng và điểm Elo** ... Trang 48
 
 ---
 
@@ -701,41 +706,73 @@ Số liệu ở Bảng 5.6, Bảng 5.7 và Hình 5.7 làm rõ hai kết luận q
 1. **Đảo chiều thứ hạng giữa `Alpha-Beta` và `Mixed-MCTS` khi bị ép `100 ms/nước`**: Khi không giới hạn thời gian (Bảng 5.1), `Mixed-MCTS (200 sims)` đứng đầu với `75,00%`. Nhưng khi mọi tác tử đều chỉ có tối đa `100 ms/nước` trên CPU đơn luồng, `Mixed-MCTS` chạm ngưỡng thời gian ở `96,3%` số nước (`5.934 / 6.162` nước) vì mỗi lần mở rộng nút mới cần ~1,9 ms gọi mạng ResNet nên chỉ kịp thực hiện vài chục mô phỏng, tụt xuống hạng 3 (`61,10%`). Ngược lại, `Alpha-Beta` nhờ Bitboard 49-bit và sắp xếp Center-First tận dụng trọn vẹn 100 ms để hoàn tất tầng sâu 5–6 ply, đạt hạng 1 áp đảo với **78,80%** (thắng `Mixed-MCTS` `59 – 12 – 29` và thắng `MCTS` `72 – 1 – 27`).
 2. **Độ an toàn tuyệt đối của cơ chế `best_or_random`**: Trên toàn bộ **31.768 nước đi** của 1.500 ván đấu, mặc dù `MCTS` (`98,7%` nước) và `Mixed-MCTS` (`96,3%` nước) liên tục chạy tới giới hạn `100 ms`, số lần phải rơi vào nhánh `fallback_random` ở cả 6 cấp độ đều bằng **0**. Điều này chứng minh mọi tác tử anytime đều kịp tính ra nước tạm thời hợp lệ trước deadline 100 ms (trừ trường hợp chủ động kiểm thử biên `time_s = 0` trong unit test).
 
+#### 5.2.7. Chuẩn hóa Sức mạnh Bằng Hệ thống Xếp hạng Elo (Bradley-Terry MLE & FIDE Logistic)
+
+Chỉ số tỷ lệ điểm trung bình (`Overall Score %`) dù trực quan nhưng có hai hạn chế khoa học: (i) không mang tính tuyến tính trên thang xác suất khi chênh lệch trình độ rất lớn (ví dụ sự cách biệt giữa `0,40%` và `38,50%` lớn hơn rất nhiều so với giữa `60,95%` và `75,00%`), và (ii) khó dự đoán xác suất thắng trực tiếp khi so sánh hai tác tử bất kỳ hoặc cập nhật dần khi đấu thêm ván lẻ. Để khắc phục, nhóm triển khai hệ thống định lượng **Elo Rating** trong kịch bản `scripts/compute_elo.py` (lưu bền vững tại `results/elo_ratings.json` và tích hợp trực tiếp vào chế độ Solo 2-Slot trên giao diện Pygame `src/c4/ui/gui.py`):
+
+1. **Ước lượng toàn cục bằng mô hình Bradley-Terry MLE (Hunter, 2004)**:
+   Với ma trận tổng điểm $W_{ij} = \text{Wins}_{ij} + 0,5 \cdot \text{Draws}_{ij}$ và tổng số ván $N_{ij}$ giữa tác tử $i$ và $j$, xác suất $i$ thắng $j$ được mô hình hóa theo tham số thực lực dương $\gamma_i > 0$:
+   $$P(i \text{ thắng } j) = \frac{\gamma_i}{\gamma_i + \gamma_j}$$
+   Nghiệm hợp lý cực đại (MLE) được tìm bằng thuật toán lặp tối ưu hóa MM (Minorization-Maximization) hội tụ sau 2.000 vòng lặp chuẩn hóa trung bình hình học:
+   $$\gamma_i^{(t+1)} = \frac{\sum_{j \ne i} W_{ij}}{\sum_{j \ne i} \frac{N_{ij}}{\gamma_i^{(t)} + \gamma_j^{(t)}}}, \qquad R_i = 400 \cdot \log_{10}(\gamma_i) + C$$
+   trong đó hằng số dịch $C$ được chọn để cố định mốc cơ sở **Random Baseline** tại $R_{\text{random}} = 1000,0\text{ Elo}$.
+2. **Cập nhật Elo trực tuyến theo chuẩn FIDE Logistic (Elo, 1978)** cho chế độ đấu Solo 2 máy (CLI `--solo` & Pygame GUI 2-Slot có khai cuộc 4-ply ngẫu nhiên):
+   $$E_A = \frac{1}{1 + 10^{(R_B - R_A)/400}}, \qquad \Delta R_A = K \cdot (S_A - E_A) \quad (K = 32)$$
+   Nhóm cũng cài đặt bộ bảo vệ `self-play guard` (khi cho hai tác tử cùng cấp độ tự đấu nhau `p1 == p2` thì giữ nguyên Elo thay vì ghi đè sai dấu `-delta`) và lưu đệm `self.elo_dict` trong RAM trên giao diện Pygame để giữ vững 60 FPS mà không đọc file JSON lặp lại mỗi khung hình.
+
+**Bảng 5.8: Đối chiếu điểm xếp hạng Bradley-Terry MLE Elo giữa Giải Mặc định (3.000 ván) và Giải 100 ms/nước (1.500 ván)**
+
+| Cấp độ Tác tử | Giải Mặc định (3.000 ván) | Elo Mặc định (`Tier`) | Giải 100 ms/nước (1.500 ván) | Elo 100 ms (`Tier`) | Biến động $\Delta\text{Elo}$ |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| **Level 6: `MixedMCTSAgent` (PUCT)** | `75,00%` (`705-90-205`) | **2114,8** (*Grandmaster*) | `61,10%` (`282-47-171`) | **1988,1** (*Expert*) | **-126,7** |
+| **Level 3: `AlphaBetaAgent`** | `74,80%` (`716-64-220`) | **2113,1** (*Grandmaster*) | `78,80%` (`372-44-84`) | **2125,8** (*Grandmaster*) | **+12,7** |
+| **Level 4: `MCTSAgent` (UCT)** | `60,95%` (`596-27-377`) | **2004,3** (*Master*) | `63,00%` (`310-10-180`) | **2002,2** (*Master*) | `-2,1` |
+| **Level 5: `NNAgent` (0-search)** | `50,35%` (`460-87-453`) | **1922,3** (*Expert*) | `53,20%` (`239-54-207`) | **1929,6** (*Expert*) | `+7,3` |
+| **Level 2: `HeuristicAgent`** | `38,50%` (`350-70-580`) | **1822,2** (*Club*) | `43,50%` (`191-53-256`) | **1854,3** (*Club*) | `+32,1` |
+| **Level 1: `RandomAgent` (Anchor)** | `0,40%` (`4-0-996`) | **1000,0** (*Novice*) | `0,40%` (`2-0-498`) | **1000,0** (*Novice*) | `0,0` |
+
+![Hình 5.8: So sánh điểm xếp hạng Bradley-Terry MLE Elo và biến động Δ Elo giữa giải Mặc định (3.000 ván) và giới hạn 100 ms/nước (1.500 ván)](../results/figures/elo_comparison_default_vs_100ms.png)
+
+Phân tích thang đo Elo trên Bảng 5.8 và Hình 5.8 mang lại ba hàm ý định lượng sâu sắc hơn tỷ lệ thắng thô:
+- **Khoảng cách năng lực dạng bước nhảy logarit**: Việc bổ sung 4 luật phản xạ 1-ply ở `HeuristicAgent` tạo ra bước nhảy khổng lồ **`+822,2 Elo`** so với `RandomAgent` (tương ứng xác suất thắng kỳ vọng $> 99,1\%$). Từ đó, mỗi bước nâng cấp kiến trúc AI tạo ra một nấc thang rõ rệt: mạng học sâu `NNAgent` 0-search vượt `Heuristic` **`+100,1 Elo`** (`1922,3`), tìm kiếm cây `MCTS-1000` cộng thêm **`+82,0 Elo`** (`2004,3`), và nhóm *Grandmaster* (`Alpha-Beta d=5` và `Mixed-MCTS 200 sims`) bứt phá thêm **`+108,8` đến `+110,5 Elo`** (`2113,1` – `2114,8`).
+- **Định lượng chính xác "chi phí độ trễ CNN trên CPU"**: Dưới ràng buộc cứng `100 ms/nước`, `MixedMCTSAgent` sụt đúng **`-126,7 Elo`** (rơi từ hạng *Grandmaster* xuống *Expert*, thấp hơn `Alpha-Beta` tới `137,7 Elo`), trong khi `AlphaBetaAgent` tăng thêm **`+12,7 Elo`** lên `2125,8 Elo` nhờ thông lượng Bitboard 49-bit.
+- **Khả năng trình diễn & kiểm chứng trực tiếp**: Người dùng có thể mở `RUN_FAST.bat` chọn mục `[5]` để xem bảng Elo hoặc chạy `python scripts/compute_elo.py --solo alphabeta mixed_mcts --games 4 --time 0.1 --watch`, cũng như chọn chế độ *Máy vs Máy* trên Pygame GUI để quan sát biến động Elo sau từng ván đấu thực tế.
+
 ### 5.3. Đánh giá mối quan hệ đánh đổi: Thông lượng duyệt nút, Độ trễ suy luận và Tỷ lệ thắng
 
-Để nhìn nhận tổng thể quá trình phát triển tăng dần qua 6 phiên bản tác tử của nhóm (từ `v1` đến `v6`), Bảng 5.8 tổng hợp số nút/mô phỏng trung bình mỗi nước, độ trễ suy luận trung bình (`Mean Latency`), độ trễ phân vị thứ 95 (`p95 Latency`) cùng thành tích thi đấu trên 1.000 ván (chế độ mặc định) của từng phiên bản.
+Để nhìn nhận tổng thể quá trình phát triển tăng dần qua 6 phiên bản tác tử của nhóm (từ `v1` đến `v6`), Bảng 5.9 tổng hợp số nút/mô phỏng trung bình mỗi nước, độ trễ suy luận trung bình (`Mean Latency`), độ trễ phân vị thứ 95 (`p95 Latency`), điểm tổng hợp cùng điểm xếp hạng **Bradley-Terry Elo** ở cả hai kịch bản mặc định và `100 ms/nước`.
 
-**Bảng 5.8: Bảng tổng hợp tiến hóa 6 phiên bản tác tử AI và sự đánh đổi giữa độ trễ suy luận với tỷ lệ thắng**
+**Bảng 5.9: Bảng tổng hợp tiến hóa 6 phiên bản tác tử AI và sự đánh đổi giữa độ trễ suy luận, tỷ lệ thắng và điểm Elo**
 
-| Phiên bản tác tử | Cơ chế suy luận chính | Số nút / mô phỏng TB mỗi nước | Độ trễ TB (`Mean ms`) | Độ trễ `p95` (`ms`) | Kết quả trên 1.000 ván (`W - D - L`) | Điểm tổng hợp (`Overall Score`) | Điểm đối đầu vs `MCTS-1000` | Điểm đối đầu vs `AlphaBeta d=5` |
-|:---|:---|---:|---:|---:|:---:|:---:|:---:|:---:|
-| **v1: `RandomAgent`** (Level 1) | Chọn ngẫu nhiên cột hợp lệ | 1 | 0,006 | 0,012 | `4 - 0 - 996` | 0,40% | 0,00% | 0,00% |
-| **v2: `HeuristicAgent`** (Level 2) | Luật 4 tầng 1 bước + lọc tự sát | ~14 | 0,121 | 0,248 | `350 - 70 - 580` | 38,50% | 23,25% | 16,75% |
-| **v3: `NNAgent`** (Level 5, `0-search`) | Truyền thẳng qua mạng ResNet 2 đầu | 1 lượt CNN | 2,910 | 3,864 | `460 - 87 - 453` | 50,35% | 41,00% | 23,50% |
-| **v4: `MCTSAgent`** (Level 4, `1.000 sims`) | Cây MCTS 4 bước + Rollout ngẫu nhiên | 1.000 sims | 83,420 | 148,847 | `596 - 27 - 377` | 60,95% | *Mốc chuẩn (50%)* | 31,50% |
-| **v5: `AlphaBetaAgent`** (Level 3, `depth = 5`) | Negamax + cắt tỉa $\alpha$-$\beta$ + Center-First + 69 cửa sổ | ~339 nút | 21,860 | 61,480 | `716 - 64 - 220` | 74,80% | **68,50%** | *Mốc chuẩn (50%)* |
-| **v6: `MixedMCTSAgent`** (Level 6, `PUCT 200 sims`) | **Mạng ResNet 2 đầu + cây PUCT + bộ nhớ đệm $O(1)$** | **200 sims** | **348,120** | **709,088** | **`705 - 90 - 205`** | **75,00% (Hạng 1)** | **62,50%** | **54,25%** |
+| Phiên bản tác tử | Cơ chế suy luận chính | Số nút / mô phỏng TB | Độ trễ TB / `p95` (`ms`) | Điểm Mặc định (`1.000` ván) | Elo Mặc định | Elo `100 ms` ($\Delta$ Elo) | Điểm đối đầu vs `MCTS-1000` | Điểm đối đầu vs `AlphaBeta d=5` |
+|:---|:---|---:|---:|:---:|:---:|:---:|:---:|:---:|
+| **v1: `RandomAgent`** (L1) | Chọn ngẫu nhiên cột hợp lệ | 1 | `0,006 / 0,012` | `0,40%` | `1000,0` | `1000,0` (`0,0`) | 0,00% | 0,00% |
+| **v2: `HeuristicAgent`** (L2) | Luật 4 tầng 1 bước + lọc tự sát | ~14 | `0,121 / 0,248` | `38,50%` | `1822,2` | `1854,3` (`+32,1`) | 23,25% | 16,75% |
+| **v3: `NNAgent`** (L5, `0-search`) | Truyền thẳng mạng ResNet 2 đầu | 1 CNN | `2,910 / 3,864` | `50,35%` | `1922,3` | `1929,6` (`+7,3`) | 41,00% | 23,50% |
+| **v4: `MCTSAgent`** (L4, `1.000`) | Cây MCTS 4 bước + Rollout | 1.000 | `83,42 / 148,85` | `60,95%` | `2004,3` | `2002,2` (`-2,1`) | *Mốc chuẩn* | 31,50% |
+| **v5: `AlphaBetaAgent`** (L3, `d=5`) | Negamax + $\alpha$-$\beta$ + Center-First | ~339 nút | `21,86 / 61,48` | `74,80%` | `2113,1` | **`2125,8` (`+12,7`)** | **68,50%** | *Mốc chuẩn* |
+| **v6: `MixedMCTSAgent`** (L6, `200`) | **ResNet 2 đầu + PUCT + Cache $O(1)$** | **200** | **`348,1 / 709,1`** | **`75,00%`** | **`2114,8`** | `1988,1` (`-126,7`) | **62,50%** | **54,25%** |
 
-Từ Bảng 5.8 (cùng kết quả giới hạn `100 ms` ở Bảng 5.6), nhóm rút ra ba nhận xét tổng kết về sự đánh đổi giữa chi phí tính toán và hiệu quả chiến thuật:
-1. **Duyệt ít mô phỏng hơn nhưng chất lượng nước đi cao hơn (`v6` so với `v4`)**: Phiên bản `MCTSAgent` thuần (`v4`) phải thực hiện `1.000` lượt mô phỏng mỗi nước nhưng chỉ đạt điểm tổng hợp `60,95%`. Trong khi đó, phiên bản `MixedMCTSAgent` (`v6`) nhờ có xác suất tiên nghiệm từ mạng `Connect4PolicyValueNet` dẫn đường chỉ cần chạy **200 lượt mô phỏng/nước** (giảm 5 lần số lượt mô phỏng) nhưng đạt điểm tổng hợp **75,00%** và thắng trực tiếp `v4` với điểm số **62,50%**. Kết quả này cho thấy tri thức học máy đã giúp cây tìm kiếm tập trung đúng vào các nhánh có ý nghĩa chiến thuật thay vì dàn trải vào các cột yếu.
-2. **Vai trò bổ trợ giữa mạng nơ-ron và tìm kiếm cây (`v6` so với `v3` và `v5`)**: Khi chỉ dùng mạng nơ-ron độc lập không kèm duyệt cây (`v3`), thời gian phản hồi rất nhanh (`~2,91 ms/nước`) và thắng tốt `HeuristicAgent` (`64,25%`), nhưng vẫn dễ mắc sai lầm trước các thuật toán có duyệt cây sâu như `Alpha-Beta` vì mạng đơn lẻ khó nhìn trước được các chuỗi ép nước dài. Khi đặt mạng nơ-ron đó vào bên trong vòng lặp tìm kiếm cây PUCT 200 mô phỏng (`v6`), cây tìm kiếm giúp kiểm tra lại các tình huống chiến thuật ngắn hạn, từ đó giúp tác tử học trò vượt qua cả tác tử thầy `Alpha-Beta` ở độ sâu 4 (`62,50%`) và nhỉnh hơn cả `Alpha-Beta` ở độ sâu 5 (`54,25%`).
-3. **Đánh đổi về độ trễ thực thi trên CPU**: Do mỗi lần mở rộng một nút mới chưa có trong `Transposition Cache`, `MixedMCTSAgent` phải thực hiện một lượt truyền thẳng qua mạng ResNet trên CPU (`~1,9 ms`/lần), nên độ trễ trung bình của `v6` khi chạy đủ 200 sims ở mức `348 ms/nước` (hoặc `151 ms/nước` nếu dùng biến thể `PUCT_Prior_Rollout`). Khi bị giới hạn cứng `100 ms/nước` trên CPU (Bảng 5.6), `AlphaBetaAgent` là lựa chọn vượt trội nhất (`78,80%`), còn ở chế độ tương tác người chơi cho phép chờ 0,3–0,7 giây thì `MixedMCTSAgent` đạt sức mạnh cao nhất (`75,00%`).
+Từ Bảng 5.9 (cùng phân tích Elo ở Bảng 5.8 và giải `100 ms` ở Bảng 5.6), nhóm rút ra ba nhận xét tổng kết về sự đánh đổi giữa chi phí tính toán và hiệu quả chiến thuật:
+1. **Duyệt ít mô phỏng hơn nhưng chất lượng nước đi cao hơn (`v6` so với `v4`)**: Phiên bản `MCTSAgent` thuần (`v4`) phải thực hiện `1.000` lượt mô phỏng mỗi nước nhưng chỉ đạt `60,95%` (`2004,3 Elo`). Trong khi đó, `MixedMCTSAgent` (`v6`) nhờ xác suất tiên nghiệm từ mạng `Connect4PolicyValueNet` dẫn đường chỉ cần chạy **200 lượt mô phỏng/nước** (giảm 5 lần) nhưng đạt **75,00%** (**2114,8 Elo**, tăng **`+110,5 Elo`**) và thắng trực tiếp `v4` với điểm số **62,50%**.
+2. **Vai trò bổ trợ giữa mạng nơ-ron và tìm kiếm cây (`v6` so với `v3` và `v5`)**: Khi chỉ dùng mạng nơ-ron độc lập không duyệt cây (`v3`), thời gian phản hồi rất nhanh (`~2,91 ms/nước`, đạt `1922,3 Elo`) và thắng tốt `HeuristicAgent` (`64,25%`), nhưng vẫn kém nhóm duyệt cây sâu khoảng `190 Elo`. Khi đặt mạng nơ-ron đó vào vòng lặp tìm kiếm cây PUCT 200 mô phỏng (`v6`), sức mạnh nhảy vọt thêm **`+192,5 Elo`** lên `2114,8 Elo`, vượt qua cả tác tử thầy `Alpha-Beta` ở độ sâu 4 (`62,50%`) và nhỉnh hơn `Alpha-Beta` ở độ sâu 5 (`54,25%`).
+3. **Đánh đổi về độ trễ thực thi trên CPU**: Do mỗi lần mở rộng nút mới chưa có trong `Transposition Cache`, `MixedMCTSAgent` phải chạy 1 lượt ResNet trên CPU (`~1,9 ms`/lần), nên độ trễ trung bình khi chạy đủ 200 sims là `348 ms/nước` (hoặc `151 ms/nước` với biến thể `PUCT_Prior_Rollout`). Khi bị giới hạn cứng `100 ms/nước` trên CPU (Bảng 5.6 & 5.8), `AlphaBetaAgent` là lựa chọn vượt trội nhất (**2125,8 Elo**, `78,80%`), còn ở chế độ tương tác người chơi cho phép chờ 0,3–0,7 giây thì `MixedMCTSAgent` đạt sức mạnh cao nhất (**2114,8 Elo**, `75,00%`).
 
 ---
 
 ## KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
 
 ### 1. Kết luận chung
-Đồ án đã hoàn thành việc xây dựng từ đầu hệ thống trò chơi Connect Four (7×6) cùng 6 cấp độ tác tử AI, bộ kiểm thử tự động **59 bài test trên 11 tệp kiểm thử**, cơ chế kiểm soát timeout `best_or_random`, quy trình sinh dữ liệu sạch và huấn luyện mạng nơ-ron hai đầu, kết hợp giao diện chơi trực quan trên cả Desktop Pygame và trình duyệt Web (`http.server`) kèm quy trình quản lý cộng tác 5 công cụ (GitHub, Google Drive, Google Sheets, Google Slides/PowerPoint, Google Docs) với phân bổ `45% – 35% – 10% – 10%` và đánh giá theo thành viên yếu nhất. Thông qua hơn **6.100 ván đấu thực nghiệm** có lưu đầy đủ nhật ký CSV và Excel/Sheets, báo cáo đã trả lời định lượng ba câu hỏi nghiên cứu đề ra ở Chương 1:
-- **Với RQ1**: Dưới cùng giới hạn thời gian suy nghĩ ngắn (`50 ms`, `100 ms`, `300 ms`), `Alpha-Beta` (tích hợp Bitboard, cắt tỉa Center-First giảm 93,07% nút và hàm lượng giá 69 cửa sổ) đạt tỷ lệ thắng cao hơn `MCTS-UCT` thuần (`Score = 0,650; 0,690; 0,605`). Khi giữ cố định `Alpha-Beta` ở độ sâu 4, `MCTS-UCT` cần khoảng **1.500 – 2.000 mô phỏng/nước** để vượt qua.
-- **Với RQ2**: Mạng `Connect4PolicyValueNet` huấn luyện trên dữ liệu tách theo ván chống rò rỉ đạt **71,68% Top-1 Accuracy** và **89,07% Top-2 Accuracy** trên tập `Test` độc lập, đạt điểm đối đầu **64,25%** trước `HeuristicAgent` khi không cần tìm kiếm cây.
-- **Với RQ3**: Khi kết hợp mạng nơ-ron vào công thức chọn nhánh PUCT ở mức chỉ 200 mô phỏng, `MixedMCTSAgent` tăng thêm 36–37% điểm số so với `MCTS-UCT` cùng ngân sách, thắng cả tác tử thầy `Alpha-Beta (depth = 4)` lẫn `Alpha-Beta (depth = 5)` để xếp hạng 1 toàn giải (**75,00%**), đồng thời giải thích được vùng ô cờ trọng yếu qua bản đồ độ nhạy Saliency Map.
+Đồ án đã hoàn thành việc xây dựng từ đầu hệ thống trò chơi Connect Four (7×6) cùng 6 cấp độ tác tử AI, bộ kiểm thử tự động **59 bài test trên 11 tệp kiểm thử**, cơ chế kiểm soát timeout `best_or_random`, **hệ thống xếp hạng Elo chuẩn Bradley-Terry MLE & FIDE Logistic**, quy trình sinh dữ liệu sạch và huấn luyện mạng nơ-ron hai đầu, kết hợp giao diện chơi trực quan trên Desktop Pygame (có chế độ Solo 2-Slot Máy vs Máy cập nhật Elo thực tế) và trình duyệt Web (`http.server`) cùng quy trình quản lý cộng tác 5 công cụ (GitHub, Google Drive, Google Sheets 5 sheet, Google Slides/PowerPoint 37 slides, Google Docs) với phân bổ `45% – 35% – 10% – 10%` và đánh giá theo thành viên yếu nhất. Thông qua hơn **6.100 ván đấu thực nghiệm** có lưu đầy đủ nhật ký CSV và Excel/Sheets, báo cáo đã trả lời định lượng ba câu hỏi nghiên cứu đề ra ở Chương 1:
+- **Với RQ1**: Dưới cùng giới hạn thời gian suy nghĩ ngắn (`50 ms`, `100 ms`, `300 ms`), `Alpha-Beta` (tích hợp Bitboard, cắt tỉa Center-First giảm 93,07% nút và hàm lượng giá 69 cửa sổ) đạt tỷ lệ thắng cao hơn `MCTS-UCT` thuần (`Score = 0,650; 0,690; 0,605`), đồng thời dẫn đầu giải 6 cấp độ `100 ms/nước` với **2125,8 Elo** (`78,80%`). Khi giữ cố định `Alpha-Beta` ở độ sâu 4, `MCTS-UCT` cần khoảng **1.500 – 2.000 mô phỏng/nước** để vượt qua.
+- **Với RQ2**: Mạng `Connect4PolicyValueNet` huấn luyện trên dữ liệu tách theo ván chống rò rỉ đạt **71,68% Top-1 Accuracy** và **89,07% Top-2 Accuracy** trên tập `Test` độc lập, đạt **1922,3 Elo** (`+100,1 Elo` trên `HeuristicAgent`, thắng đối đầu **64,25%**) dù không cần tìm kiếm cây.
+- **Với RQ3**: Khi kết hợp mạng nơ-ron vào công thức chọn nhánh PUCT ở mức chỉ 200 mô phỏng, `MixedMCTSAgent` tăng thêm 36–37% điểm số so với `MCTS-UCT` cùng ngân sách, đạt **2114,8 Elo** (`+192,5 Elo` so với `NNAgent` đơn lẻ và `+110,5 Elo` so với `MCTS-1000`) để xếp hạng 1 toàn giải không giới hạn thời gian (**75,00%**), đồng thời giải thích được vùng ô cờ trọng yếu qua bản đồ độ nhạy Saliency Map.
 
 ### 2. Hạn chế và hướng phát triển tiếp theo
 Bên cạnh các kết quả đạt được, đồ án của nhóm vẫn còn một số điểm có thể cải thiện thêm:
 - Hiện tại dữ liệu huấn luyện mạng được sinh có giám sát từ `AlphaBetaAgent(depth = 4)` trên CPU nên đầu ra Value Head chưa thật sự chính xác ở các thế cờ phức tạp (`Test Value MSE = 0,7884`). Hướng phát triển tiếp theo là cài đặt vòng lặp tự chơi tăng cường (Self-Play Reinforcement Learning) qua nhiều thế hệ theo đúng quy trình AlphaZero, trong đó dùng chính phân phối số lượt thăm của cây PUCT làm nhãn huấn luyện lại cho mạng.
-- Đối với `AlphaBetaAgent`, nhóm mới sử dụng sắp xếp nước đi tĩnh theo cột giữa; trong tương lai có thể bổ sung thêm bảng băm hoán vị (Transposition Table lưu cận trên/cận dưới) và kỹ thuật sắp xếp nước đi động (*Killer Moves* / *History Heuristic*) để duyệt sâu tới 9–11 ply trong cùng ngân sách 100 ms.
-- Cuối cùng, khung mã nguồn mạng ResNet hai đầu kết hợp PUCT của đồ án được thiết kế tách biệt với luật trò chơi, do đó có thể mở rộng sang các bàn cờ có hệ số phân nhánh lớn hơn như Cờ Caro / Gomoku ($15 \times 15$) hoặc Othello ($8 \times 8$).
+- Độ trễ suy luận ResNet trên CPU đơn luồng làm `MixedMCTSAgent` giảm `-126,7 Elo` khi bị ép `100 ms/nước`; trong tương lai có thể tối ưu bằng xuất mô hình sang ONNX Runtime / lượng tử hóa INT8 hoặc đánh giá theo lô (batched leaf evaluation) trên GPU để tăng gấp 5–10 lần số mô phỏng mỗi giây.
+- Đối với `AlphaBetaAgent`, nhóm mới sử dụng sắp xếp nước đi tĩnh theo cột giữa; có thể bổ sung bảng băm hoán vị (Transposition Table lưu cận trên/cận dưới) và kỹ thuật sắp xếp động (*Killer Moves* / *History Heuristic*) để duyệt sâu tới 9–11 ply trong cùng ngân sách 100 ms, đồng thời mở rộng toàn bộ khung ResNet + PUCT + Elo sang các bàn cờ lớn hơn như Cờ Caro / Gomoku ($15 \times 15$) hoặc Othello ($8 \times 8$).
 
 ---
 
@@ -750,3 +787,5 @@ Bên cạnh các kết quả đạt được, đồ án của nhóm vẫn còn m
 7. K. Simonyan, A. Vedaldi, A. Zisserman (2014), "Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps", *ICLR Workshop*.
 8. S. Edelkamp, P. Kissmann (2008), "Symbolic Classification of General Two-Player Games", *KI 2008: Advances in Artificial Intelligence*, Springer, tr. 185–192.
 9. D. E. Knuth, R. W. Moore (1975), "An analysis of alpha-beta pruning", *Artificial Intelligence*, vol. 6, no. 4, tr. 293–326.
+10. D. R. Hunter (2004), "MM algorithms for generalized Bradley-Terry models", *The Annals of Statistics*, vol. 32, no. 1, tr. 384–406.
+11. A. E. Elo (1978), *The Rating of Chessplayers, Past and Present*, Arco Publishing, New York.

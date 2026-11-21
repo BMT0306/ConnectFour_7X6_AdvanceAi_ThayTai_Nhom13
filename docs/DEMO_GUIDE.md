@@ -44,20 +44,22 @@
 - Thao tác:
   + Giới thiệu bàn cờ 7×6 màu sắc rõ nét, hiệu ứng rơi trọng lực 60 FPS.
   + Thử nghiệm chế độ Người vs Máy (chọn cả Đi trước cầm Đỏ hoặc bấm phím `S` / chọn Đi sau cầm Vàng; thử AI Alpha-Beta, Neural Net và Mixed-MCTS PUCT).
-  + Quan sát bảng thông số độ trễ suy luận (ms), số nút duyệt / mô phỏng và trạng thái nạp checkpoint thực tế.
-  + Thử nghiệm chế độ Máy vs Máy: Alpha-Beta đấu với Mixed-MCTS / MCTS.
+  + Quan sát bảng thông số độ trễ suy luận (ms), **điểm xếp hạng Elo chuẩn Bradley-Terry** và trạng thái nạp checkpoint thực tế.
+  + Thử nghiệm chế độ **Máy vs Máy (Solo 2-Slot)** nâng cấp mới trên Pygame: chọn tự do `Máy 1 (Đỏ)` và `Máy 2 (Vàng)` trong 6 cấp độ, bật/tắt **Khai cuộc 4 nước ngẫu nhiên (`O`)**, bấm **Bắt đầu / Tạm dừng (`Space` / `P`)** và quan sát biến động Elo trực tiếp sau khi kết thúc ván.
   + Nút "Đi lại" (Undo) và "Ván mới" (Reset) hoạt động mượt mà.
 
-#### Phân cảnh 5: Chạy giải đấu đối kháng tự động (Tournament) (1 phút)
-- Lệnh chạy:
+#### Phân cảnh 5: Chạy giải đấu đối kháng tự động & Hệ thống Xếp hạng Elo (1 phút)
+- Xem bảng xếp hạng Elo (Bradley-Terry MLE) từ `RUN_FAST.bat` mục `[5]` hoặc chạy:
   ```
-  python -m c4.eval.cli --a alphabeta --b mcts --openings 20 --depth-a 4 --sims-b 500 --out results/logs/demo_match.csv
+  python scripts/compute_elo.py
+  python scripts/compute_elo.py --timed
+  python scripts/compute_elo.py --solo alphabeta mixed_mcts --games 2 --time 0.1 --watch
   ```
 - Hoặc chạy giải đấu 6 cấp độ giới hạn `100 ms/nước`:
   ```
   python scripts/run_tournament.py --config configs/tournament_levels_timed.yaml --resume
   ```
-- Thể hiện: Hệ thống tự động đổi bên Đỏ/Vàng đối xứng, đo thời gian bằng `time.perf_counter()`, áp dụng `best_or_random` khi chạm ngưỡng thời gian, xuất log thô CSV và tính toán Score, Wilson 95% CI, Bootstrap 95% CI và p95 latency trực tiếp trên màn hình.
+- Thể hiện: Hệ thống tự động đổi bên Đỏ/Vàng đối xứng, đo thời gian bằng `time.perf_counter()`, áp dụng `best_or_random` khi chạm ngưỡng thời gian, xuất log thô CSV, tính khoảng tin cậy Wilson/Bootstrap 95% và chuẩn hóa sang thang điểm **Bradley-Terry MLE Elo** (`Random = 1000.0`).
 
 #### Phân cảnh 6: Đóng gói sản phẩm nộp bài (30 giây)
 - Lệnh chạy:
