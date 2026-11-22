@@ -389,8 +389,8 @@ class Connect4GUI:
             if (self.mode == "H_VS_AI" and self.game.current_player == self.human_player) or self.mode == "H_VS_H":
                 if self.hover_col in self.game.legal_actions():
                     hx = BOARD_OFFSET_X + self.hover_col * SLOT_SIZE + SLOT_SIZE // 2
-                    hy = BOARD_OFFSET_Y - 45
-                    self.draw_disc(self.screen, hx, hy, RADIUS - 4, self.game.current_player, alpha=180)
+                    hy = BOARD_OFFSET_Y - 28
+                    self.draw_disc(self.screen, hx, hy, RADIUS - 11, self.game.current_player, alpha=190)
 
         # Highlight 4 quân thắng
         if self.winning_coords:
@@ -446,12 +446,12 @@ class Connect4GUI:
         if self.mode == "H_VS_AI":
             side_txt = "Phe bạn: Đỏ [S đổi bên]" if self.human_player == PLAYER1 else "Phe bạn: Vàng [S đổi bên]"
             info_str += f"  •  {side_txt}"
-        elif self.mode == "AI_VS_AI" and self.last_elo_msg:
-            info_str += f"  •  {self.last_elo_msg}"
-        self.screen.blit(self.font_small.render(info_str, True, COLOR_MUTED), (panel_x + 20, status_y + 46))
+        self.screen.blit(self.font_small.render(info_str, True, COLOR_MUTED), (panel_x + 20, status_y + 44))
+        if self.mode == "AI_VS_AI" and self.last_elo_msg:
+            self.screen.blit(self.font_small.render(self.last_elo_msg, True, (52, 211, 153)), (panel_x + 20, status_y + 60))
 
         # 3. Mode selector (Section 2)
-        mode_y = 154
+        mode_y = 158
         self.screen.blit(self.font_header.render("Chế Độ Chơi", True, COLOR_ACCENT), (panel_x + 20, mode_y))
 
         modes = [("H_VS_AI", "Người vs Máy"), ("AI_VS_AI", "Máy vs Máy"), ("H_VS_H", "Người vs Người")]
@@ -475,6 +475,14 @@ class Connect4GUI:
             ("nn", "Cấp 5: ResNet"),
             ("mixed_mcts", "Cấp 6: Mixed-MCTS"),
         ]
+        short_names = {
+            "random": "Random",
+            "heuristic": "Heuristic",
+            "alphabeta": "Alpha-Beta",
+            "mcts": "MCTS",
+            "nn": "ResNet",
+            "mixed_mcts": "Mixed-MCTS",
+        }
 
         if self.mode == "AI_VS_AI":
             self.screen.blit(self.font_header.render("Chọn Cấp Độ Solo (Máy vs Máy)", True, COLOR_ACCENT), (panel_x + 20, ai_y))
@@ -491,7 +499,7 @@ class Connect4GUI:
             # Vẽ hình tròn vector đỏ thay vì emoji để tránh lỗi ô chữ nhật
             pygame.draw.circle(self.screen, COLOR_RED, (tab1_rect.x + 16, tab1_rect.centery), 6)
             pygame.draw.circle(self.screen, COLOR_WHITE, (tab1_rect.x + 16, tab1_rect.centery), 6, width=1)
-            t1_txt = self.font_small.render(f"Máy 1: {self.ai_agent_name[:8]}", True, COLOR_WHITE)
+            t1_txt = self.font_small.render(f"M1: {short_names.get(self.ai_agent_name, self.ai_agent_name)}", True, COLOR_WHITE)
             self.screen.blit(t1_txt, (tab1_rect.x + 28, tab1_rect.centery - t1_txt.get_height() // 2))
 
             t2_active = self.active_ai_picker == 2
@@ -502,7 +510,7 @@ class Connect4GUI:
             # Vẽ hình tròn vector vàng thay vì emoji
             pygame.draw.circle(self.screen, COLOR_YELLOW, (tab2_rect.x + 16, tab2_rect.centery), 6)
             pygame.draw.circle(self.screen, COLOR_WHITE, (tab2_rect.x + 16, tab2_rect.centery), 6, width=1)
-            t2_txt = self.font_small.render(f"Máy 2: {self.ai_agent_name_p2[:8]}", True, COLOR_WHITE)
+            t2_txt = self.font_small.render(f"M2: {short_names.get(self.ai_agent_name_p2, self.ai_agent_name_p2)}", True, COLOR_WHITE)
             self.screen.blit(t2_txt, (tab2_rect.x + 28, tab2_rect.centery - t2_txt.get_height() // 2))
 
             # Nhãn chỉ dẫn đang chọn slot nào
@@ -622,14 +630,14 @@ class Connect4GUI:
         self.screen.fill(COLOR_BG)
         # Tiêu đề góc trên bên trái
         header = self.font_title.render("CONNECT FOUR - AI ENGINE", True, COLOR_WHITE)
-        self.screen.blit(header, (BOARD_OFFSET_X, 30))
+        self.screen.blit(header, (BOARD_OFFSET_X, 20))
 
         if self.mode == "AI_VS_AI":
             sub_txt = "Chế độ Solo 2 Máy | Bấm BẮT ĐẦU trên thanh điều khiển để theo dõi thi đấu"
-            self.screen.blit(self.font_small.render(sub_txt, True, (56, 189, 248)), (BOARD_OFFSET_X, 68))
+            self.screen.blit(self.font_small.render(sub_txt, True, (56, 189, 248)), (BOARD_OFFSET_X, 54))
         else:
             sub = self.font_small.render("Nhấp chuột vào cột hoặc bấm phím số 1..7 để thả quân", True, COLOR_MUTED)
-            self.screen.blit(sub, (BOARD_OFFSET_X, 68))
+            self.screen.blit(sub, (BOARD_OFFSET_X, 54))
 
         self.draw_board()
         self.draw_sidebar()
@@ -664,7 +672,7 @@ class Connect4GUI:
         panel_w = 350
 
         # Check Mode buttons
-        mode_y = 154
+        mode_y = 158
         modes = ["H_VS_AI", "AI_VS_AI", "H_VS_H"]
         for i, m_code in enumerate(modes):
             r = pygame.Rect(panel_x + 20 + i * 106, mode_y + 28, 98, 32)

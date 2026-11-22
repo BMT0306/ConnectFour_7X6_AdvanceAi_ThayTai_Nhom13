@@ -28,10 +28,15 @@ class GameSession:
     def __init__(self):
         self.game = Connect4()
         self.history = []
+        self.last_elapsed_ms: float = 0.0
+        self.last_stats: str = "-"
+        self.last_agent: str = "alphabeta"
 
     def reset(self):
         self.game.reset()
         self.history.clear()
+        self.last_elapsed_ms = 0.0
+        self.last_stats = "-"
 
     def step(self, col: int) -> bool:
         if col not in self.game.legal_actions():
@@ -85,6 +90,9 @@ class GameSession:
             "winner": int(self.game.winner),
             "legal_actions": self.game.legal_actions(),
             "winning_quad": self.find_winning_quad(),
+            "last_elapsed_ms": self.last_elapsed_ms,
+            "last_stats": self.last_stats,
+            "last_agent": self.last_agent,
         }
 
 
@@ -247,6 +255,10 @@ class Connect4HTTPHandler(BaseHTTPRequestHandler):
                     stats_text = str(raw_stats)
             else:
                 stats_text = str(raw_stats) if raw_stats else f"{elapsed_ms:.1f} ms"
+
+            SESSION.last_elapsed_ms = round(elapsed_ms, 2)
+            SESSION.last_stats = stats_text
+            SESSION.last_agent = agent_name
 
             res = SESSION.to_dict()
             res["ai_col"] = chosen_col

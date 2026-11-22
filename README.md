@@ -13,7 +13,7 @@
 * **Tài liệu Nộp & Quản lý Cộng tác Nhóm 13**:
   [Báo cáo Word (.docx)](docs/BAO_CAO_DO_AN_CUOI_KY.docx) ·
   [Báo cáo Markdown](docs/BAO_CAO_DO_AN_CUOI_KY.md) ·
-  [Slide Thuyết trình 37 Slides (.pptx)](docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx) ·
+  [Slide Thuyết trình 39 Slides (.pptx)](docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx) ·
   [Kịch bản Trình bày](docs/KICH_BAN_TRINH_BAY.md) ·
   [Nhật ký Thí nghiệm 5 Sheets (.xlsx)](docs/NHAT_KY_THI_NGHIEM.xlsx) ·
   [Quản lý Trục Dọc/Ngang & Người Yếu Nhất](docs/QUAN_LY_CONG_TAC_VA_NHAT_KY.md) ·
@@ -139,8 +139,8 @@ CONTRIBUTING.md  Quy trình 5 nền tảng cộng tác (GitHub, Drive, Sheets, S
 
 | STT | Họ và tên | MSSV | Vai trò | Trục dọc phụ trách & Công việc thực hiện | Tỷ lệ đóng góp |
 |:---:|---|:---:|:---:|---|:---:|
-| 1 | **Bùi Minh Trung** | `3124720074` | Nhóm Trưởng (TV1) | **Trục Code, Hạ tầng & Kiến trúc hệ thống**: Thiết kế lõi `Bitboard` 49-bit + `ReferenceConnect4`, bộ unit test, `HeuristicAgent`, `AlphaBetaAgent`, khung giải đấu `match.py` (kèm cơ chế timeout/fallback), thống kê (`Wilson`, `Bootstrap`, `p95`), Web UI, Saliency XAI, cấu hình Ablation & quản lý GitHub/Google Docs tổng thể | **45%** |
-| 2 | **Trần Lê Minh Tâm** | `3124720064` | Thành viên (TV2) | **Trục Mô hình AI, Test Game & Demo**: Cài đặt `RandomAgent`, `MCTSAgent`, mạng hai đầu `Connect4PolicyValueNet`, pipeline sinh dữ liệu/huấn luyện & `MixedMCTSAgent` (PUCT + Cache + Dirichlet); giao diện Pygame; **hỗ trợ test game thực tế, quay video demo và đề xuất ý tưởng/fix lỗi code** | **35%** |
+| 1 | **Bùi Minh Trung** | `3124720074` | Nhóm Trưởng (TV1) | **Trục Code, Hạ tầng & Kiến trúc hệ thống**: Thiết kế lõi `Bitboard` 49-bit + `ReferenceConnect4`, bộ unit test, `HeuristicAgent`, `AlphaBetaAgent`, khung giải đấu `match.py` (kèm cơ chế timeout/fallback), thống kê (`Wilson`, `Bootstrap`, `p95`), Web UI, Saliency XAI, cấu hình Ablation & quản lý GitHub/Google Docs tổng thể | **40%** |
+| 2 | **Trần Lê Minh Tâm** | `3124720064` | Thành viên (TV2) | **Trục Mô hình AI, Elo, Test Game & Demo**: Cài đặt `RandomAgent`, `MCTSAgent`, mạng hai đầu `Connect4PolicyValueNet`, pipeline sinh dữ liệu/huấn luyện & `MixedMCTSAgent` (PUCT + Cache + Dirichlet); Hệ thống xếp hạng Elo Bradley-Terry (`compute_elo.py`) & giao diện Pygame Solo 2-Slot; **hỗ trợ test game thực tế, quay video demo và đề xuất ý tưởng/fix lỗi code** | **40%** |
 | 3 | **Nguyễn Thành Tài** | `3124720062` | Thành viên (TV3) | **Trục Báo cáo, Slide & Nhật ký thí nghiệm**: Chỉnh sửa, chuẩn hóa nội dung báo cáo trên Google Docs và file PowerPoint thuyết trình; tham gia ghi nhận nhật ký thí nghiệm lên Google Sheets/Drive và rà soát số liệu đối chiếu | **10%** |
 | 4 | **Chương Gia Thịnh** | `3124720067` | Thành viên (TV4) | **Trục Báo cáo, Slide & Tư liệu thuyết trình**: Chỉnh sửa, hoàn thiện bố cục báo cáo trên Google Docs và file PowerPoint thuyết trình; rà soát tài liệu tham khảo, kịch bản trình bày và chuẩn bị tài liệu bảo vệ | **10%** |
 | | **TỔNG CỘNG** | | | | **100%** |

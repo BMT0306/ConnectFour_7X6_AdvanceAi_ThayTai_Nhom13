@@ -958,6 +958,16 @@
       if (res.ok) {
         const state = await res.json();
         renderBoard(state);
+        if (state.last_agent) {
+          const sel = document.getElementById('agent-select');
+          if (sel) { sel.value = state.last_agent; onAgentChange(); }
+        }
+        if (state.last_elapsed_ms && state.last_elapsed_ms > 0) {
+          document.getElementById('tele-latency').innerText = `${state.last_elapsed_ms} ms`;
+        }
+        if (state.last_stats && state.last_stats !== '-') {
+          document.getElementById('tele-nodes').innerText = state.last_stats;
+        }
       }
     });
   </script>

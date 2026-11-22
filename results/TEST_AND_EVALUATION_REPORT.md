@@ -92,5 +92,5 @@ Thi đấu vòng tròn 15 cặp × 100 ván (`50` ván Đỏ đi trước + `50`
 1. **Tính đúng đắn kỹ thuật & Kiểm thử**: Đạt xuất sắc (`59/59` unit tests trên `11` tệp kiểm thử pass `100%`, đối chiếu chéo `10.000` ván, Perft ply 1–6, `33` thế cờ chiến thuật, xử lý timeout `best_or_random` không lỗi).
 2. **Độ sâu thuật toán & Giá trị mở rộng**: Hoàn thiện đầy đủ 6 cấp tác tử (bao gồm Policy-Value ResNet có checkpoint thực tế, PUCT-MCTS vượt tác tử thầy và Explainable AI Saliency Heatmap).
 3. **Phương pháp thực nghiệm & Thống kê**: Hơn `6.100` ván thực nghiệm có log CSV thô, kiểm soát khai cuộc & đổi bên đối xứng, khoảng tin cậy Wilson/Bootstrap 95%, độ trễ `p95`, đủ 4 Ablations A1–A4 và bộ biểu đồ/sơ đồ 300 DPI.
-4. **Mức điểm kỳ vọng theo Rubric**: **Đạt vững chắc mức 9,0 – 9,5 / 10** (với phân công cộng tác `45% – 35% – 10% – 10%` và đánh giá đạt chuẩn theo thành viên yếu nhất).
+4. **Mức điểm kỳ vọng theo Rubric**: **Đạt vững chắc mức 9,0 – 9,5 / 10** (với phân công cộng tác `40% – 40% – 10% – 10%` và đánh giá đạt chuẩn theo thành viên yếu nhất).
 

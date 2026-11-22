@@ -17,10 +17,10 @@
 
 ---
 
-## 2. Phân công Trục Dọc × Trục Ngang (`45% – 35% – 10% – 10%`)
+## 2. Phân công Trục Dọc × Trục Ngang (`40% – 40% – 10% – 10%`)
 
-1. **Bùi Minh Trung (`45%` — Nhóm trưởng)**: Trục Code & Hạ tầng AI (Bitboard 49-bit, `AlphaBetaAgent`, khung giải đấu/timeout `best_or_random`, thống kê `Wilson`/`Bootstrap`/`p95`, Web UI, Saliency XAI, quản lý GitHub & tổng hợp Google Docs).
-2. **Trần Lê Minh Tâm (`35%`)**: Trục Học sâu & Demo (`MCTSAgent`, `Connect4PolicyValueNet`, Data Pipeline, `MixedMCTSAgent` PUCT, Pygame GUI, hỗ trợ test game thực tế, quay Video Demo & đề xuất idea fix lỗi).
+1. **Bùi Minh Trung (`40%` — Nhóm trưởng)**: Trục Code & Hạ tầng AI (Bitboard 49-bit, `AlphaBetaAgent`, khung giải đấu/timeout `best_or_random`, thống kê `Wilson`/`Bootstrap`/`p95`, Web UI, Saliency XAI, quản lý GitHub & tổng hợp Google Docs).
+2. **Trần Lê Minh Tâm (`40%`)**: Trục Học sâu & Demo (`MCTSAgent`, `Connect4PolicyValueNet`, Data Pipeline, `MixedMCTSAgent` PUCT, Hệ thống Elo Bradley-Terry, Pygame GUI Solo 2-Slot, hỗ trợ test game thực tế, quay Video Demo & đề xuất idea fix lỗi).
 3. **Nguyễn Thành Tài (`10%`)**: Chỉnh sửa Báo cáo (Google Docs Chương 4–5 & bảng số liệu), chỉnh sửa Slide PPTX và đồng bộ Nhật ký thí nghiệm Google Sheets/Drive.
 4. **Chương Gia Thịnh (`10%`)**: Chỉnh sửa Báo cáo (Google Docs Chương 1–3 & văn phong), chỉnh sửa Slide PPTX, chuẩn hóa Tài liệu tham khảo & Kịch bản trình bày (`docs/KICH_BAN_TRINH_BAY.md`).
 

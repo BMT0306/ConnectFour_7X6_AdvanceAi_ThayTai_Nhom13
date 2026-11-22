@@ -4,7 +4,7 @@
 ### 1. Yêu cầu video demo
 - **Thời lượng khuyến nghị**: 3 - 5 phút.
 - **Độ phân giải**: Full HD (1080p).
-- **Phụ trách**: **Trần Lê Minh Tâm** (35% — trực tiếp test game thực tế, quay Video Demo và đề xuất ý tưởng fix code); **Bùi Minh Trung** (45% — hỗ trợ kỹ thuật Web UI & giải đấu); **Nguyễn Thành Tài & Chương Gia Thịnh** (mỗi bạn 10% — hoàn thiện Google Docs & slide PPT).
+- **Phụ trách**: **Trần Lê Minh Tâm** (40% — trực tiếp test game thực tế, quay Video Demo và đề xuất ý tưởng fix code); **Bùi Minh Trung** (40% — hỗ trợ kỹ thuật Web UI & giải đấu); **Nguyễn Thành Tài & Chương Gia Thịnh** (mỗi bạn 10% — hoàn thiện Google Docs & slide PPT).
 - **Mục tiêu**: Minh chứng chương trình chạy thực tế trên cả Pygame Desktop (60 FPS) và Web UI (`http.server`), kiểm tra cơ chế `best_or_random` khi giới hạn thời gian và thể hiện đầy đủ 6 cấp độ AI.
 
 ---
@@ -12,7 +12,7 @@
 ### 2. Kịch bản từng phân cảnh (Storyline)
 
 #### Phân cảnh 1: Giới thiệu đề tài (30 giây)
-- Hiện slide bìa: Tên đề tài, Nhóm 13, GVHD Thầy Đỗ Như Tài, bảng phân công 4 thành viên (`45% – 35% – 10% – 10%`).
+- Hiện slide bìa: Tên đề tài, Nhóm 13, GVHD Thầy Đỗ Như Tài, bảng phân công 4 thành viên (`40% – 40% – 10% – 10%`).
 - Giới thiệu ngắn gọn mục tiêu: Xây dựng và đánh giá 6 cấp độ AI trên Connect Four 7×6.
 
 #### Phân cảnh 2: Chạy kiểm thử tự động (Unit Tests) (30 giây)

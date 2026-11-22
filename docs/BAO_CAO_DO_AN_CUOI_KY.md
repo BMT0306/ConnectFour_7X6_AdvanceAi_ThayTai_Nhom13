@@ -15,8 +15,8 @@
 
 | STT | Họ và tên sinh viên | Mã số SV | Vai trò | Công việc thực hiện | Tỷ lệ đóng góp |
 |:---:|:---|:---:|:---:|:---|:---:|
-| 1 | Bùi Minh Trung | 3124720074 | Nhóm trưởng | Thiết kế lõi `Connect4` Bitboard 49-bit và `ReferenceConnect4`; viết bộ unit test; cài đặt `HeuristicAgent`, `AlphaBetaAgent`, cơ chế kiểm soát timeout `best_or_random`; xây dựng khung giải đấu & thống kê (`Wilson`, `Bootstrap`, `p95`), chạy giải 6 cấp độ 100 ms & Ablation A1, A3; cài đặt Saliency XAI, Web UI (`http.server`), review/fix lỗi self-play Elo & cache 60 FPS, quản lý GitHub, khung báo cáo Google Docs và đóng gói bài nộp. | **45%** |
-| 2 | Trần Lê Minh Tâm | 3124720064 | Thành viên | Cài đặt `RandomAgent`, `MCTSAgent` (UCT 4 bước); xây dựng Data Pipeline chống rò rỉ gương, mạng `Connect4PolicyValueNet` (`model.py`), `MixedMCTSAgent` (PUCT + `Transposition Cache` + Dirichlet); xây dựng **Hệ thống Xếp hạng Elo Bradley-Terry MLE (`compute_elo.py`)** và nâng cấp giao diện Pygame 60 FPS (**chế độ Solo 2-Slot AI vs AI, Start/Pause, khai cuộc 4-ply ngẫu nhiên, cập nhật Elo thực tế**); chạy Ablation A2, A4; **trực tiếp test game thực tế, quay Video Demo và đề xuất ý tưởng fix code**. | **35%** |
+| 1 | Bùi Minh Trung | 3124720074 | Nhóm trưởng | Thiết kế lõi `Connect4` Bitboard 49-bit và `ReferenceConnect4`; viết bộ unit test; cài đặt `HeuristicAgent`, `AlphaBetaAgent`, cơ chế kiểm soát timeout `best_or_random`; xây dựng khung giải đấu & thống kê (`Wilson`, `Bootstrap`, `p95`), chạy giải 6 cấp độ 100 ms & Ablation A1, A3; cài đặt Saliency XAI, Web UI (`http.server`), review/fix lỗi self-play Elo & cache 60 FPS, quản lý GitHub, khung báo cáo Google Docs và đóng gói bài nộp. | **40%** |
+| 2 | Trần Lê Minh Tâm | 3124720064 | Thành viên | Cài đặt `RandomAgent`, `MCTSAgent` (UCT 4 bước); xây dựng Data Pipeline chống rò rỉ gương, mạng `Connect4PolicyValueNet` (`model.py`), `MixedMCTSAgent` (PUCT + `Transposition Cache` + Dirichlet); xây dựng **Hệ thống Xếp hạng Elo Bradley-Terry MLE (`compute_elo.py`)** và nâng cấp giao diện Pygame 60 FPS (**chế độ Solo 2-Slot AI vs AI, Start/Pause, khai cuộc 4-ply ngẫu nhiên, cập nhật Elo thực tế**); chạy Ablation A2, A4; **trực tiếp test game thực tế, quay Video Demo và đề xuất ý tưởng fix code**. | **40%** |
 | 3 | Nguyễn Thành Tài | 3124720062 | Thành viên | Đồng bộ log CSV/Elo lên Google Drive, cập nhật Nhật ký thí nghiệm Google Sheets/Excel 5 sheets (`docs/NHAT_KY_THI_NGHIEM.xlsx`), soạn bộ 33 thế cờ kiểm thử thủ công (`positions.csv`); **trực tiếp chỉnh sửa nội dung Báo cáo trên Google Docs (Chương 4–5, bảng biểu số liệu & Elo) và hoàn thiện file Slide thuyết trình PPTX**. | **10%** |
 | 4 | Chương Gia Thịnh | 3124720067 | Thành viên | Chuẩn hóa Danh mục tài liệu tham khảo (bổ sung Hunter 2004, Elo 1978), Danh mục từ viết tắt, tệp `THIRD_PARTY.md`, `README.md`; **trực tiếp chỉnh sửa nội dung Báo cáo trên Google Docs (Chương 1–3, văn phong/trình bày), chỉnh sửa Slide PPTX và hoàn thiện Kịch bản trình bày (`KICH_BAN_TRINH_BAY.md`)**. | **10%** |
 | **Tổng** | | | | | **100%** |
@@ -30,7 +30,7 @@
 | **Quản lý mã nguồn (Code)** | **GitHub** | `https://github.com/BMT0306/ConnectFour_7X6_AdvanceAi_ThayTai_Nhom13` |
 | **Lưu trữ kết quả thí nghiệm** | **Google Drive** | `https://drive.google.com/drive/folders/1k-q-cuTi3Rb_eYnrmfmrr_6-C35j7M6K?usp=sharing` |
 | **Nhật ký thí nghiệm** | **Google Sheets / Excel** | `docs/NHAT_KY_THI_NGHIEM.xlsx` (5 sheets chuẩn đối chiếu Baseline–Variant, EXP-01..EXP-11) |
-| **Vẽ hình & Slide thuyết trình** | **Google Slides / PowerPoint** | `docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx` (37 slides + sơ đồ khối vector) |
+| **Vẽ hình & Slide thuyết trình** | **Google Slides / PowerPoint** | `docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx` (39 slides + hình demo thực tế & sơ đồ khối) |
 | **Kế hoạch & Viết báo cáo** | **Google Docs** | Bản soạn thảo trực tuyến đồng chỉnh sửa cho 4 thành viên (`BAO_CAO_DO_AN_CUOI_KY.docx`) |
 
 - **Phân công Trục dọc × Trục ngang**: Trục dọc phân định người đầu mối chịu trách nhiệm cho từng nhóm công việc (Code & Hạ tầng AI: Trung; Mô hình AI, Elo, Test Game, Demo & Fix Idea: Tâm; Nhật ký thí nghiệm & Rà soát số liệu: Tài; Báo cáo Google Docs, Slide & Kịch bản: Tài & Thịnh dưới sự rà soát của Nhóm trưởng). Trục ngang chia nhỏ từ giai đoạn M1 (Engine) đến M5 (UI, Video & Tài liệu) kèm **Nhật ký công việc 7 tuần** cho mọi thành viên (ghi nhận cả chu trình review PR nhánh `feature/tam-ai-solo-elo`).
@@ -121,10 +121,11 @@ Quá trình đánh giá được thực hiện thông qua giải đấu vòng tr
     - 5.2.6. Giải đấu Vòng tròn 6 Cấp độ Giới hạn 100 ms/nước (1.500 ván, best_or_random) ... Trang 43
     - 5.2.7. Chuẩn hóa Sức mạnh Bằng Hệ thống Xếp hạng Elo (Bradley-Terry MLE & FIDE Logistic) ... Trang 46
   - 5.3. Đánh giá mối quan hệ đánh đổi: Thông lượng duyệt nút, Độ trễ suy luận và Tỷ lệ thắng ... Trang 48
-- **KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN** ............................................... **Trang 51**
-  - 1. Kết luận chung ........................................................ Trang 51
-  - 2. Hạn chế và hướng phát triển tiếp theo ................................. Trang 51
-- **TÀI LIỆU THAM KHẢO** ......................................................... **Trang 53**
+  - 5.4. Triển khai Giao diện Ứng dụng và Minh chứng Thực tế Chạy Demo ......... Trang 50
+- **KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN** ............................................... **Trang 54**
+  - 1. Kết luận chung ........................................................ Trang 54
+  - 2. Hạn chế và hướng phát triển tiếp theo ................................. Trang 54
+- **TÀI LIỆU THAM KHẢO** ......................................................... **Trang 56**
 
 ---
 
@@ -144,6 +145,9 @@ Quá trình đánh giá được thực hiện thông qua giải đấu vòng tr
 - **Hình 5.6: Tỷ lệ thắng của người đi trước (Quân Đỏ) và người đi sau (Quân Vàng) trên từng cặp đấu** ... Trang 42
 - **Hình 5.7: Giải đấu vòng tròn 6 cấp độ giới hạn 100 ms/nước (1.500 ván) và phân tích tỷ lệ timeout** ... Trang 45
 - **Hình 5.8: So sánh điểm xếp hạng Bradley-Terry MLE Elo và biến động Δ Elo giữa giải Mặc định và 100 ms/nước** ... Trang 47
+- **Hình 5.9: Giao diện Web App (localhost:5000) chạy thực tế chế độ Người vs Máy gặp Mixed-MCTS (200 sims, Cache 9)** ... Trang 51
+- **Hình 5.10: Giao diện Desktop Pygame 60 FPS chạy thực tế chế độ Người vs Máy gặp Cấp 6 Mixed-MCTS (2114,8 Elo)** ... Trang 52
+- **Hình 5.11: Chế độ Solo Máy vs Máy 2-Slot trên Pygame giữa Alpha-Beta và Mixed-MCTS kèm cập nhật Elo thời gian thực** ... Trang 53
 
 ### Danh mục Bảng biểu
 
@@ -758,12 +762,34 @@ Từ Bảng 5.9 (cùng phân tích Elo ở Bảng 5.8 và giải `100 ms` ở B�
 2. **Vai trò bổ trợ giữa mạng nơ-ron và tìm kiếm cây (`v6` so với `v3` và `v5`)**: Khi chỉ dùng mạng nơ-ron độc lập không duyệt cây (`v3`), thời gian phản hồi rất nhanh (`~2,91 ms/nước`, đạt `1922,3 Elo`) và thắng tốt `HeuristicAgent` (`64,25%`), nhưng vẫn kém nhóm duyệt cây sâu khoảng `190 Elo`. Khi đặt mạng nơ-ron đó vào vòng lặp tìm kiếm cây PUCT 200 mô phỏng (`v6`), sức mạnh nhảy vọt thêm **`+192,5 Elo`** lên `2114,8 Elo`, vượt qua cả tác tử thầy `Alpha-Beta` ở độ sâu 4 (`62,50%`) và nhỉnh hơn `Alpha-Beta` ở độ sâu 5 (`54,25%`).
 3. **Đánh đổi về độ trễ thực thi trên CPU**: Do mỗi lần mở rộng nút mới chưa có trong `Transposition Cache`, `MixedMCTSAgent` phải chạy 1 lượt ResNet trên CPU (`~1,9 ms`/lần), nên độ trễ trung bình khi chạy đủ 200 sims là `348 ms/nước` (hoặc `151 ms/nước` với biến thể `PUCT_Prior_Rollout`). Khi bị giới hạn cứng `100 ms/nước` trên CPU (Bảng 5.6 & 5.8), `AlphaBetaAgent` là lựa chọn vượt trội nhất (**2125,8 Elo**, `78,80%`), còn ở chế độ tương tác người chơi cho phép chờ 0,3–0,7 giây thì `MixedMCTSAgent` đạt sức mạnh cao nhất (**2114,8 Elo**, `75,00%`).
 
+### 5.4. Triển khai Giao diện Ứng dụng và Minh chứng Thực tế Chạy Demo
+
+Để kiểm chứng toàn bộ hệ thống không chỉ chạy ở mức dòng lệnh thí nghiệm mà còn hoạt động ổn định trong môi trường tương tác trực tiếp với người dùng, nhóm đóng gói 3 giao diện khởi chạy một chạm thông qua tệp `RUN_FAST.bat`: **Web App RESTful** (`http.server` cổng `5000`), **Desktop Pygame 60 FPS** (`src/c4/ui/gui.py`) và **Terminal CLI / Elo Solo** (`c4.play`, `scripts/compute_elo.py`).
+
+1. **Giao diện Web App (`python -m c4.ui.web_server --port 5000`)**:
+   - Xây dựng hoàn toàn bằng thư viện chuẩn `http.server` của Python kết hợp HTML/CSS/JS thuần (không phụ thuộc framework nặng), cung cấp các API `/api/state`, `/api/move`, `/api/ai_move`, `/api/undo`, `/api/reset`.
+   - Hình 5.9 ghi lại phiên chạy thực tế trên trình duyệt khi người chơi (Quân Đỏ) đối kháng với `MixedMCTSAgent` (Quân Vàng, `200` mô phỏng): hệ thống hiển thị trực tiếp thông số suy luận theo từng nước (`659,69 ms`, `200 sims · WR 77.8% · Cache 9`), hỗ trợ chọn đầy đủ 6 cấp độ AI, đổi bên đi trước/đi sau, hoàn tác (`Đi Lại`) và gợi ý `Máy Đi Hộ Lượt Này`.
+
+![Hình 5.9: Giao diện Web App (localhost:5000) chạy thực tế chế độ Người vs Máy gặp Mixed-MCTS (200 sims, Cache 9)](../results/figures/demo_web_app_ui.png)
+
+2. **Giao diện Desktop Pygame 60 FPS — Chế độ Người vs Máy (`H_VS_AI`)**:
+   - Giao diện Pygame mô phỏng vật lý thả quân có trọng lực và độ nảy (`FallingPiece`), hiệu ứng bóng 3D và xem trước cột thả quân (hover preview).
+   - Hình 5.10 minh họa ván đấu thực tế giữa Người chơi (Quân Đỏ) và `Cấp 6: Mixed-MCTS (2114,8 Elo)` ở nước thứ `10 / 42`: tác tử tự động thiết lập cột trung tâm 3 quân liên tiếp gây áp lực chiến thuật chỉ trong `558,6 ms` (`sims=200 cache=9`), đồng thời bảng điều khiển bên phải hiển thị điểm Elo chuẩn Bradley-Terry của cả 6 cấp độ.
+
+![Hình 5.10: Giao diện Desktop Pygame 60 FPS chạy thực tế chế độ Người vs Máy gặp Cấp 6 Mixed-MCTS (2114,8 Elo)](../results/figures/demo_pygame_human_vs_ai.png)
+
+3. **Giao diện Desktop Pygame — Chế độ Solo Máy vs Máy 2-Slot & Cập nhật Elo Thời gian Thực (`AI_VS_AI`)**:
+   - Phiên bản nâng cấp hỗ trợ 2 tab độc lập `M1` (Quân Đỏ) và `M2` (Quân Vàng) cho phép ghép cặp tự do mọi cấp độ AI, bật/tắt **Khai cuộc 4 nước ngẫu nhiên (phím `O`)** để tránh các cặp đấu tất định bị lặp kịch bản, điều khiển **Bắt đầu / Tạm dừng (phím `Space`/`P`)**, và tự động đánh dấu vòng hào quang xanh ngọc quanh 4 quân chiến thắng.
+   - Hình 5.11 ghi lại trận đấu thực tế giữa `M1: Alpha-Beta` và `M2: Mixed-MCTS`: sau 42 lượt giằng co kín bàn cờ (`42 / 42`), `Mixed-MCTS` hoàn tất đường chéo 4 quân chiến thắng ở nước cuối cùng, hệ thống lập tức tính và hiển thị biến động Elo FIDE thực tế (`Elo: alphabeta (-15.9) | mixed_mcts (+15.9)`). Bên cạnh đó, chế độ dòng lệnh `python -m c4.play --opponent alphabeta --depth 4` và mục `[5]` `scripts/compute_elo.py` cũng đã được chạy kiểm chứng hoàn toàn không lỗi runtime.
+
+![Hình 5.11: Chế độ Solo Máy vs Máy 2-Slot trên Pygame giữa Alpha-Beta và Mixed-MCTS kết thúc nước 42/42 kèm cập nhật Elo thời gian thực](../results/figures/demo_pygame_ai_vs_ai_elo.png)
+
 ---
 
 ## KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
 
 ### 1. Kết luận chung
-Đồ án đã hoàn thành việc xây dựng từ đầu hệ thống trò chơi Connect Four (7×6) cùng 6 cấp độ tác tử AI, bộ kiểm thử tự động **59 bài test trên 11 tệp kiểm thử**, cơ chế kiểm soát timeout `best_or_random`, **hệ thống xếp hạng Elo chuẩn Bradley-Terry MLE & FIDE Logistic**, quy trình sinh dữ liệu sạch và huấn luyện mạng nơ-ron hai đầu, kết hợp giao diện chơi trực quan trên Desktop Pygame (có chế độ Solo 2-Slot Máy vs Máy cập nhật Elo thực tế) và trình duyệt Web (`http.server`) cùng quy trình quản lý cộng tác 5 công cụ (GitHub, Google Drive, Google Sheets 5 sheet, Google Slides/PowerPoint 37 slides, Google Docs) với phân bổ `45% – 35% – 10% – 10%` và đánh giá theo thành viên yếu nhất. Thông qua hơn **6.100 ván đấu thực nghiệm** có lưu đầy đủ nhật ký CSV và Excel/Sheets, báo cáo đã trả lời định lượng ba câu hỏi nghiên cứu đề ra ở Chương 1:
+Đồ án đã hoàn thành việc xây dựng từ đầu hệ thống trò chơi Connect Four (7×6) cùng 6 cấp độ tác tử AI, bộ kiểm thử tự động **59 bài test trên 11 tệp kiểm thử**, cơ chế kiểm soát timeout `best_or_random`, **hệ thống xếp hạng Elo chuẩn Bradley-Terry MLE & FIDE Logistic**, quy trình sinh dữ liệu sạch và huấn luyện mạng nơ-ron hai đầu, kết hợp giao diện chơi trực quan trên Desktop Pygame (có chế độ Solo 2-Slot Máy vs Máy cập nhật Elo thực tế) và trình duyệt Web (`http.server`) cùng quy trình quản lý cộng tác 5 công cụ (GitHub, Google Drive, Google Sheets 5 sheet, Google Slides/PowerPoint 39 slides, Google Docs) với phân bổ `40% – 40% – 10% – 10%` và đánh giá theo thành viên yếu nhất. Thông qua hơn **6.100 ván đấu thực nghiệm** có lưu đầy đủ nhật ký CSV và Excel/Sheets, báo cáo đã trả lời định lượng ba câu hỏi nghiên cứu đề ra ở Chương 1:
 - **Với RQ1**: Dưới cùng giới hạn thời gian suy nghĩ ngắn (`50 ms`, `100 ms`, `300 ms`), `Alpha-Beta` (tích hợp Bitboard, cắt tỉa Center-First giảm 93,07% nút và hàm lượng giá 69 cửa sổ) đạt tỷ lệ thắng cao hơn `MCTS-UCT` thuần (`Score = 0,650; 0,690; 0,605`), đồng thời dẫn đầu giải 6 cấp độ `100 ms/nước` với **2125,8 Elo** (`78,80%`). Khi giữ cố định `Alpha-Beta` ở độ sâu 4, `MCTS-UCT` cần khoảng **1.500 – 2.000 mô phỏng/nước** để vượt qua.
 - **Với RQ2**: Mạng `Connect4PolicyValueNet` huấn luyện trên dữ liệu tách theo ván chống rò rỉ đạt **71,68% Top-1 Accuracy** và **89,07% Top-2 Accuracy** trên tập `Test` độc lập, đạt **1922,3 Elo** (`+100,1 Elo` trên `HeuristicAgent`, thắng đối đầu **64,25%**) dù không cần tìm kiếm cây.
 - **Với RQ3**: Khi kết hợp mạng nơ-ron vào công thức chọn nhánh PUCT ở mức chỉ 200 mô phỏng, `MixedMCTSAgent` tăng thêm 36–37% điểm số so với `MCTS-UCT` cùng ngân sách, đạt **2114,8 Elo** (`+192,5 Elo` so với `NNAgent` đơn lẻ và `+110,5 Elo` so với `MCTS-1000`) để xếp hạng 1 toàn giải không giới hạn thời gian (**75,00%**), đồng thời giải thích được vùng ô cờ trọng yếu qua bản đồ độ nhạy Saliency Map.

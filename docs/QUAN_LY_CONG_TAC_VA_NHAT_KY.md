@@ -20,14 +20,14 @@
 
 ---
 
-## 2. Phân công theo Trục Dọc × Trục Ngang & Tỷ lệ Đóng góp (45% – 35% – 10% – 10%)
+## 2. Phân công theo Trục Dọc × Trục Ngang & Tỷ lệ Đóng góp (40% – 40% – 10% – 10%)
 
 ### 2.1. Phân bổ tỷ lệ đóng góp chính thức
 
 | STT | Họ và tên | MSSV | Vai trò | Tỷ lệ | Định hướng trách nhiệm chính |
 |:---:|---|---|:---:|:---:|---|
-| 1 | **Bùi Minh Trung** | `3124720074` | Nhóm trưởng | **45%** | Trục kỹ thuật lõi (Bitboard, Alpha-Beta, khung giải đấu & timeout/fallback, thống kê, Saliency XAI, Web UI, tổng hợp báo cáo & GitHub). |
-| 2 | **Trần Lê Minh Tâm** | `3124720064` | Thành viên | **35%** | Trục Học sâu & Demo (MCTS-UCT, Policy-Value ResNet, Data Pipeline, PUCT MixedMCTS, Pygame GUI, **hỗ trợ test game, quay video demo và đề xuất idea fix code**). |
+| 1 | **Bùi Minh Trung** | `3124720074` | Nhóm trưởng | **40%** | Trục kỹ thuật lõi (Bitboard, Alpha-Beta, khung giải đấu & timeout/fallback, thống kê, Saliency XAI, Web UI, tổng hợp báo cáo & GitHub). |
+| 2 | **Trần Lê Minh Tâm** | `3124720064` | Thành viên | **40%** | Trục Học sâu & Demo (MCTS-UCT, Policy-Value ResNet, Data Pipeline, PUCT MixedMCTS, Pygame GUI, **hỗ trợ test game, quay video demo và đề xuất idea fix code**). |
 | 3 | **Nguyễn Thành Tài** | `3124720062` | Thành viên | **10%** | Trục hoàn thiện Báo cáo (Google Docs) & Slide PowerPoint; hỗ trợ cập nhật nhật ký thí nghiệm Google Sheets/Drive và rà soát số liệu bảng biểu. |
 | 4 | **Chương Gia Thịnh** | `3124720067` | Thành viên | **10%** | Trục hoàn thiện Báo cáo (Google Docs) & Slide PowerPoint; chuẩn hóa tài liệu tham khảo, kịch bản trình bày (`KICH_BAN_TRINH_BAY.md`) và rà soát lỗi chính tả/định dạng. |
 
@@ -41,7 +41,7 @@
 
 * **Trục ngang (Horizontal Micro-Tasks)**: Chia nhỏ từng đầu việc xuyên suốt từ đầu đến cuối cho từng thành viên:
 
-| Giai đoạn / Task nhỏ (Trục ngang) | Trung (45%) | Tâm (35%) | Tài (10%) | Thịnh (10%) |
+| Giai đoạn / Task nhỏ (Trục ngang) | Trung (40%) | Tâm (40%) | Tài (10%) | Thịnh (10%) |
 |---|---|---|---|---|
 | **M1. Khởi tạo Engine & Luật chơi** | Thiết kế `Connect4` Bitboard 49-bit & `ReferenceConnect4`, Perft Depth 1–6 | Review luật chơi, kiểm thử nước đi hợp lệ | Kiểm tra đối chiếu bảng Perft | Rà soát mô tả toán học $(S, A, T, R)$ trên Google Docs |
 | **M2. Xây dựng 6 Cấp độ Tác tử AI** | `HeuristicAgent`, `AlphaBetaAgent`, tối ưu Center-First & Iterative Deepening | `RandomAgent`, `MCTSAgent`, `Connect4PolicyValueNet`, `MixedMCTSAgent` (PUCT), **fix idea cache & timeout** | Đọc hiểu hành vi từng cấp độ để đối chiếu bảng mô tả | Chuẩn hóa bảng phân cấp 6 level trên Slide & Báo cáo |
@@ -83,8 +83,8 @@
 
 | Thành viên | C1: Hiểu thuật toán (/10) | C2: Thực hành chạy/log (/10) | C3: Chất lượng chỉnh sửa Docs/PPT (/10) | C4: Nhật ký & Tiến độ (/10) | Điểm TB quá trình | Trạng thái |
 |---|:---:|:---:|:---:|:---:|:---:|:---|
-| **Bùi Minh Trung** (45%) | 9,5 | 9,5 | 9,0 | 9,5 | **9,38** | Đạt chuẩn |
-| **Trần Lê Minh Tâm** (35%) | 9,0 | 9,5 | 8,5 | 9,0 | **9,00** | Đạt chuẩn |
+| **Bùi Minh Trung** (40%) | 9,5 | 9,5 | 9,0 | 9,5 | **9,38** | Đạt chuẩn |
+| **Trần Lê Minh Tâm** (40%) | 9,0 | 9,5 | 8,5 | 9,0 | **9,00** | Đạt chuẩn |
 | **Nguyễn Thành Tài** (10%) | 7,5 | 8,0 | 8,0 | 8,5 | **8,00** | Đạt chuẩn sàn (cần nắm kỹ phần giải thích Bảng 5.x khi vấn đáp) |
 | **Chương Gia Thịnh** (10%) | 7,5 | 7,5 | 8,5 | 8,5 | **8,00** | Đạt chuẩn sàn (cần nắm kỹ phần Data Pipeline & giới hạn Bitboard khi vấn đáp) |
 | **Ngưỡng nhóm (theo người yếu nhất)** | **7,5** | **7,5** | **8,0** | **8,5** | **8,00** | **Cả 4 thành viên đều vượt mức sàn tối thiểu (≥ 7,0)** |

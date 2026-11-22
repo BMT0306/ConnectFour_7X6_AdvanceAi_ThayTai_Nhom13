@@ -4,8 +4,8 @@ about: Giao task cụ thể theo Trục dọc (nhóm việc) và Trục ngang (t
 ---
 
 ## 1. Phân loại Trục dọc (Nhóm việc chính)
-- [ ] Code & Hạ tầng AI (Bitboard, Agents, Match/Timeout, Web UI) — Lead: Bùi Minh Trung (45%)
-- [ ] Mô hình Học sâu, Test Game, Demo & Fix Idea — Lead: Trần Lê Minh Tâm (35%)
+- [ ] Code & Hạ tầng AI (Bitboard, Agents, Match/Timeout, Web UI) — Lead: Bùi Minh Trung (40%)
+- [ ] Mô hình Học sâu, Elo, Test Game, Demo & Fix Idea — Lead: Trần Lê Minh Tâm (40%)
 - [ ] Nhật ký & Rà soát Số liệu Thực nghiệm — Đầu mối: Nguyễn Thành Tài (10%)
 - [ ] Báo cáo Google Docs, Slide PPT & Kịch bản — Đầu mối: Chương Gia Thịnh & Nguyễn Thành Tài (mỗi bạn 10%)
 
