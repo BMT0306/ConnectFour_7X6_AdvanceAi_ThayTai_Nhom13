@@ -30,7 +30,7 @@
 | **Quản lý mã nguồn (Code)** | **GitHub** | `https://github.com/BMT0306/ConnectFour_7X6_AdvanceAi_ThayTai_Nhom13` |
 | **Lưu trữ kết quả thí nghiệm** | **Google Drive** | `https://drive.google.com/drive/folders/1k-q-cuTi3Rb_eYnrmfmrr_6-C35j7M6K?usp=sharing` |
 | **Nhật ký thí nghiệm** | **Google Sheets / Excel** | `docs/NHAT_KY_THI_NGHIEM.xlsx` (5 sheets chuẩn đối chiếu Baseline–Variant, EXP-01..EXP-11) |
-| **Vẽ hình & Slide thuyết trình** | **Google Slides / PowerPoint** | `docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx` (39 slides + hình demo thực tế & sơ đồ khối) |
+| **Vẽ hình, Slide & Poster** | **Google Slides / PowerPoint** | `docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx` (39 slides) & `docs/POSTER_CONNECT_FOUR_NHOM13.pdf` (`.pptx`) |
 | **Kế hoạch & Viết báo cáo** | **Google Docs** | Bản soạn thảo trực tuyến đồng chỉnh sửa cho 4 thành viên (`BAO_CAO_DO_AN_CUOI_KY.docx`) |
 
 - **Phân công Trục dọc × Trục ngang**: Trục dọc phân định người đầu mối chịu trách nhiệm cho từng nhóm công việc (Code & Hạ tầng AI: Trung; Mô hình AI, Elo, Test Game, Demo & Fix Idea: Tâm; Nhật ký thí nghiệm & Rà soát số liệu: Tài; Báo cáo Google Docs, Slide & Kịch bản: Tài & Thịnh dưới sự rà soát của Nhóm trưởng). Trục ngang chia nhỏ từ giai đoạn M1 (Engine) đến M5 (UI, Video & Tài liệu) kèm **Nhật ký công việc 7 tuần** cho mọi thành viên (ghi nhận cả chu trình review PR nhánh `feature/tam-ai-solo-elo`).

@@ -14,6 +14,8 @@
   [Báo cáo Word (.docx)](docs/BAO_CAO_DO_AN_CUOI_KY.docx) ·
   [Báo cáo Markdown](docs/BAO_CAO_DO_AN_CUOI_KY.md) ·
   [Slide Thuyết trình 39 Slides (.pptx)](docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx) ·
+  [Poster Giới thiệu Đề tài (.pdf)](docs/POSTER_CONNECT_FOUR_NHOM13.pdf) ·
+  [Poster Chỉnh sửa (.pptx)](docs/POSTER_CONNECT_FOUR_NHOM13.pptx) ·
   [Kịch bản Trình bày](docs/KICH_BAN_TRINH_BAY.md) ·
   [Nhật ký Thí nghiệm 5 Sheets (.xlsx)](docs/NHAT_KY_THI_NGHIEM.xlsx) ·
   [Quản lý Trục Dọc/Ngang & Người Yếu Nhất](docs/QUAN_LY_CONG_TAC_VA_NHAT_KY.md) ·
@@ -113,8 +115,9 @@ checkpoints/     policy_net_best.pt (mô hình đã huấn luyện) & training_h
 data/            Dữ liệu huấn luyện/kiểm định/kiểm tra (.npz) & dataset_summary.json
 results/         logs/ (CSV từng ván), tables/ (bảng tổng hợp), figures/ (biểu đồ 300 DPI), test_results/
 tests/           59 unit tests tự động + tests/data/positions.csv (33 thế cờ chiến thuật kiểm thử thủ công)
-notebooks/       01_tournament_analysis.ipynb (phân tích thống kê & trực quan hóa kết quả)
-docs/            BAO_CAO_DO_AN_CUOI_KY.docx/.md, SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx, KICH_BAN_TRINH_BAY.md, QUAN_LY_CONG_TAC_VA_NHAT_KY.md, NHAT_KY_THI_NGHIEM.xlsx/.csv, DEMO_GUIDE.md, ConnectFour_Proposal_Nhom13.pdf, THIRD_PARTY.md
+notebooks/       01_tournament_analysis.ipynb (phân tích thống kê, giải đấu 100ms, Bradley-Terry Elo & XAI)
+docs/            BAO_CAO_DO_AN_CUOI_KY.docx/.md, SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx, POSTER_CONNECT_FOUR_NHOM13.pdf/.pptx, KICH_BAN_TRINH_BAY.md, QUAN_LY_CONG_TAC_VA_NHAT_KY.md, NHAT_KY_THI_NGHIEM.xlsx/.csv, DEMO_GUIDE.md, ConnectFour_Proposal_Nhom13.pdf, THIRD_PARTY.md
+DEMO.mp4         Video trình diễn toàn diện ứng dụng (đóng gói trong file ZIP nộp bài & đồng bộ trên Google Drive)
 scripts/         Các script tự động hóa giải đấu, ablation, kiểm thử và đóng gói nộp bài
 .github/         GitHub Actions CI (pytest tự động), Issue Template (Trục Dọc/Ngang) & Pull Request Checklist
 CONTRIBUTING.md  Quy trình 5 nền tảng cộng tác (GitHub, Drive, Sheets, Slides/PPT, Docs) và quy tắc nhánh Git

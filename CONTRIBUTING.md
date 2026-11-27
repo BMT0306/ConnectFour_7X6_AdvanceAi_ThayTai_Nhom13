@@ -12,7 +12,7 @@
 | **Mã nguồn (Code & CI)** | **GitHub** (`Actions pytest`) | `src/`, `tests/`, `configs/`, `scripts/`, `.github/workflows/tests.yml` |
 | **Kết quả thí nghiệm & Video** | **Google Drive** | `results/logs/`, `results/tables/`, `results/figures/` + Link Drive chung |
 | **Nhật ký thí nghiệm** | **Google Sheets / Excel** | `docs/NHAT_KY_THI_NGHIEM.xlsx` & `docs/NHAT_KY_THI_NGHIEM.csv` |
-| **Vẽ sơ đồ & Slide** | **Google Slides / PowerPoint** | `docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx` |
+| **Vẽ sơ đồ, Slide & Poster** | **Google Slides / PowerPoint** | `docs/SLIDE_THUYET_TRINH_CONNECT_FOUR_NHOM13.pptx` & `docs/POSTER_CONNECT_FOUR_NHOM13.pdf` (`.pptx`) |
 | **Kế hoạch & Viết báo cáo** | **Google Docs / Word** | `docs/BAO_CAO_DO_AN_CUOI_KY.docx` & `docs/BAO_CAO_DO_AN_CUOI_KY.md` |
 
 ---

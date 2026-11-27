@@ -12,6 +12,8 @@ checkpoints/*.pt
 !checkpoints/policy_net_best.pt
 !checkpoints/training_history.json
 *.zip
+# Video demo lớn (>100MB): đóng gói trực tiếp trong file ZIP nộp bài & Google Drive, tránh vượt giới hạn 100MB của GitHub
+*.mp4
 ~$*
 *.tmp
 .vscode/

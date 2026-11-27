@@ -3,11 +3,11 @@
 
 * **Thời lượng tổng dự kiến**: 18 – 20 phút thuyết trình + Demo trực tiếp / Video Demo
 * **Phân vai trình bày (theo phân bổ 40% – 40% – 10% – 10%)**:
-  * **Chương Gia Thịnh** (10%): Mở đầu, Tổng quan & Kết luận (Slide **1–8** và **35–37**)
+  * **Chương Gia Thịnh** (10%): Mở đầu, Tổng quan & Kết luận (Slide **1–8**, **35–36** và **39**)
   * **Bùi Minh Trung** (40%): Hạ tầng Bitboard, Tác tử cổ điển 1–4 & Cơ chế Timeout (Slide **9–16**)
   * **Trần Lê Minh Tâm** (40%): Học sâu ResNet, Data Pipeline, PUCT, XAI & Demo Thực tế Web / Pygame / Elo (Slide **17–23** và **32–34**)
   * **Nguyễn Thành Tài** (10%): Thực nghiệm Đối kháng (3.000 ván + 6-Level 100ms + Xếp hạng Elo Bradley-Terry), Ablation & Phân tích Đánh đổi (Slide **24–31**)
-  * **Cả nhóm**: Phụ lục Q&A Dự phòng khi Giảng viên vấn đáp (Slide **38–39**)
+  * **Cả nhóm**: Phụ lục Q&A Dự phòng khi Giảng viên vấn đáp (Slide **37–38**)
 
 ---
 
@@ -49,6 +49,6 @@
 | **34** | Tổng kết Đóng góp Đề tài & Quản lý Cộng tác 5 Nền tảng | Tâm | Tổng kết toàn bộ phần demo và kết quả: mọi chế độ (Web App, Pygame Solo 2-Slot, CLI `c4.play` và mục `[5]` `compute_elo.py`) đều khởi chạy một chạm qua `RUN_FAST.bat`, đạt 59/59 unit tests và đồng bộ đầy đủ trên 5 nền tảng cộng tác. Sau đây xin mời bạn Thịnh trình bày Hạn chế, Hướng phát triển và Kết luận. |
 | **35** | Hạn chế & Hướng Phát triển | Thịnh | Cảm ơn Tâm. Nhóm thẳng thắn nhìn nhận các hạn chế hiện tại như dữ liệu huấn luyện còn phụ thuộc thầy `AlphaBeta d=4`, Value Head chưa thật sát ở thế cờ sâu (`MSE = 0,7884`), và độ trễ CNN trên CPU làm `Mixed-MCTS` tụt `-126,7 Elo` dưới 100 ms; từ đó đề xuất hướng AlphaZero Self-Play, ONNX/GPU batching và Transposition Table cho Alpha-Beta. |
 | **36** | Tài liệu Tham khảo Học thuật Chính | Thịnh | Để hoàn thành đề tài, nhóm đã nghiên cứu và trích dẫn 11 tài liệu chuẩn học thuật, tiêu biểu như luận văn giải Connect Four của Victor Allis (1988), bài báo UCT của Kocsis & Szepesvári (2006), AlphaGo/AlphaZero của Silver et al. (2016, 2017), Saliency Maps của Simonyan et al. (2014), cùng mô hình Bradley-Terry MM của Hunter (2004) và chuẩn xếp hạng Elo (1978). |
-| **37** | Kết thúc & Lời cảm ơn | Thịnh | Phần trình bày của Nhóm 13 đến đây là kết thúc. Nhóm đã hoàn thành đầy đủ mã nguồn, hơn 6.100 ván đấu thực nghiệm, hệ thống xếp hạng Elo chuẩn hóa, 3 giao diện demo thực tế, 59/59 bài kiểm thử đạt chuẩn và bộ nhật ký cộng tác 5 công cụ. Em xin trân trọng cảm ơn Thầy Đỗ Như Tài và các bạn đã lắng nghe, rất mong nhận được nhận xét góp ý từ Thầy. |
-| **38** | Phụ lục Vấn đáp 1: Hệ thống Kiểm thử Tự động (59/59 Pytest) | Cả nhóm | *(Mở khi Thầy hỏi về kiểm thử)* Toàn bộ 11 tệp kiểm thử với **59 unit test** bao phủ từ Bitboard 49-bit, Perft ply 1–6, 10.000 ván đối chiếu chéo, 33 thế cờ chiến thuật, pipeline chống rò rỉ gương, cho đến chính sách timeout `best_or_random` và trường hợp biên hết giờ ở bước 0 đều đạt 100% (`0 failed, 0 skipped`). |
-| **39** | Phụ lục Vấn đáp 2: So sánh Biased MCTS Cổ điển vs PUCT MCTS | Cả nhóm | *(Mở khi Thầy hỏi so sánh các KLTN/nghiên cứu trước)* Khác với Biased MCTS cổ điển dùng bảng từ điển mẫu cục bộ để cộng bias vào UCB và lấy mẫu simulation, kiến trúc `MixedMCTSAgent` của nhóm dùng mạng ResNet hai đầu quan sát toàn bàn cờ $2 \times 6 \times 7$, nhân tiên nghiệm vào PUCT và hỗ trợ cả Value Head lẫn Bitboard Cache $O(1)$. |
+| **37** | Phụ lục Vấn đáp 1: Hệ thống Kiểm thử Tự động (59/59 Pytest) | Cả nhóm | *(Mở khi Thầy hỏi về kiểm thử)* Toàn bộ 11 tệp kiểm thử với **59 unit test** bao phủ từ Bitboard 49-bit, Perft ply 1–6, 10.000 ván đối chiếu chéo, 33 thế cờ chiến thuật, pipeline chống rò rỉ gương, cho đến chính sách timeout `best_or_random` và trường hợp biên hết giờ ở bước 0 đều đạt 100% (`0 failed, 0 skipped`). |
+| **38** | Phụ lục Vấn đáp 2: So sánh Biased MCTS Cổ điển vs PUCT MCTS | Cả nhóm | *(Mở khi Thầy hỏi so sánh các KLTN/nghiên cứu trước)* Khác với Biased MCTS cổ điển dùng bảng từ điển mẫu cục bộ để cộng bias vào UCB và lấy mẫu simulation, kiến trúc `MixedMCTSAgent` của nhóm dùng mạng ResNet hai đầu quan sát toàn bàn cờ $2 \times 6 \times 7$, nhân tiên nghiệm vào PUCT và hỗ trợ cả Value Head lẫn Bitboard Cache $O(1)$. |
+| **39** | Kết thúc & Lời cảm ơn | Thịnh | Phần trình bày của Nhóm 13 đến đây là kết thúc. Nhóm đã hoàn thành đầy đủ mã nguồn, hơn 6.100 ván đấu thực nghiệm, hệ thống xếp hạng Elo chuẩn hóa, 3 giao diện demo thực tế, 59/59 bài kiểm thử đạt chuẩn và bộ nhật ký cộng tác 5 công cụ. Em xin trân trọng cảm ơn Thầy Đỗ Như Tài và các bạn đã lắng nghe, rất mong nhận được nhận xét góp ý từ Thầy. |
